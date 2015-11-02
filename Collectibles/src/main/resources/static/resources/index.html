@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html ng-app="collections">
+	<head>
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/main.css" />
+		
+		<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+		
+		<script type="text/javascript" src="angular/angular.min.js"></script>
+		<script type="text/javascript" src="angular/modules/app.js"></script>		
+		<script type="text/javascript" src="angular/modules/controllers/products.js"></script>
+		<script type="text/javascript" src="angular/modules/directives/products.js"></script>
+		<script type="text/javascript" src="angular/modules/directives/generic.js"></script>
+	</head>	
+	<body>
+	
+		<div clas="content"  ng-controller="NavbarController as navpanel">
+	
+			<div>
+				<nav class="navbar-inverse" role="navigation">
+					<div class="container">
+						<div class="navbar-header">
+							<button type="button" class="navbar-toggle collapsed"
+								data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+								aria-controls="navbar">
+								<span class="sr-only">Toggle navigation</span> <span
+									class="icon-bar"></span> <span class="icon-bar"></span> <span
+									class="icon-bar"></span>
+							</button>
+							<a class="navbar-brand" ng-href="#products" ng-click="navpanel.selectTab(1)">Collections</a>
+						</div>
+						<div id="navbar" class="collapse navbar-collapse">
+							<ul class="nav navbar-nav">							
+								<li ng-class="{ active: navpanel.isSelected(1)}"><a ng-href="#products" ng-click="navpanel.selectTab(1)">Products</a></li>							
+								<li ng-class="{ active: navpanel.isSelected(2)}"><a ng-href="#categories" ng-click="navpanel.selectTab(2)">Categories</a></li>												
+								<li ng-class="{ active: navpanel.isSelected(3)}"><a ng-href="#admin" ng-click="navpanel.selectTab(3)">Admin</a></li>
+							</ul>
+						</div>
+					</div>
+				</nav>
+			</div>
+			
+			<div class="container">
+				<div class="panel" ng-show="navpanel.isSelected(1)">		
+					<h1>Products</h1>
+					
+					<product-search></product-search>		
+				</div>
+				
+				<div class="panel" ng-show="navpanel.isSelected(2)">		
+					<h1>Categories</h1>
+				</div>
+				
+				<div class="panel" ng-show="navpanel.isSelected(3)">		
+					<h1>Admin</h1>
+					
+					<product-create></product-create>
+				</div>
+			</div>
+		</div><!--  end content -->
+		
+	
+			
+	</body>
+</html>
