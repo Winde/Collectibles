@@ -11,8 +11,7 @@
 		var hierarchy = {};
 		var searchTerm = "";
 		var ajax = true;
-		
-		var productsPromise = $http.get('/product/search/1/');
+				
 		var hierarchiesPromise = $http.get('/hierarchy/root/');
 		
 		hierarchiesPromise.success(function(data){

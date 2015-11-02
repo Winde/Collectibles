@@ -1,9 +1,12 @@
 (function(){
 	var app = angular.module('collections', 
-	['products-controllers',
+	['ngRoute',
+	 'products-controllers',
 	 'products-directives',
 	 'generic-directives']);
-
+	
+	
+	
 	app.controller('NavbarController', function(){
 		this.tab = 1;
 		

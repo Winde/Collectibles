@@ -5,7 +5,7 @@
 	app.directive('ajax', function(){
 		return {
 			restrict: 'E',
-			templateUrl: 'snipet/ajax.html'				
+			templateUrl: '/app/snipet/ajax.html'				
 		};		
 	});
 	
