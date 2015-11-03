@@ -1,12 +1,13 @@
-<form name="createProductForm" 	
-	ng-submit="createProductForm.$valid && productCtrl.addProduct()" 
+<form name="changeProductForm" 
+	class="changeProductForm"	
+	ng-submit="changeProductForm.$valid && productCtrl.changeProduct()" 
 	novalidate>			
 	
 	<div class="form-group">	
 		<label>Hierarchy</label>		
 		<select class="form-control"
-			ng-model="productCtrl.product.hierarchyNode.id"
-			ng-options="item.id as item.name for item in productCtrl.hierarchies"
+			ng-model="productCtrl.product.hierarchyPlacement"
+			ng-options="item as item.name for item in productCtrl.hierarchies"
 			required 
 		> 						
 		</select>
@@ -22,9 +23,8 @@
 		<label>Description</label>
 		<textarea class="form-control"
 			ng-model="productCtrl.product.description" 
-			required ></textarea>
+			></textarea>
 	</div>		
-	<input type="submit" value="Submit" />
-	
-	<product-page></product-page>
+	<button type="submit" value="Submit">Save</button>		
+	<button ng-if="productCtrl.canCreateNew()" ng-click="productCtrl.newProduct()">New Product</button>
 </form>

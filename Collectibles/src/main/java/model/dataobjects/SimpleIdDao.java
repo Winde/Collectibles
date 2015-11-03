@@ -14,11 +14,14 @@ public abstract class SimpleIdDao implements Comparable<SimpleIdDao>{
 	
 	@Override
 	public boolean equals(Object o){
-		if (o instanceof SimpleIdDao) {
+		if (o instanceof SimpleIdDao) {			
 			SimpleIdDao other = (SimpleIdDao) o;
+			System.out.println("this.getId(): " + this.getId());
+			System.out.println("other.getId(): " + other.getId());
 			if (this.getId()==null || other.getId()==null) {
 				return false;
 			} else {
+				
 				return this.getId().equals(other.getId());
 			}
 		} else {

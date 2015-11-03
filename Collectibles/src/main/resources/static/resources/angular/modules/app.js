@@ -7,17 +7,13 @@
 	
 	
 	
-	app.controller('NavbarController', function(){
-		this.tab = 1;
+	app.controller('NavbarController',['$scope','$location', function($scope, $location){
 		
-		this.selectTab = function(setTab){
-			this.tab = setTab;			
-		}
 		
-		this.isSelected = function(checkTab){
-			return this.tab === checkTab;
-		}
-	});
+		$scope.isActive = function (viewLocation) { 
+	        return viewLocation === $location.path();
+	    };
+	}]);
 	
 
 })();

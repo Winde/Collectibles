@@ -13,7 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductRepository extends CrudRepository<Product,Long>{
+public interface ProductRepository extends CrudRepository<Product,Long>, ProductRepositoryCustom{
 
 	public List<Product> findAll();
 	
@@ -29,7 +29,7 @@ public interface ProductRepository extends CrudRepository<Product,Long>{
 			+ "		lower(p.name) LIKE lower(CONCAT('%',:search,'%'))  "
 			+ ") "
 			+ "AND "
-			+ "(p.hierachyPlacement = :node) "
+			+ "(p.hierarchyPlacement = :node) "
 			+ "AND "
 			+ "( categoryValues IN (:categoryValues) ) "
 			+ "group by p having count(categoryValues)=:sizeCategoryValues ")
@@ -46,12 +46,12 @@ public interface ProductRepository extends CrudRepository<Product,Long>{
 			+ "		lower(p.name) LIKE lower(CONCAT('%',:search,'%'))  "
 			+ ") "
 			+ "AND "
-			+ "(p.hierachyPlacement = :node) ")
+			+ "(p.hierarchyPlacement = :node) ")
 	public List<Product> searchProduct(@Param(value = "node") HierarchyNode node,@Param(value = "search") String search);
 		
 	@Query("select p from Product p INNER JOIN p.categoryValues categoryValues "
 			+ "where "
-			+ "(p.hierachyPlacement = :node) "
+			+ "(p.hierarchyPlacement = :node) "
 			+ "AND "
 			+ "( categoryValues IN (:categoryValues) ) "
 			+ "group by p having count(categoryValues)=:sizeCategoryValues ")	
@@ -70,6 +70,8 @@ public interface ProductRepository extends CrudRepository<Product,Long>{
 	
 	@Query("select p from Product p "
 			+ "where "
-			+ "(p.hierachyPlacement = :node) ")
+			+ "(p.hierarchyPlacement = :node) ")
 	public List<Product> searchProduct(@Param(value = "node") HierarchyNode node);
+
+
 }

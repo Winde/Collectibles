@@ -27,11 +27,11 @@
 		};		
 	});
 	
-	app.directive('productCreate', function(){
+	app.directive('productChange', function(){
 		return {
 			restrict: 'E',
-			templateUrl: '/app/snipet/product-create.html',
-			controller: 'ProductCreationController',
+			templateUrl: '/app/snipet/product-change.html',
+			controller: 'ProductChangeController',
 			controllerAs: 'productCtrl'			
 		};		
 	});

@@ -2,14 +2,18 @@ package model.dataobjects;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -21,7 +25,7 @@ public class Product extends SimpleIdDao{
 
 	@ManyToOne
 	@JsonIgnoreProperties({ "father", "children"})
-	private HierarchyNode hierachyPlacement;
+	private HierarchyNode hierarchyPlacement;
 	
 	@OneToMany
 	private Set<CategoryValue> categoryValues;
@@ -30,14 +34,15 @@ public class Product extends SimpleIdDao{
 	private String reference = null;
 	
 	@Column
+	@Lob @Basic
 	private String description = null;
-	
-	@Column
-	private String imagePath = null;
-	
+
 	@Column
 	private String name = null;
 
+	@OneToMany(fetch=FetchType.LAZY)
+	@JsonIgnoreProperties({ "data" })
+	private List<Image> images = null;
 
 		
 	public Product(){}
@@ -61,22 +66,12 @@ public class Product extends SimpleIdDao{
 		this.description = description;
 	}
 
-
-	public String getImagePath() {
-		return imagePath;
+	public HierarchyNode getHierarchyPlacement() {
+		return hierarchyPlacement;
 	}
 
-
-	public void setImagePath(String imagePath) {
-		this.imagePath = imagePath;
-	}
-
-	public HierarchyNode getHierachyPlacement() {
-		return hierachyPlacement;
-	}
-
-	public void setHierachyPlacement(HierarchyNode hierachyPlacement) {
-		this.hierachyPlacement = hierachyPlacement;
+	public void setHierarchyPlacement(HierarchyNode hierarchyPlacement) {
+		this.hierarchyPlacement = hierarchyPlacement;
 	}
 
 	public Set<CategoryValue> getCategoryValues() {
@@ -105,6 +100,29 @@ public class Product extends SimpleIdDao{
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public List<Image> getImages() {
+		return images;
+	}
+
+	public void setImages(List<Image> images){
+		this.images = images;
+	}
+	
+	public boolean addImage(Image image) {
+		if (this.images==null){
+			this.images = new ArrayList<>();
+		} 
+		return this.images.add(image);
+	}
+	
+	public boolean removeImage(Image image) {
+		if (this.images==null){
+			return false;
+		} else {
+			return this.images.remove(image);
+		}
 	}
 	
 	

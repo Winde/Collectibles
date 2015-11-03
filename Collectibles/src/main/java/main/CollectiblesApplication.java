@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
@@ -39,5 +40,12 @@ public class CollectiblesApplication {
     @Bean
     public ViewResolver viewResolver() {
         return new BeanNameViewResolver();
+    }
+    
+    @Bean
+    public CommonsMultipartResolver commonsMultipartResolver() {
+        final CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
+        commonsMultipartResolver.setMaxUploadSize(-1);
+        return commonsMultipartResolver;
     }
 }

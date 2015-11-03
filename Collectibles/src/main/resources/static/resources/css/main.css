@@ -2,6 +2,10 @@
 	margin-top: 20px;
 }
 
+.createProductForm {
+	clear: both;
+}
+
 .productListEntry {
 	border-bottom: 1px solid grey;	
 }

@@ -1,117 +1,183 @@
 (function(){
 	
 	var app = angular.module('products-controllers',[]);
-
-	app.controller('ProductListController',['$scope','$http','$filter', function($scope,$http,$filter){
-		var productListController = this;
+	
+	
+	app.controller('ProductDetailsController',['$http','$routeParams','$scope', function($http,$routeParams,$scope){
+		var controller = this;
+		this.product = {};
+		this.editable = false;
 		
-		var root = {}
-		var products = [];
-		var hierarchies = [];
-		var hierarchy = {};
-		var searchTerm = "";
-		var ajax = true;
-				
-		var hierarchiesPromise = $http.get('/hierarchy/root/');
+		$scope.newProductAvailable = false;
 		
-		hierarchiesPromise.success(function(data){
-			productListController.root = { id: data.id };
-			productListController.hierarchy = { id: data.id };
-			productListController.hierarchies = [{ id: data.id, name: "All"}];
-			console.log(JSON.stringify(data.children));
-			if (data.children!=null && data.children!=undefined && data.children.length>0){
-				productListController.hierarchies = productListController.hierarchies.concat(data.children);
+		this.setProduct = function(product){
+			this.product = product;
+			$scope.product = product;
+		};
+		
+		$http({ method: 'GET', url: '/product/find/'+$routeParams.id })
+		.success(function(data){
+			controller.setProduct(data);			
+			if (data.images!=undefined && data.images!=null && data.images.length>0){
+				var parameter = "";
+				var i=0;
+				for (var i=0;i<data.images.length; i++){
+					var image = data.images[i];					
+					parameter = parameter + image.id					
+					if (i<data.images.length-1){
+						parameter = parameter + ",";
+					}
+				}				
+				$http({method: 'GET', url: '/images/'+parameter}).success(function(data){
+					controller.product.images = data;										
+				});
 			}
-			console.log(JSON.stringify(productListController.hierarchies));					
+		})
+		.catch(function(){
+			
+		});
+		
+		this.remove = function(image){
+			
+			$http({method: 'POST', url: '/product/'+controller.product.id+'/image/remove/'+image.id})
+			.success(function(data){
+				controller.product.images = controller.product.images.filter(function(e){ return e.id != data}); 
+			});			
+		};
+		
+		this.setEditable = function(value){
+			controller.editable = value;
+		};
+		
+		this.isEditable = function(){
+			return this.editable === true;
+		};
+		
+		this.edit = function(){
+			$http({method: 'POST', url: '/product/'+controller.product.id+'/image/remove/'+image.id})
+		};
+		
+	}]);
+	
+	app.controller('ProductListController',['$scope','$http','$filter', function($scope,$http,$filter){
+		var controller = this;
+		
+		controller.root = {}
+		controller.products = [];
+		controller.hierarchies = [];
+		controller.hierarchy = {};
+		controller.searchTerm = "";
+		controller.ajax = false;
+				
+		$http.get('/hierarchy/root/')
+		.success(function(data){
+			controller.root = { id: data.id };
+			controller.hierarchy = { id: data.id };
+			controller.hierarchies = [{ id: data.id, name: "All"}];			
+			if (data.children!=null && data.children!=undefined && data.children.length>0){
+				controller.hierarchies = controller.hierarchies.concat(data.children);
+			}							
 		});
 		
 		this.remove = function(product){			
-			productListController.ajax = true;
-			var productsPromise = null;
-			productsPromise = $http.post('/product/remove/'+product.id);
-			
-			console.log($scope);
-			productsPromise.success(function(data){				
+			controller.ajax = true;			
+			$http.post('/product/remove/'+product.id)
+			.success(function(data){				
 				if ($scope.productListCtrl && $scope.productListCtrl.products){												
 					$scope.productListCtrl.products = $scope.productListCtrl.products.filter(function(e){ return e.id != data});
 				}				
+			})
+			.error(function(data){				
+			})
+			.finally(function(){ 
+				controller.ajax = false; 
 			});
-			
-			productsPromise.error(function(data){				
-			});
-			productsPromise.finally(function(){ productListController.ajax = false; });
 		}
 
 		this.search = function() {
-			productListController.ajax = true;
-			var productsPromise = null;
-			var searchTerm = productListController.searchTerm; 
+			controller.ajax = true;			
+			var searchTerm = controller.searchTerm; 
 							
 			var url = "/product/search/";
 											
-			if (productListController.hierarchy!=null &&
-				productListController.hierarchy.id!=null &&
-				productListController.hierarchy.id!=productListController.root.id	
+			if (controller.hierarchy!=null &&
+				controller.hierarchy.id!=null &&
+				controller.hierarchy.id!=controller.root.id	
 			){
-				url = url + productListController.hierarchy.id + "/";
+				url = url + controller.hierarchy.id + "/";
 			}
 							
 			if (searchTerm!=null && searchTerm!=undefined && searchTerm!=""){
 				url = url + '?search='+searchTerm;				
-			} 		
-			console.log(url);
-			productsPromise = $http.get(url);
-			productsPromise.success(function(data){ 
-				productListController.products = data; 				
-			});
+			} 					
 			
-			productsPromise.error(function(data){
-				productListController.products = [];				
-			});
-			
-			productsPromise.finally(function(data){
-				productListController.ajax = false;
-			});
+			$http.get(url)
+				.success(function(data){ 
+					controller.products = data; 				
+				})
+				.error(function(data){
+					controller.products = [];				
+				}).finally(function(data){
+					controller.ajax = false;
+				});
 		}
 		
 	}]);
 		
-	app.controller('ProductCreationController',['$http','$log',function($http,$log){
-		var productCreationController = this;
-		
-		this.product = {};
+	app.controller('ProductChangeController',['$http','$log','$scope',function($http,$log,$scope){
+		var controller = this;
+				
+		this.product = $scope.product;				
 		this.hierarchy = {};
 		this.hierarchies = [];
 		
-		var hierarchiesPromise = $http.get('/hierarchy/root/');
+		$http.get('/hierarchy/root/')
+			.success(function(data){
+				controller.hierarchies = data.children;			
+			})
+			.error(function(){				
+			});
 		
-		hierarchiesPromise.success(function(data){
-			productCreationController.hierarchies = data.children;			
-		});
 		
-		hierarchiesPromise.error(function(){
-			$log('error');
-		});
+		this.canCreateNew = function(){			
+			$scope.newProductAvailable != false;
+		}
+		
+		this.newProduct = function(){
+			this.product = {};
+		}
+		
+		this.changeProduct = function(){
+			var product = controller.product;
 			
-		this.addProduct = function(){
-			var product = productCreationController.product;				
-			if (product.hierarchyNode!=null && product.hierarchyNode!=undefined && 
-				product.hierarchyNode.id!=null && product.hierarchyNode.id!=undefined){	
-				console.log("entered");
-				var productAddPromise = $http({
-					method: 'POST', 
-					url: '/product/create/'+product.hierarchyNode.id,
-					data: product					
-				});
-				productAddPromise.success(function(data) {
-					productCreationController.product = { hierarchyNode : product.hierarchyNode};				
-				});			
-				productAddPromise.error(function(data,e,i){					
-					alert(JSON.stringify(data));
+			if (product.hierarchyPlacement!=null && product.hierarchyPlacement!=undefined && 
+				product.hierarchyPlacement.id!=null && product.hierarchyPlacement.id!=undefined){					
+				
+				var method = 'POST';
+				var url = "";
+				if (product.id!=null && product.id!=undefined){
+					url = '/product/modify/';
+					method = 'PUT';
+				} else {
+					method = 'POST';
+					url = '/product/create/'+product.hierarchyPlacement.id;
+				}
+				
+				
+				var productToSend = angular.copy(product);
+				productToSend.images = null;
+				$http({
+					method: method, 
+					url: url,
+					data: productToSend					
 				})
-			} else {
-				console.log("not entered");
-			}
+					.success(function(data) {
+						product.id = data.id;				
+					})
+					.error(function(data,e,i){					
+						alert(JSON.stringify(data));
+					});
+			} 
 		}
 	}]);
 	

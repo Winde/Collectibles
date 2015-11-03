@@ -30,12 +30,12 @@
 									class="icon-bar"></span> <span class="icon-bar"></span> <span
 									class="icon-bar"></span>
 							</button>
-							<a class="navbar-brand" ng-href="#products" ng-click="navpanel.selectTab(1)">Collections</a>
+							<a class="navbar-brand" href="#/products/">Collections</a>
 						</div>
 						<div id="navbar" class="collapse navbar-collapse">
 							<ul class="nav navbar-nav">							
-								<li><a href="#/products/">Products</a></li>																											
-								<li><a href="#/products/create/">Add Products</a></li>
+								<li ng-class="{ active: isActive('/products/')}"><a href="#/products/">Products</a></li>																											
+								<li ng-class="{ active: isActive('/products/create/')}"><a href="#/products/create/">Add Products</a></li>
 							</ul>
 						</div>
 					</div>
