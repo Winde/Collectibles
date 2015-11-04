@@ -1,4 +1,10 @@
 <div class="product">	
+
+	<div ng-if="!productCtrl.isEditForbidden()">
+		<button class="btn" ng-click="productCtrl.setEditable(true)" ng-show="!productCtrl.isEditable()">EDIT</button>
+		<button class="btn" ng-click="productCtrl.setEditable(false)" ng-show="productCtrl.isEditable()">STOP EDITING</button>
+	</div>
+
 	<h1>{{productCtrl.product.hierarchyPlacement.name}}</h1>
 
 

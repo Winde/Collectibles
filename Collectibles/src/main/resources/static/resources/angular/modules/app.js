@@ -3,6 +3,10 @@
 	['ngRoute',
 	 'products-controllers',
 	 'products-directives',
+	 'products-services',
+	 'images-services',
+	 'hierarchies-services',
+	 'generic-services',
 	 'generic-directives']);
 	
 	

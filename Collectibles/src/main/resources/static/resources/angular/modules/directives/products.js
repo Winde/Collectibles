@@ -12,9 +12,16 @@
 	});
 	
 	app.directive('productPage', function(){
-		return {
+		return {			
 			restrict: 'E',
-			templateUrl: '/app/snipet/product-page.html'
+			templateUrl: '/app/snipet/product-page.html',	
+			scope: {
+				product: "=",
+				editable: "=",
+				forbidedit: "="
+			},
+			controllerAs: 'productCtrl',
+			controller: 'ProductDetailsController'
 		};		
 	});
 	
@@ -31,8 +38,12 @@
 		return {
 			restrict: 'E',
 			templateUrl: '/app/snipet/product-change.html',
+			scope: {
+				product: "=",
+				createnew: "@"
+			},
 			controller: 'ProductChangeController',
-			controllerAs: 'productCtrl'			
+			controllerAs: 'productChangeCtrl'			
 		};		
 	});
 	

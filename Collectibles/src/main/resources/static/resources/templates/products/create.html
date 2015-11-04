@@ -1,5 +1,8 @@
-<h1>Admin</h1>
-					
-<product-change></product-change>
+<div ng-init="product = { name: 'Bla'}; forbidedit = true">
+	<h1>Admin</h1>
+						
+	<product-change product="product"></product-change>
+	
+	<product-page product="product" forbidedit="forbidedit"></product-page>
 
-<product-page></product-page>
+</div>

@@ -1,6 +1,13 @@
-<button class="btn" ng-click="productCtrl.setEditable(true)" ng-show="!productCtrl.isEditable()">EDIT</button>
-<button class="btn" ng-click="productCtrl.setEditable(false)" ng-show="productCtrl.isEditable()">STOP EDITING</button>
-
-<product-page></product-page>
-
-<product-change ng-if="productCtrl.editable"></product-change>
+<div ng-init="product={}; editable = false; forbidedit = false">
+		
+	<product-page 
+		product="product" 
+		editable="editable" 
+		forbidedit="forbidedit"></product-page>
+	
+	<product-change 
+		ng-show="editable" 
+		product="product" 
+		createnew="editable"></product-change>
+		
+</div>
