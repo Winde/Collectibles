@@ -13,7 +13,6 @@
 		this.setProduct = function(product){
 			controller.product = product;	
 			angular.copy(product, $scope.product);
-			console.log($scope.product);
 		};
 		
 		if ($routeParams.id){
@@ -68,21 +67,19 @@
 	                                        function($scope,$filter,Product,Hierarchy,Message){
 		var controller = this;
 		
-		controller.root = {}
-		controller.products = [];
-		controller.hierarchies = [];
-		controller.hierarchy = {};
-		controller.searchTerm = "";
-		controller.ajax = false;
+		$scope.root = {}
+		$scope.products = [];
+		$scope.hierarchies = [];
+		$scope.hierarchy = {};
+		$scope.searchTerm = "";
+		$scope.ajax = false;
 				
 		Hierarchy.root()
 		.success(function(data){
-			controller.root = { id: data.id };
-			controller.hierarchy = { id: data.id };
-			controller.hierarchies = [{ id: data.id, name: "All"}];			
-			if (data.children!=null && data.children!=undefined && data.children.length>0){
-				controller.hierarchies = controller.hierarchies.concat(data.children);
-			}							
+			$scope.root = { id: data.id };
+			$scope.hierarchy = { id: data.id };
+			$scope.hierarchies.push({ id: data.id, name: "All", isRoot: true});			
+			Hierarchy.calculateTree(data,$scope.hierarchies);			
 		})
 		.catch(function(){	
 			Message.alert("There was an error");
@@ -91,40 +88,40 @@
 		});
 		
 		this.remove = function(product){			
-			controller.ajax = true;		
+			$scope.ajax = true;		
 			Product.remove(product)			
 			.success(function(data){				
-				if ($scope.productListCtrl && $scope.productListCtrl.products){												
-					$scope.productListCtrl.products = $scope.productListCtrl.products.filter(function(e){ return e.id != data});
+				if ($scope.productListCtrl.products){												
+					$scope.products = $scope.products.filter(function(e){ return e.id != data});
 				}				
 			})
 			.catch(function(data){				
 			})
 			.finally(function(){ 
-				controller.ajax = false; 
+				$scope.ajax = false; 
 			});
 		}
 
 		this.search = function() {
 			
-			var searchTerm = controller.searchTerm; 
+			var searchTerm = $scope.searchTerm; 
 			if (	
-					(controller.root.id!=controller.hierarchy.id) || 
+					($scope.root.id!=$scope.hierarchy.id) || 
 					(searchTerm!=null && searchTerm !=undefined && searchTerm!="")
 				){
-				controller.ajax = true;
-				Product.search(controller.root,controller.hierarchy,searchTerm)
+				$scope.ajax = true;
+				Product.search($scope.root,$scope.hierarchy,searchTerm)
 				.success(function(data){ 
-					controller.products = data; 				
+					$scope.products = data; 				
 				})
 				.catch(function(data){
 					Message.alert("There was an error");
-					controller.products = [];				
+					$scope.products = [];				
 				}).finally(function(data){
-					controller.ajax = false;
+					$scope.ajax = false;
 				});
 			} else {
-				controller.products = [];
+				$scope.products = [];
 			}
 		}
 		
@@ -132,17 +129,14 @@
 		
 	app.controller('ProductChangeController',['$scope','Hierarchy','Product','Message',
 	                                          function($scope,Hierarchy,Product,Message){
-		var controller = this;
-
-		this.product = $scope.product;	
-		this.createnew = $scope.createnew;
 		
-		this.hierarchy = {};
-		this.hierarchies = [];
+
+		$scope.hierarchy = {};
+		$scope.hierarchies = [];
 		
 		Hierarchy.root()
 		.success(function(data){
-			controller.hierarchies = data.children;			
+			Hierarchy.calculateTree(data,$scope.hierarchies);			
 		})
 		.catch(function(){		
 			Message.alert("There was an error");
@@ -152,15 +146,15 @@
 		
 		
 		this.canCreateNew = function(){						
-			return (controller.createnew != "false" && controller.createnew!= false);
+			return ($scope.createnew != "false" && $scope.createnew!= false);
 		}
 		
 		this.newProduct = function(){
-			this.product = {};
+			$scope.product = {};
 		}
 		
 		this.changeProduct = function(){
-			var product = controller.product;
+			var product = $scope.product;
 			
 			if (product.hierarchyPlacement!=null && product.hierarchyPlacement!=undefined && 
 				product.hierarchyPlacement.id!=null && product.hierarchyPlacement.id!=undefined){					

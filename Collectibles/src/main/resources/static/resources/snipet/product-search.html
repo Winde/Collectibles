@@ -1,25 +1,29 @@
 <form class="form-inline">				
 	<div class="form-group">
 		<input type="text" class="form-control"
-			ng-model="productListCtrl.searchTerm"
+			ng-model="searchTerm"
 			ng-model-options="{ debounce: 500 }"
 			ng-change="productListCtrl.search()" />					 
 		</div>
-	<div class="form-group">
-		<select class="form-control" 
-			ng-model="productListCtrl.hierarchy.id" 
-			ng-options="item.id as item.name for item in productListCtrl.hierarchies"
-			ng-change="productListCtrl.search()">
+	<div class="form-group" ><!-- selectpicker -->
+		<select class="form-control"	
+			selectpicker	
+			ng-model="hierarchy.id"
+			data-collection-attribute="id"
+			data-collection-name="hierarchies"			 
+			ng-options="item.id as item.name for item in hierarchies" 
+			ng-change="productListCtrl.search()"			
+			options-class="{ group : father == null, root: isRoot == true, element: father!=null}">
 		</select>
 	</div>
-	<ajax ng-show="productListCtrl.ajax" ></ajax>
+	<ajax ng-show="ajax" ></ajax>
 			
 </form>
 
 <div  class="productGrid container-fluid">
-	<product-list-entry ng-repeat="product in productListCtrl.products"></product-list-entry>
+	<product-list-entry ng-repeat="product in products"></product-list-entry>
 </div>
 
-<div ng-show="productListCtrl.products.length <=0">
+<div ng-show="products.length <=0">
 	No results found
 </div>

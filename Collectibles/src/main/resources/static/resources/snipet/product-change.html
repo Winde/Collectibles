@@ -4,10 +4,13 @@
 	novalidate>			
 	
 	<div class="form-group">	
-		<label>Hierarchy</label>		
-		<select class="form-control"
-			ng-model="productChangeCtrl.product.hierarchyPlacement"
-			ng-options="item as item.name for item in productChangeCtrl.hierarchies track by item.id"
+		<label>Hierarchy</label>	<!-- selectpicker  -->	
+		<select class="form-control"		
+			selectpicker
+			ng-model="product.hierarchyPlacement"						
+			data-collection-name="hierarchies"			 
+			ng-options="item as item.name for item in hierarchies"					
+				
 			required 
 		> 						
 		</select>
@@ -15,14 +18,14 @@
 	<div class="form-group">
 		<label>Name</label>
 		<input type="text" class="form-control"
-			ng-model="productChangeCtrl.product.name" 
+			ng-model="product.name" 
 			required />
 	</div>
 	
 	<div class="form-group">
 		<label>Description</label>
 		<textarea class="form-control"
-			ng-model="productChangeCtrl.product.description" 
+			ng-model="product.description" 
 			></textarea>
 	</div>		
 	<button type="submit" value="Submit">Save</button>		

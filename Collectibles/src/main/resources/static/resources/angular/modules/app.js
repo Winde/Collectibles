@@ -1,6 +1,6 @@
 (function(){
 	var app = angular.module('collections', 
-	['ngRoute',
+	['ngRoute',	 
 	 'products-controllers',
 	 'products-directives',
 	 'products-services',

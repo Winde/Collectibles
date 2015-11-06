@@ -1,4 +1,4 @@
-(function(){
+(function(){	
 	
 	var app = angular.module('products-directives',['products-controllers']);
 
@@ -7,7 +7,12 @@
 			restrict: 'E',
 			templateUrl: '/app/snipet/product-search.html',
 			controllerAs: 'productListCtrl',
-			controller: 'ProductListController'
+			controller: 'ProductListController',			
+			link: function(scope, element, attrs, ng){
+                
+               
+                
+			}
 		};		
 	});
 	
