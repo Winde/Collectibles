@@ -15,18 +15,22 @@
 		<script type="text/javascript" src="/app/angular/modules/routes.js"></script>
 		
 		<script type="text/javascript" src="/app/angular/modules/controllers/products.js"></script>		
+		<script type="text/javascript" src="/app/angular/modules/controllers/hierarchies.js"></script>
+		
 		<script type="text/javascript" src="/app/angular/modules/services/products.js"></script>
 		<script type="text/javascript" src="/app/angular/modules/services/hierarchies.js"></script>
 		<script type="text/javascript" src="/app/angular/modules/services/images.js"></script>
 		<script type="text/javascript" src="/app/angular/modules/services/generic.js"></script>
 				
 		<script type="text/javascript" src="/app/angular/modules/directives/products.js"></script>		
+		<script type="text/javascript" src="/app/angular/modules/directives/hierarchies.js"></script>
 		<script type="text/javascript" src="/app/angular/modules/directives/generic.js"></script>
 				
 		<script type="text/javascript" src="/app/vendor/jquery/jquery-2.1.4.min.js"></script>
 		<script type="text/javascript" src="/app/bootstrap/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="/app/vendor/bootstrap-growl/jquery.bootstrap-growl.min.js"></script>
 		<script type="text/javascript" src="/app/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>		
+		<script type="text/javascript" src="/app/vendor/ng-file-upload-master/dist/ng-file-upload.min.js"></script>
 		
 	</head>	
 	<body>
@@ -50,6 +54,7 @@
 							<ul class="nav navbar-nav">							
 								<li ng-class="{ active: isActive('/products/')}"><a href="#/products/">Products</a></li>																											
 								<li ng-class="{ active: isActive('/products/create/')}"><a href="#/products/create/">Add Products</a></li>
+								<li ng-class="{ active: isActive('/hierarchy/create/')}"><a href="#/hierarchy/create/">Manage Hierarchies</a></li>
 							</ul>
 						</div>
 					</div>

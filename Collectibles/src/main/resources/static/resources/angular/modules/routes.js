@@ -10,8 +10,13 @@
 		})
 		.when('/product/:id', {
 			templateUrl: '/app/templates/products/details.html',
-		});
-		
+		})
+		.when('/hierarchy/create/', {
+			templateUrl: '/app/templates/hierarchies/create.html',
+		})
+		.otherwise({
+			redirectTo: '/products/'	
+		});				
 	});
 	
 })();

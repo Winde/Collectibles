@@ -1,7 +1,7 @@
 (function(){
 	
-	angular.module('products-services',[])
-	.factory('Product', function ProductFactory($http){
+	angular.module('products-services',['ngFileUpload'])
+	.factory('Product', function ProductFactory($http,Upload){
 		return {
 			
 			one: function(id) {
@@ -35,6 +35,14 @@
 			},
 			removeImage: function(product,image){
 				return $http({method: 'POST', url: '/product/'+product.id+'/image/remove/'+image.id});
+			},
+			uploadFile: function(hierarchy,file){
+				var upload = Upload.upload({
+		            url: '/product/create/from/file/'+hierarchy.id,
+		            data: {file: file}
+				});
+								
+				return upload;
 			}
 			
 		}		

@@ -1,0 +1,42 @@
+<form name="uploadProductForm" 
+	class=""uploadProductForm""	
+	ng-submit="uploadProductForm.$valid && productChangeCtrl.uploadFile()" 
+	novalidate>			
+	
+	<div class="form-group">	
+		<label>Hierarchy</label>	<!-- selectpicker  -->	
+		<select class="form-control"		
+			selectpicker
+			ng-model="hierarchy"						
+			data-collection-name="hierarchies"			 
+			ng-options="item as item.name for item in hierarchies track by item.id"					
+				options-class="{ 
+				root: isRoot == true,
+				depth0: depth == 0,
+				depth1: depth == 1,
+				depth2: depth == 2,
+				depth3: depth == 3,
+				depth4: depth == 4,
+				depth5: depth == 5,
+				depth6: depth == 6,
+				depth7: depth == 7,
+				element: isElement == true				
+			}" 
+			required			
+			>				
+		</select>
+		
+			
+	</div>
+	
+	<div class="form-group">
+		<label>Upload file</label>
+		<div class="btn btn-default" 
+				ngf-select ng-model="file" name="file" >Select File <span ng-if="file.name">[{{file.name}}]</span></div>
+								
+		
+	</div>
+		
+			
+	<button type="submit" value="Submit">Save</button>			
+</form>

@@ -5,18 +5,18 @@
 		<button class="btn" ng-click="productCtrl.setEditable(false)" ng-show="productCtrl.isEditable()">STOP EDITING</button>
 	</div>
 
-	<h1>{{productCtrl.product.hierarchyPlacement.name}}</h1>
+	<h1>{{product.hierarchyPlacement.name}}</h1>
 
 
-	<h2>{{productCtrl.product.name}}</h2>
+	<h2>{{product.name}}</h2>
 	
 	<div class="images">
-		<div ng-repeat="image in productCtrl.product.images" style="display: inline-block">
+		<div ng-repeat="image in product.images" style="display: inline-block">
 			<a href ng-if="productCtrl.isEditable()" ng-click="productCtrl.remove(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
 			<div>Image: {{image.id}}</div>
 			<img style="width: 100px" ng-id="image.data" ng-src="data:image/JPEG;base64,{{image.data}}">		
 		</div>
 	</div>
 	
-	<p>{{productCtrl.product.description}}</p> 					
+	<p>{{product.description}}</p> 					
 </div>

@@ -1,6 +1,8 @@
 package web.controllers;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -14,6 +16,9 @@ import model.persistence.CategoryValueRepository;
 import model.persistence.HierarchyRepository;
 import model.persistence.ProductRepository;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,12 +49,8 @@ public class ProductController  extends CollectiblesController{
 
 	@RequestMapping(value="/product/find/{id}")
 	public Product product(@PathVariable String id) throws CollectiblesException {
-		Long idLong = null;
-		try {
-			idLong = Long.parseLong(id);
-		}catch(Exception ex){
-			
-		}
+		Long idLong = this.getId(id);
+		
 		if (idLong==null){
 			throw new IncorrectParameterException(new String[]{"id"});
 		} else {
@@ -62,14 +63,62 @@ public class ProductController  extends CollectiblesController{
 		}
 	}
 	
+	@RequestMapping(value="/product/create/from/file/{hierarchy}", method = RequestMethod.POST)
+	public Collection<Product> addProductsFromFile(
+			@PathVariable String hierarchy,
+			@RequestPart("file") MultipartFile file) throws CollectiblesException {
+		Long hierarchyId = this.getId(hierarchy);
+			
+		if (hierarchyId!=null){
+			
+			HierarchyNode hierarchyNode = hierarchyRepository.findOne(hierarchyId);
+			if (hierarchyNode!=null){
+				if (file!=null){
+					Collection<Product> products = new ArrayList<>();
+					
+					InputStream inputStream = null;
+					try {
+						inputStream = file.getInputStream();					
+						InputStreamReader reader = new InputStreamReader(inputStream);					
+						CSVParser parser = CSVFormat.EXCEL.withHeader().parse(reader);
+						for (CSVRecord record : parser.getRecords()){
+							String name = record.get("name");
+							String description = record.get("description");
+							Product product = new Product();
+							product.setName(name);
+							product.setDescription(description);
+							product.setHierarchyPlacement(hierarchyNode);
+							System.out.println(product);
+							validate(product);
+							
+							
+							
+							products.add(product);														
+						}
+						productRepository.save(products);
+						return products;
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						throw new IncorrectParameterException(new String[]{"file"});
+					}
+					
+				} else {
+					throw new IncorrectParameterException(new String[]{"file"});
+				}				
+			} else {
+				throw new NotFoundException(new String[]{"hierarchy"});
+			}
+		} else {
+			throw new IncorrectParameterException(new String[]{"hierarchy"});
+		}		
+	}
+	
+	
 	@RequestMapping(value="/product/create/{hierarchy}", method = RequestMethod.POST)
 	public Product addProduct(@RequestBody Product product,@PathVariable String hierarchy) throws CollectiblesException {
-		Long hierarchyId = null;
-		try {
-			hierarchyId = Long.parseLong(hierarchy);
-		}catch(Exception ex){
-			
-		}
+		Long hierarchyId = this.getId(hierarchy);
+		
 		if (hierarchyId!=null){
 			
 			HierarchyNode hierarchyNode = hierarchyRepository.findOne(hierarchyId);
@@ -90,12 +139,8 @@ public class ProductController  extends CollectiblesController{
 	
 	@RequestMapping(value="/product/remove/{id}", method = RequestMethod.POST)
 	public Long removeProduct(@PathVariable String id) throws CollectiblesException {		
-		Long idLong = null;
-		try {
-			idLong = Long.parseLong(id);
-		}catch(Exception ex){
-			
-		}
+		Long idLong = this.getId(id);
+		
 		if (idLong==null){
 			throw new IncorrectParameterException(new String[]{"id"});
 		} else {		

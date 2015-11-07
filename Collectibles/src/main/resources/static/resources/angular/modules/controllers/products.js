@@ -6,13 +6,12 @@
 	app.controller('ProductDetailsController',['$routeParams','$scope','Product','Image','Message',
 	                                           function($routeParams,$scope,Product,Image,Message){
 		var controller = this;
-		this.product = $scope.product;					
 		
 		$scope.newProductAvailable = false;
 	
-		this.setProduct = function(product){
-			controller.product = product;	
-			angular.copy(product, $scope.product);
+		this.setProduct = function(product){					
+			angular.copy(product,$scope.product);
+			angular.copy($scope.product,controller.product);			
 		};
 		
 		if ($routeParams.id){
@@ -22,7 +21,7 @@
 				if (data.images!=undefined && data.images!=null && data.images.length>0){				
 					Image.multiple(data.images)
 					.success(function(data){
-						controller.product.images = data;										
+						$scope.product.images = data;										
 					})
 					.catch(function(){		
 						Message.alert("There was an error");
@@ -41,7 +40,7 @@
 			
 			Product.removeImage(controller.product,image)
 			.success(function(data){
-				controller.product.images = controller.product.images.filter(function(e){ return e.id != data}); 
+				$scope.product.images = $scope.product.images.filter(function(e){ return e.id != data}); 
 			})
 			.catch(function(){	
 				Message.alert("There was an error");
@@ -66,33 +65,44 @@
 	app.controller('ProductListController',['$scope','$filter','Product','Hierarchy','Message',
 	                                        function($scope,$filter,Product,Hierarchy,Message){
 		var controller = this;
+				
+		if ($scope.$parent && $scope.$parent.root) {
+			$scope.root = $scope.$parent.root;
+		}
 		
-		$scope.root = {}
 		$scope.products = [];
-		$scope.hierarchies = [];
+		if ($scope.hierarchies = null || $scope.hierarchies == undefined) {
+			$scope.hierarchies = [];
+		}
+		
+		if ($scope.$parent && $scope.$parent.hierarchies) {
+			$scope.hierarchies = $scope.$parent.hierarchies;
+		}
+		
 		$scope.hierarchy = {};
 		$scope.searchTerm = "";
 		$scope.ajax = false;
-				
-		Hierarchy.root()
-		.success(function(data){
-			$scope.root = { id: data.id };
-			$scope.hierarchy = { id: data.id };
-			$scope.hierarchies.push({ id: data.id, name: "All", isRoot: true});			
-			Hierarchy.calculateTree(data,$scope.hierarchies);			
-		})
-		.catch(function(){	
-			Message.alert("There was an error");
-		})
-		.finally(function(){			
-		});
-		
+			
+		if ($scope.root == undefined || $scope.root == null){
+			Hierarchy.root()
+			.success(function(data){
+				$scope.root = { id: data.id };
+				$scope.hierarchy = { id: data.id };
+				$scope.hierarchies.push({ id: data.id, name: "All", isRoot: true});			
+				Hierarchy.calculateTree(data,$scope.hierarchies);			
+			})
+			.catch(function(){	
+				Message.alert("There was an error");
+			})
+			.finally(function(){			
+			});
+		}
 		this.remove = function(product){			
 			$scope.ajax = true;		
 			Product.remove(product)			
 			.success(function(data){				
-				if ($scope.productListCtrl.products){												
-					$scope.products = $scope.products.filter(function(e){ return e.id != data});
+				if ($scope.$parent.products){					
+					$scope.$parent.products = $scope.$parent.products.filter(function(e){ return e.id != data});					
 				}				
 			})
 			.catch(function(data){				
@@ -153,6 +163,20 @@
 			$scope.product = {};
 		}
 		
+		this.uploadFile = function(){
+			
+			Product.uploadFile($scope.hierarchy,$scope.file)
+			.success(function(data){
+				Message.success("Products have been uploaded",true);
+			})
+			.catch(function(){
+				Message.alert("There was an error",true);
+			})
+			.finally(function(){
+				
+			});
+		};
+		
 		this.changeProduct = function(){
 			var product = $scope.product;
 			
@@ -162,17 +186,17 @@
 				var productToSend = angular.copy(product);
 				productToSend.images = null;
 				
-				var promise = null;
-				if (product.id!=null && product.id!=undefined){
+				var promise = null;				
+				if (product.id==null || product.id==undefined){					
 					productSubmission = Product.create(productToSend);
-				} else {
+				} else {					
 					productSubmission = Product.modify(productToSend);
 				}
 				
 				productSubmission
 				.success(function(data) {
 					if (product.id==null){
-						Message.success("Product was created");
+						Message.success("Product was created",true);
 					} else {
 						Message.success("Product was updated");
 					}

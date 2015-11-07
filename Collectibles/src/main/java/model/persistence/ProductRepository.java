@@ -29,7 +29,7 @@ public interface ProductRepository extends CrudRepository<Product,Long>, Product
 			+ "		lower(p.name) LIKE lower(CONCAT('%',:search,'%'))  "
 			+ ") "
 			+ "AND "
-			+ "(p.hierarchyPlacement = :node) "
+			+ "(p.hierarchyPlacement.lineage LIKE CONCAT(:#{#node.lineage},'%')) "
 			+ "AND "
 			+ "( categoryValues IN (:categoryValues) ) "
 			+ "group by p having count(categoryValues)=:sizeCategoryValues ")
@@ -39,19 +39,19 @@ public interface ProductRepository extends CrudRepository<Product,Long>, Product
 										@Param(value = "categoryValues") Collection<CategoryValue> categoryValues,
 										@Param(value = "sizeCategoryValues") Long sizeCategoryValues);
 	
-	@Query("select p from Product p "
+	@Query("select p from Product p LEFT JOIN FETCH p.images i "
 			+ "where "
 			+ "( "
 			+ "		lower(p.description) LIKE lower(CONCAT('%',:search,'%')) OR "
 			+ "		lower(p.name) LIKE lower(CONCAT('%',:search,'%'))  "
 			+ ") "
 			+ "AND "
-			+ "(p.hierarchyPlacement = :node) ")
+			+ "(p.hierarchyPlacement.lineage LIKE CONCAT(:#{#node.lineage},'%')) ")
 	public List<Product> searchProduct(@Param(value = "node") HierarchyNode node,@Param(value = "search") String search);
 		
 	@Query("select p from Product p INNER JOIN p.categoryValues categoryValues "
 			+ "where "
-			+ "(p.hierarchyPlacement = :node) "
+			+ "(p.hierarchyPlacement.lineage LIKE CONCAT(:#{#node.lineage},'%')) "
 			+ "AND "
 			+ "( categoryValues IN (:categoryValues) ) "
 			+ "group by p having count(categoryValues)=:sizeCategoryValues ")	
@@ -60,7 +60,7 @@ public interface ProductRepository extends CrudRepository<Product,Long>, Product
 										@Param(value = "categoryValues") Collection<CategoryValue> categoryValues,
 										@Param(value = "sizeCategoryValues") Long sizeCategoryValues);
 	
-	@Query("select p from Product p "
+	@Query("select p from Product p LEFT JOIN FETCH p.images i "
 			+ "where "
 			+ "( "
 			+ "		lower(p.description) LIKE lower(CONCAT('%',:search,'%')) OR "
@@ -68,9 +68,11 @@ public interface ProductRepository extends CrudRepository<Product,Long>, Product
 			+ ") ")
 	public List<Product> searchProduct(@Param(value = "search")String search);
 	
-	@Query("select p from Product p "
+	
+	
+	@Query("select p from Product p LEFT JOIN FETCH p.images i "
 			+ "where "
-			+ "(p.hierarchyPlacement = :node) ")
+			+ "(p.hierarchyPlacement.lineage LIKE CONCAT(:#{#node.lineage},'%')) ")
 	public List<Product> searchProduct(@Param(value = "node") HierarchyNode node);
 
 

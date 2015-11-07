@@ -1,5 +1,31 @@
 <div class="row productListEntry">
-	<div class="col-md-5"><a ng-href="#/product/{{product.id}}"><span>{{product.name}}</span></a></div>
-	<div class="col-md-5"><span>{{product.description}}</span></div>		
+	<div class="col-md-4"><a ng-href="#/product/{{product.id}}"><span>{{product.name}}</span></a></div>
+	<div class="col-md-4"><span>{{product.description}}</span></div>		
 	<div class="col-md-2"><a href ng-click="productManagementCtrl.remove(product)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></div>
+	<div class="col-md-2">
+		{{product.hierarchyPlacement.name}}
+		<!-- 
+		<form>
+			<div class="form-group">
+				<select class="form-control"										
+					ng-model="product.hierarchyPlacement"										
+					data-collection-name="hierarchies"								
+					ng-options="item as item.name for item in (hierarchies|filter:{isRoot:'!'}) track by item.id" 					
+						options-class="{ 
+						root: isRoot == true,
+						depth0: depth == 0,
+						depth1: depth == 1,
+						depth2: depth == 2,
+						depth3: depth == 3,
+						depth4: depth == 4,
+						depth5: depth == 5,
+						depth6: depth == 6,
+						depth7: depth == 7,
+						element: isElement == true				
+					}">
+				</select>
+			</div>
+		</form>
+		 -->	
+	</div>
 </div>

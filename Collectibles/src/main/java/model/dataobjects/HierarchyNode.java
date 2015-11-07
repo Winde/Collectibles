@@ -7,38 +7,51 @@ import java.util.TreeSet;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 
 
 @Entity
 public class HierarchyNode extends SimpleIdDao{
 
+	public interface HierarchySimpleView extends SimpleIdDaoView{};
+	public interface HierarchyComplexView extends HierarchySimpleView {};
+	
 	@Column
+	@JsonView(HierarchySimpleView.class)
 	private String name;
 	
 	@OneToMany	
+	@JsonIgnoreProperties({"categories"})	
+	@JsonView(HierarchyComplexView.class)
 	private Set<HierarchyNode> children;
 	
 	@ManyToOne
 	@JsonIgnoreProperties({ "father", "children", "categories"})
+	@JsonView(HierarchyComplexView.class)
 	private HierarchyNode father;
 		
-	@ManyToMany	
+	@ManyToMany(fetch=FetchType.LAZY)	
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	@JsonView(HierarchyComplexView.class)
 	private Set<Category> categories; 
+	
+	@Column
+	@JsonView(HierarchySimpleView.class)
+	private String lineage;
+	
+	@Column
+	private Integer depth;
 	
 	public HierarchyNode(){
 		children = new TreeSet<>();
 		categories = new TreeSet<>();
-	}
+	}	
 	
 	public String getName() {
 		return name;
@@ -98,5 +111,24 @@ public class HierarchyNode extends SimpleIdDao{
 		}
 	}
 
+	public String getLineage() {
+		return lineage;
+	}
+	
+	public boolean updateLineage() {
+		if (this.getFather()!=null && this.getFather().getLineage()!=null && this.getId()!=null){
+			this.lineage = this.getFather().getLineage() + "-" + this.getId();
+			if (this.getFather().getDepth()!=null){
+				this.depth = this.getFather().getDepth()+1;
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public Integer getDepth() {
+		return depth;
+	}
 
 }

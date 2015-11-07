@@ -34,12 +34,8 @@ public class CategoryController extends CollectiblesController{
 
 	@RequestMapping(value="/category/find/{id}")
 	public Category product(@PathVariable String id) throws CollectiblesException {
-		Long idLong = null;
-		try {
-			idLong = Long.parseLong(id);
-		}catch(Exception ex){
-			
-		}
+		Long idLong = this.getId(id);
+		
 		if (idLong==null){
 			throw new IncorrectParameterException(new String[]{"id"});
 		} else {
@@ -54,10 +50,7 @@ public class CategoryController extends CollectiblesController{
 	
 	@RequestMapping("/category/by/hierarchy/{hierarchy}")
 	public Collection<Category> categories(@PathVariable String hierarchy) throws CollectiblesException{
-		Long hierarchyId = null;
-		try {
-			hierarchyId = Long.parseLong(hierarchy);
-		}catch(Exception ex){}
+		Long hierarchyId = this.getId(hierarchy);
 		
 		if (hierarchyId==null){
 			throw new IncorrectParameterException(new String[]{"hierarchy"});
@@ -74,10 +67,7 @@ public class CategoryController extends CollectiblesController{
 	
 	@RequestMapping(value="/category/add/{hierarchy}", method = RequestMethod.POST)
 	public Category addCategory(@PathVariable String hierarchy,@RequestBody Category category) throws CollectiblesException {		
-		Long hierarchyId = null;
-		try {
-			hierarchyId = Long.parseLong(hierarchy);
-		}catch(Exception ex){}
+		Long hierarchyId = this.getId(hierarchy);
 		
 		if (hierarchyId==null){
 			throw new IncorrectParameterException(new String[]{"hierarchy"});
@@ -97,10 +87,7 @@ public class CategoryController extends CollectiblesController{
 	
 	@RequestMapping(value="/category/remove/{category}", method = RequestMethod.POST)
 	public boolean removeCategory(@PathVariable String category) throws CollectiblesException {		
-		Long categoryId = null;
-		try {
-			categoryId = Long.parseLong(category);
-		}catch(Exception ex){}
+		Long categoryId = this.getId(category);
 		
 		if (categoryId==null){
 			throw new IncorrectParameterException(new String[]{"category"});
@@ -116,15 +103,8 @@ public class CategoryController extends CollectiblesController{
 	
 	@RequestMapping(value="/category/{category}/dettach/{hierarchy}", method = RequestMethod.POST)
 	public boolean  removeCategoryFromHierarchy(@PathVariable String category, @PathVariable String hierarchy ) throws CollectiblesException {		
-		Long categoryId = null;
-		try {
-			categoryId = Long.parseLong(category);
-		}catch(Exception ex){}
-		
-		Long hierarchyId = null;
-		try {
-			hierarchyId = Long.parseLong(hierarchy);
-		}catch(Exception ex){}
+		Long categoryId = this.getId(category);		
+		Long hierarchyId = this.getId(hierarchy);
 		
 		if (categoryId==null && hierarchyId==null){
 			throw new IncorrectParameterException(new String[]{"category","hierarchy"});
@@ -149,10 +129,7 @@ public class CategoryController extends CollectiblesController{
 	
 	@RequestMapping(value="/category/add/value/to/{category}", method = RequestMethod.POST)
 	public CategoryValue addCategobyryValue(@PathVariable String category, @RequestBody CategoryValue categoryValue) throws CollectiblesException {		
-		Long categoryId = null;
-		try {
-			categoryId = Long.parseLong(category);
-		}catch(Exception ex){}
+		Long categoryId = this.getId(category);
 		
 		if (categoryId==null){
 			throw new IncorrectParameterException(new String[]{"category"});			

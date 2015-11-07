@@ -17,34 +17,50 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import model.dataobjects.HierarchyNode.HierarchySimpleView;
+import model.dataobjects.SimpleIdDao.SimpleIdDaoView;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
 public class Product extends SimpleIdDao{
 
-
+	public interface ProductSimpleView  extends SimpleIdDaoView{};
+	public interface ProductComplexView extends ProductSimpleView {};
+	public interface ProductListView extends ProductSimpleView,HierarchySimpleView{};
+	
 	@ManyToOne
 	@JsonIgnoreProperties({ "father", "children"})
+	@JsonView(ProductSimpleView.class)
 	private HierarchyNode hierarchyPlacement;
 	
-	@OneToMany
+	@OneToMany(fetch=FetchType.LAZY)
+	@JsonView(ProductComplexView.class)
 	private Set<CategoryValue> categoryValues;
 	
 	@Column(unique=true )
+	@JsonView(ProductSimpleView.class)
 	private String reference = null;
 	
 	@Column
 	@Lob @Basic
+	@JsonView(ProductSimpleView.class)
 	private String description = null;
 
 	@Column
+	@JsonView(ProductSimpleView.class)
 	private String name = null;
 
 	@OneToMany(fetch=FetchType.LAZY)
 	@JsonIgnoreProperties({ "data" })
+	@JsonView(ProductSimpleView.class)
 	private List<Image> images = null;
 
-		
+	@Column
+	private Boolean owned = Boolean.FALSE;	
+	
+	
 	public Product(){}
 
 	public String getReference() {
@@ -124,6 +140,18 @@ public class Product extends SimpleIdDao{
 			return this.images.remove(image);
 		}
 	}
-	
+
+	public boolean isOwned() {
+		return Boolean.TRUE.equals(this.owned);
+	}
+
+	public void setOwned(Boolean owned) {
+		this.owned = owned;
+	}
+
+	public String toString(){
+		return "{" + this.getId() + " - " + this.getName() + " - " + this.getDescription() +"}";		
+	}
 	
 }
+

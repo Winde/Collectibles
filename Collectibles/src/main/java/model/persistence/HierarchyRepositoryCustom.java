@@ -15,4 +15,7 @@ public interface HierarchyRepositoryCustom {
 
 	@Transactional
 	public boolean removeCategory(HierarchyNode hierarchyNode,Category category);
+
+	@Transactional
+	public HierarchyNode save(HierarchyNode node);
 }

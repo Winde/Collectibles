@@ -5,19 +5,22 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 @MappedSuperclass
 public abstract class SimpleIdDao implements Comparable<SimpleIdDao>{
 
+	public interface SimpleIdDaoView{};
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@JsonView(SimpleIdDaoView.class)
 	public Long id;
 	
 	@Override
 	public boolean equals(Object o){
 		if (o instanceof SimpleIdDao) {			
-			SimpleIdDao other = (SimpleIdDao) o;
-			System.out.println("this.getId(): " + this.getId());
-			System.out.println("other.getId(): " + other.getId());
+			SimpleIdDao other = (SimpleIdDao) o;			
 			if (this.getId()==null || other.getId()==null) {
 				return false;
 			} else {

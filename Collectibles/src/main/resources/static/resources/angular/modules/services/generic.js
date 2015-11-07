@@ -5,26 +5,41 @@
 		var config = {
 				  ele: 'body', // which element to append to
 				  type: 'info', // (null, 'info', 'danger', 'success')
-				  offset: {from: 'top', amount: 20}, // 'top', or 'bottom'
+				  offset: {from: 'bottom', amount: 20}, // 'top', or 'bottom'
 				  align: 'right', // ('left', 'right', or 'center')
-				  width: 250, // (integer, or 'auto')
+				  width: 'auto', // (integer, or 'auto')
 				  delay: 4000, // Time while the message will be displayed. It's not equivalent to the *demo* timeOut!
 				  allow_dismiss: true, // If true then will display a cross to close the popup.
 				  stackup_spacing: 10 // spacing between consecutively stacked growls.
 		};
 		
 		return {
-			info: function(message){				
-				config.type = "info";				
-				jQuery.bootstrapGrowl(message); 
+			info: function(message,important){
+				var newconfig = angular.copy(config,newconfig);
+				newconfig.type = "info";	
+				if (important){
+					newconfig.align = "center";
+					newconfig.offset =  {from: 'top', amount: 150};	
+				}
+				jQuery.bootstrapGrowl(message,newconfig); 
 			},
-			alert: function(message){
-				config.type = "danger";				
-				jQuery.bootstrapGrowl(message,config); 
+			alert: function(message,important){
+				var newconfig = angular.copy(config,newconfig);
+				newconfig.type = "danger";
+				if (important){
+					newconfig.align = "center";
+					newconfig.offset =  {from: 'top', amount: 150};	
+				}
+				jQuery.bootstrapGrowl(message,newconfig); 
 			},
-			success: function(message){
-				config.type = 'success';				
-				jQuery.bootstrapGrowl(message,config); 
+			success: function(message,important){
+				var newconfig = angular.copy(config,newconfig);
+				newconfig.type = "success";		
+				if (important){
+					newconfig.align = "center";
+					newconfig.offset =  {from: 'top', amount: 150};	
+				}
+				jQuery.bootstrapGrowl(message,newconfig); 
 			}
 		};		
 	});

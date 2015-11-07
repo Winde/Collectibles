@@ -34,10 +34,8 @@ public class HierarchyController extends CollectiblesController{
 	
 	@RequestMapping("/hierarchy/get/{id}")
 	public HierarchyNode subHierarchy(@PathVariable String id) throws CollectiblesException{
-		Long nodeId = null;
-		try {
-			nodeId = Long.parseLong(id);
-		}catch(Exception ex){}
+		Long nodeId = this.getId(id);
+		
 		if (nodeId!=null){
 			HierarchyNode hierarchyNode = hierarchyRepository.findOne(nodeId);
 			if (hierarchyNode==null) {
@@ -52,10 +50,8 @@ public class HierarchyController extends CollectiblesController{
 
 	@RequestMapping(value="/hierarchy/remove/{id}", method = RequestMethod.POST)
 	public boolean removeHierarchyNode(@PathVariable String id) throws CollectiblesException {
-		Long hierarchyId = null;
-		try {
-			hierarchyId = Long.parseLong(id);
-		}catch(Exception ex){}
+		Long hierarchyId = this.getId(id);
+		
 		if (hierarchyId!=null){
 			try {
 				hierarchyRepository.delete(hierarchyId);
@@ -70,14 +66,15 @@ public class HierarchyController extends CollectiblesController{
 	
 	@RequestMapping(value="/hierarchy/create/{father}/", method = RequestMethod.POST)
 	public HierarchyNode addHierarchyNode(@RequestBody HierarchyNode node,@PathVariable String father) throws CollectiblesException {
-		Long fatherId = null;
-		try {
-			fatherId = Long.parseLong(father);
-		}catch(Exception ex){}
+		Long fatherId = this.getId(father);
 			
 		if (fatherId!=null){
 			this.validate(node);
-						
+			
+			if (node.getId()!=null){
+				throw new IncorrectParameterException(new String[]{"category.id"});
+			}
+			
 			HierarchyNode fatherNode = hierarchyRepository.findOne(fatherId);
 			
 			if (fatherNode!=null){				

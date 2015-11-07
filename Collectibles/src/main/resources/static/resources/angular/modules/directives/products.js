@@ -32,7 +32,7 @@
 	
 	app.directive('productListEntry', function(){
 		return {
-			restrict: 'E',
+			restrict: 'E',	
 			templateUrl: '/app/snipet/product-list-entry.html',
 			controller: 'ProductListController',
 			controllerAs: 'productManagementCtrl'			
@@ -47,6 +47,15 @@
 				product: "=",
 				createnew: "@"
 			},
+			controller: 'ProductChangeController',
+			controllerAs: 'productChangeCtrl'			
+		};		
+	});
+	
+	app.directive('productUpload', function(){
+		return {
+			restrict: 'E',
+			templateUrl: '/app/snipet/product-upload.html',
 			controller: 'ProductChangeController',
 			controllerAs: 'productChangeCtrl'			
 		};		

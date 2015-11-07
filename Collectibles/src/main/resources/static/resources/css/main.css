@@ -2,16 +2,17 @@
 	margin-top: 20px;
 }
 
-.bootstrap-select .group.root {
+.bootstrap-select .root {
 	padding-left: 20px;
 }
-.bootstrap-select .group {
-	font-weight: bold;
-	padding-left: 30px;
-}
-.bootstrap-select .element {
-	padding-left: 40px;	
-}
+.bootstrap-select .depth0 {	padding-left: 20px; }
+.bootstrap-select .depth1 {	padding-left: 30px; }
+.bootstrap-select .depth2 {	padding-left: 40px; }
+.bootstrap-select .depth3 {	padding-left: 50px; }
+.bootstrap-select .depth4 {	padding-left: 60px; }
+.bootstrap-select .depth5 {	padding-left: 70px; }
+.bootstrap-select .depth6 {	padding-left: 80px; }
+.bootstrap-select .depth7 {	padding-left: 90px; }
 
 .createProductForm {
 	clear: both;

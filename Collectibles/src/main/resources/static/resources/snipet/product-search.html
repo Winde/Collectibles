@@ -13,7 +13,18 @@
 			data-collection-name="hierarchies"			 
 			ng-options="item.id as item.name for item in hierarchies" 
 			ng-change="productListCtrl.search()"			
-			options-class="{ group : father == null, root: isRoot == true, element: father!=null}">
+				options-class="{ 
+				root: isRoot == true,
+				depth0: depth == 0,
+				depth1: depth == 1,
+				depth2: depth == 2,
+				depth3: depth == 3,
+				depth4: depth == 4,
+				depth5: depth == 5,
+				depth6: depth == 6,
+				depth7: depth == 7,
+				element: isElement == true				
+			}">
 		</select>
 	</div>
 	<ajax ng-show="ajax" ></ajax>
