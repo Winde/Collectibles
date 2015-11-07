@@ -1,7 +1,9 @@
-<div>
+<div ng-init="hierarchies = []">
 	<h1>Manage Hierarchies</h1>
+
+	<hierarchy-tree hierarchies="hierarchies"></hierarchy-tree>
 	
 	<h2>Create Hierarchy</h2>
-	<hierarchy-create></hierarchy-create>
+	<hierarchy-create hierarchies="hierarchies"></hierarchy-create>
 	
 </div>

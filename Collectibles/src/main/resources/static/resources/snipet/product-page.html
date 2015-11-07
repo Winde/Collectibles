@@ -12,8 +12,7 @@
 	
 	<div class="images">
 		<div ng-repeat="image in product.images" style="display: inline-block">
-			<a href ng-if="productCtrl.isEditable()" ng-click="productCtrl.remove(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-			<div>Image: {{image.id}}</div>
+			<a href ng-if="productCtrl.isEditable()" ng-click="productCtrl.remove(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>			
 			<img style="width: 100px" ng-id="image.data" ng-src="data:image/JPEG;base64,{{image.data}}">		
 		</div>
 	</div>

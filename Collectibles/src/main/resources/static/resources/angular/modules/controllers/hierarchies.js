@@ -9,12 +9,15 @@
 				
 				$scope.hierarchy = {};
 				$scope.parent = {};
-				$scope.hierarchies = [];
-				
+				if ($scope.hierarchies== null){
+					$scope.hierarchies = [];
+				}
+				this.deleting = false;
 				
 				this.updateHierarchies = function(){
 					Hierarchy.root()
-					.success(function(data){											
+					.success(function(data){	
+						$scope.hierarchies =[];
 						Hierarchy.calculateTree(data,$scope.hierarchies);			
 					})
 					.catch(function(){	
@@ -38,6 +41,27 @@
 					})
 					.finally(function(){			
 					});		
+				};
+				
+				this.remove = function(hierarchy){
+					if (!controller.deleting){
+						Message.confirm("Are you sure?", function(){
+							controller.deleting = true;
+							Hierarchy.remove(hierarchy)
+							.success(function(){
+								controller.updateHierarchies();	
+							})
+							.catch(function(){
+								
+							})
+							.finally(function(){
+								$scope.ajax = false;	
+							});
+						});
+					} else {
+						Message.alert("Operation in progress",true)
+					}
+										
 				};
 				
 				this.updateHierarchies();

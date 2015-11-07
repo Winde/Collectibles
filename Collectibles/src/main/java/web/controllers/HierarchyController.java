@@ -1,6 +1,7 @@
 package web.controllers;
 
 import model.dataobjects.HierarchyNode;
+import model.dataobjects.HierarchyNode.HierarchyTreeView;
 import model.persistence.HierarchyRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 import web.supporting.error.exceptions.CollectiblesException;
 import web.supporting.error.exceptions.GenericException;
@@ -22,6 +25,7 @@ public class HierarchyController extends CollectiblesController{
 	@Autowired
 	private HierarchyRepository hierarchyRepository;
 	
+	@JsonView(HierarchyTreeView.class)
 	@RequestMapping("/hierarchy/root/")
 	public HierarchyNode hierarchyRoot() throws CollectiblesException{
 		HierarchyNode hierarchyNode = hierarchyRepository.findRoot();
@@ -48,7 +52,7 @@ public class HierarchyController extends CollectiblesController{
 		}
 	}
 
-	@RequestMapping(value="/hierarchy/remove/{id}", method = RequestMethod.POST)
+	@RequestMapping(value="/hierarchy/remove/{id}", method = RequestMethod.DELETE)
 	public boolean removeHierarchyNode(@PathVariable String id) throws CollectiblesException {
 		Long hierarchyId = this.getId(id);
 		

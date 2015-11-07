@@ -1,5 +1,8 @@
 package model.persistence;
 
+import java.util.Collection;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -7,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import model.dataobjects.Category;
 import model.dataobjects.HierarchyNode;
+import model.dataobjects.Product;
 
 public class HierarchyRepositoryImpl implements HierarchyRepositoryCustom{
 
@@ -15,6 +19,10 @@ public class HierarchyRepositoryImpl implements HierarchyRepositoryCustom{
 	
 	@Autowired
 	private CategoryRepository categoryRepository;
+	
+	@Autowired
+	private ProductRepository productRepository;
+	
 	
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -45,28 +53,49 @@ public class HierarchyRepositoryImpl implements HierarchyRepositoryCustom{
 		return result;
 	}
 	
+	@Override
+	public void delete(Long id){
+		System.out.println("Starting delete id " + id);
+		HierarchyNode node = hierarchyRepository.findOne(id);
+		if (node!=null){
+			this.delete(node);
+		}
+	}
+	
+	@Override
+	public void delete(HierarchyNode node){
+		System.out.println("Starting delete" + node);
+		List<Product> products = productRepository.searchProduct(node);
+		productRepository.delete(products);
+		
+		if (node.getChildren()!=null && node.getChildren().size()>0){			
+			for (HierarchyNode child : node.getChildren()){
+				this.delete(child);				
+			}
+		}
+		
+		node.getFather().removeChildren(node);
+		
+		entityManager.remove(node);
+		entityManager.flush();
+	}
+	
 	@Override 
-	public HierarchyNode save(HierarchyNode node){	
-		System.out.println("BEGIN:" + node);
+	public HierarchyNode save(HierarchyNode node){			
 		HierarchyNode result = null;
 		if (node.getId()!=null && node.getLineage()!=null){
 			result = entityManager.merge(node);
 		} else {
 			entityManager.persist(node);
 			entityManager.refresh(node);
-			boolean updateLineage = node.updateLineage();
-			
-			System.out.println(node.getId());
-			System.out.println(node.getLineage());
-			
+			boolean updateLineage = node.updateLineage();				
 			if (updateLineage){
 				result = entityManager.merge(node);
 			} else {
 				result = node;
 			}
 		}
-		entityManager.flush();
-		System.out.println("END:" + node);
+		entityManager.flush();		
 		return result;		
 	}
 	

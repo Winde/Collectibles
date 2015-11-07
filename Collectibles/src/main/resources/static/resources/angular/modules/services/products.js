@@ -13,7 +13,7 @@
 			remove: function(product){
 				return $http.post('/product/remove/'+product.id);
 			},
-			search: function(root,hierarchy,searchTerm){				
+			search: function(root,hierarchy,searchTerm,withImages){				
 				var url = "/product/search/";
 												
 				if (
@@ -23,15 +23,32 @@
 				){
 					url = url + hierarchy.id + "/";
 				}
-								
+				
+				var needsQuestionMark = true;
+				
 				if (searchTerm!=null && searchTerm!=undefined && searchTerm!=""){
-					url = url + '?search='+searchTerm;				
-				} 					
+					if (needsQuestionMark) { url = url + '?';} else {url = url + '&';}
+					url = url + 'search='+searchTerm;				
+					needsQuestionMark = false;
+				} 				
+				
+				if (withImages!=null){
+					if (needsQuestionMark) { url = url + '?';} else {url = url + '&';}
+					url = url + "withImages=" + withImages;
+					needsQuestionMark = false;
+				}
 				
 				return $http.get(url);
 			},
 			modify: function(product){
 				return $http({ method: 'PUT', url: '/product/modify/', data: product });
+			},
+			addImage: function(product,file){
+				var upload = Upload.upload({
+					url: '/product/'+product.id+'/image/add/',
+					data: { images: file }
+				});
+				return upload;
 			},
 			removeImage: function(product,image){
 				return $http({method: 'POST', url: '/product/'+product.id+'/image/remove/'+image.id});

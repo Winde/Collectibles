@@ -21,7 +21,7 @@
 				if (data.images!=undefined && data.images!=null && data.images.length>0){				
 					Image.multiple(data.images)
 					.success(function(data){
-						$scope.product.images = data;										
+						$scope.product.images = data;						
 					})
 					.catch(function(){		
 						Message.alert("There was an error");
@@ -38,7 +38,7 @@
 		}
 		this.remove = function(image){
 			
-			Product.removeImage(controller.product,image)
+			Product.removeImage($scope.product,image)
 			.success(function(data){
 				$scope.product.images = $scope.product.images.filter(function(e){ return e.id != data}); 
 			})
@@ -70,6 +70,7 @@
 			$scope.root = $scope.$parent.root;
 		}
 		
+		$scope.withImages = "";
 		$scope.products = [];
 		if ($scope.hierarchies = null || $scope.hierarchies == undefined) {
 			$scope.hierarchies = [];
@@ -97,6 +98,22 @@
 			.finally(function(){			
 			});
 		}
+		
+		this.update = function(product) {
+			$scope.ajax = true;
+			
+			Product.modify(product)
+			.success(function(data){
+				product = angular.copy(data);
+			})
+			.catch(function(data){
+				Message.alert("There was an error");
+			})
+			.finally(function(data){
+				
+			});
+		},
+		
 		this.remove = function(product){			
 			$scope.ajax = true;		
 			Product.remove(product)			
@@ -105,7 +122,8 @@
 					$scope.$parent.products = $scope.$parent.products.filter(function(e){ return e.id != data});					
 				}				
 			})
-			.catch(function(data){				
+			.catch(function(data){		
+				Message.alert("There was an error");
 			})
 			.finally(function(){ 
 				$scope.ajax = false; 
@@ -114,13 +132,19 @@
 
 		this.search = function() {
 			
-			var searchTerm = $scope.searchTerm; 
+			var searchTerm = $scope.searchTerm;
+			var withImages = null;
+			if ($scope.withImages == 'true' || $scope.withImages == 'false'){
+				withImages = $scope.withImages;
+			}
+						
+			
 			if (	
 					($scope.root.id!=$scope.hierarchy.id) || 
 					(searchTerm!=null && searchTerm !=undefined && searchTerm!="")
 				){
 				$scope.ajax = true;
-				Product.search($scope.root,$scope.hierarchy,searchTerm)
+				Product.search($scope.root,$scope.hierarchy,searchTerm,withImages)
 				.success(function(data){ 
 					$scope.products = data; 				
 				})
@@ -140,9 +164,11 @@
 	app.controller('ProductChangeController',['$scope','Hierarchy','Product','Message',
 	                                          function($scope,Hierarchy,Product,Message){
 		
+		var controller = this;
 
 		$scope.hierarchy = {};
 		$scope.hierarchies = [];
+		controller.uploading = false;
 		
 		Hierarchy.root()
 		.success(function(data){
@@ -163,18 +189,23 @@
 			$scope.product = {};
 		}
 		
-		this.uploadFile = function(){
-			
-			Product.uploadFile($scope.hierarchy,$scope.file)
-			.success(function(data){
-				Message.success("Products have been uploaded",true);
-			})
-			.catch(function(){
-				Message.alert("There was an error",true);
-			})
-			.finally(function(){
-				
-			});
+		this.uploadFile = function(){			
+			if (controller.uploading!=true){
+				controller.uploading = true;
+				Product.uploadFile($scope.hierarchy,$scope.file)
+				.success(function(data){					
+					$scope.file = [];					 				
+					Message.success("Products have been uploaded",true);					
+				})
+				.catch(function(){
+					Message.alert("There was an error",true);
+				})
+				.finally(function(){
+					controller.uploading = false;
+				});
+			} else {
+				Message.alert("Upload in progress",false);
+			}
 		};
 		
 		this.changeProduct = function(){
@@ -209,6 +240,23 @@
 				.finally(function(){					
 				});
 			} 
+		};
+		
+		this.uploadImage = function(file){
+			
+			var product = $scope.product;
+			
+			Product.addImage(product,file)
+			.success(function(data){
+				product.images = product.images.concat(data);
+			})
+			.catch(function(){
+				Message.alert("There was an error");
+			})
+			.finally(function(){
+				
+			});
+			
 		}
 	}]);
 	

@@ -14,12 +14,18 @@
 .bootstrap-select .depth6 {	padding-left: 80px; }
 .bootstrap-select .depth7 {	padding-left: 90px; }
 
+.hierarchy-tree .depth0 {	padding-left: 0px; }
+.hierarchy-tree .depth1 {	padding-left: 15px; }
+.hierarchy-tree .depth2 {	padding-left: 30px; }
+.hierarchy-tree .depth3 {	padding-left: 45px; }
+.hierarchy-tree .depth4 {	padding-left: 60px; }
+.hierarchy-tree .depth5 {	padding-left: 75px; }
+.hierarchy-tree .depth6 {	padding-left: 90px; }
+.hierarchy-tree .depth7 {	padding-left: 105px; }
+
+
 .createProductForm {
 	clear: both;
-}
-
-.productListEntry {
-	border-bottom: 1px solid grey;	
 }
 
 select.ng-invalid,.ng-invalid.ng-dirty,.ng-invalid {

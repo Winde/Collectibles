@@ -40,7 +40,22 @@
 					newconfig.offset =  {from: 'top', amount: 150};	
 				}
 				jQuery.bootstrapGrowl(message,newconfig); 
-			}
+			},
+			confirm: function(message,callback){
+				if (bootbox){
+					bootbox.confirm(message, function(result) {
+						console.log(result);
+						if (result){
+							callback();
+						}
+		            });			
+				}else {
+					if (confirm(message)){
+						callback();
+					}
+				}
+			} 
+			
 		};		
 	});
 	

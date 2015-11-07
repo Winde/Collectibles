@@ -27,12 +27,34 @@
 			}">
 		</select>
 	</div>
+	<div class="form-group">
+		<label>Images:</label>
+		<div class="radio">
+			<label>Any</label>
+			<input type="radio" class="form-control"
+				ng-model="withImages"			
+				ng-change="productListCtrl.search()" value=""/>
+		</div>
+		<div class="radio">		
+			<label>With</label>
+			<input type="radio" class="form-control"
+				ng-model="withImages"			
+				ng-change="productListCtrl.search()" value="true"/>
+		</div>
+		<div class="radio">
+			<label>Without</label>
+			<input type="radio" class="form-control"
+				ng-model="withImages"			
+				ng-change="productListCtrl.search()" value="false" />
+		</div>
+	</div>
+		
 	<ajax ng-show="ajax" ></ajax>
 			
 </form>
 
 <div  class="productGrid container-fluid">
-	<product-list-entry ng-repeat="product in products"></product-list-entry>
+	<product-list-entry ng-repeat="product in products | orderBy:'releaseDate'"></product-list-entry>
 </div>
 
 <div ng-show="products.length <=0">

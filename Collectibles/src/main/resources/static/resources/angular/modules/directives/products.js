@@ -8,10 +8,7 @@
 			templateUrl: '/app/snipet/product-search.html',
 			controllerAs: 'productListCtrl',
 			controller: 'ProductListController',			
-			link: function(scope, element, attrs, ng){
-                
-               
-                
+			link: function(scope, element, attrs, ng){               
 			}
 		};		
 	});

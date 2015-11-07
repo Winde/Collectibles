@@ -3,8 +3,11 @@ package web.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import model.dataobjects.Category;
@@ -28,6 +31,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.joestelmach.natty.DateGroup;
+import com.joestelmach.natty.Parser;
 
 import web.supporting.error.exceptions.CollectiblesException;
 import web.supporting.error.exceptions.GenericException;
@@ -81,14 +87,35 @@ public class ProductController  extends CollectiblesController{
 						inputStream = file.getInputStream();					
 						InputStreamReader reader = new InputStreamReader(inputStream);					
 						CSVParser parser = CSVFormat.EXCEL.withHeader().parse(reader);
+						
+						List<SimpleDateFormat> formats = new ArrayList<>();
+						formats.add(new SimpleDateFormat("yyyy-mm-dd"));
+						formats.add(new SimpleDateFormat("yyyy"));
+						
+						
 						for (CSVRecord record : parser.getRecords()){
 							String name = record.get("name");
 							String description = record.get("description");
+							String owned = record.get("owned");
+							String reference = record.get("reference");
+							String date = record.get("date");
 							Product product = new Product();
-							product.setName(name);
-							product.setDescription(description);
-							product.setHierarchyPlacement(hierarchyNode);
-							System.out.println(product);
+							if (name!=null && !"".equals(name.trim())){ product.setName(name); }
+							if (description!=null && !"".equals(description.trim())){ product.setDescription(description); }
+							if (reference!=null && !"".equals(reference.trim())){ product.setReference(reference); }
+							if (owned !=null && owned.trim().equals("true")){product.setOwned(true); }
+							if (date!=null && !date.trim().equals("")){
+								for (SimpleDateFormat format : formats ){
+									try {
+										Date parsedDate = format.parse(date);
+										if (parsedDate!=null){
+											product.setReleaseDate(parsedDate);
+										}
+									} catch (ParseException e) {}
+								}
+								
+							}
+							product.setHierarchyPlacement(hierarchyNode);							
 							validate(product);
 							
 							
@@ -222,7 +249,7 @@ public class ProductController  extends CollectiblesController{
 	}
 	
 	@RequestMapping(value="/product/{id}/image/add/", method = RequestMethod.POST)
-	public Product addImageToProduct(@PathVariable String id,			
+	public List<Image> addImageToProduct(@PathVariable String id,			
             @RequestPart("images") MultipartFile[] files)
             throws CollectiblesException {
 		
@@ -252,7 +279,7 @@ public class ProductController  extends CollectiblesController{
 				}
 				
 				productRepository.addImage(productInDb, images);
-				return productInDb;
+				return images;
 			} else {
 				throw new NotFoundException(new String[]{"product"});
 			}			

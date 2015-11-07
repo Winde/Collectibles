@@ -1,0 +1,18 @@
+<div ng-repeat="hierarchy in hierarchies">
+	<div class="hierarchy-tree">
+		<div ng-class="{ 
+					'root': hierarchy.isRoot == true,
+					'depth0': hierarchy.depth == 0,
+					'depth1': hierarchy.depth == 1,
+					'depth2': hierarchy.depth == 2,
+					'depth3': hierarchy.depth == 3,
+					'depth4': hierarchy.depth == 4,
+					'depth5': hierarchy.depth == 5,
+					'depth6': hierarchy.depth == 6,
+					'depth7': hierarchy.depth == 7,
+					element: isElement == true				
+				}">
+			<a href ng-click="hierarchyCtrl.remove(hierarchy)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>{{hierarchy.name}}
+		</div>
+	</div>
+</div>

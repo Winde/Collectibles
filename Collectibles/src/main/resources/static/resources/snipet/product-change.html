@@ -3,6 +3,12 @@
 	ng-submit="changeProductForm.$valid && productChangeCtrl.changeProduct()" 
 	novalidate>			
 	
+	<div class="form-group" ng-if="product.id">
+		<label>Add Image</label>
+		<div class="btn btn-default" 
+			ngf-select="productChangeCtrl.uploadImage($file)" >Upload</span></div>
+	</div>
+	
 	<div class="form-group">	
 		<label>Hierarchy</label>	<!-- selectpicker  -->	
 		<select class="form-control"		

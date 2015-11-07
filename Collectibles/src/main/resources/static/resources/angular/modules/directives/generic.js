@@ -71,9 +71,8 @@
                     return {
                         restrict: "A",
                         require: ["ngModel", "?collectionName",'?eval'],
-                        compile: function(tElement, tAttrs, transclude) {                            
-                            $(tElement).selectpicker();
-                            
+                        compile: function(tElement, tAttrs, transclude) {
+                        	
                             if (angular.isUndefined(tAttrs.ngModel)) {
                                 throw new Error("Please add ng-model attribute!");
                             } else if (angular.isUndefined(tAttrs.collectionName)) {
@@ -86,6 +85,7 @@
                                     return;
                                 }
                                 
+                                $(element).selectpicker();
                                 
                                 $(element).on('change', function() {
                                 	

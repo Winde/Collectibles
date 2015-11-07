@@ -10,8 +10,7 @@
 				children[j].group = parent.name;
 				array.push(children[j]);
 				if ((maxDepth== undefined || depth<maxDepth) && children[j].children!=null && children[j].children.length > 0) {				
-					children[j].isGroup = true;	
-					console.log(JSON.stringify(array, ["name","depth"]));
+					children[j].isGroup = true;						
 					addChildren(array, children[j], children[j].children, depth +1, maxDepth);
 				} else {
 					children[j].isElement = true;
@@ -25,12 +24,14 @@
 			},
 			calculateTree: function(root,destination){
 				if (root.children!=null && root.children!=undefined && root.children.length>0){							
-					addChildren(destination, root, root.children, 1);
-					console.log(JSON.stringify(destination, ["name","depth"]));
+					addChildren(destination, root, root.children, 1);					
 				}
 			},
 			create: function(hierarchy, parent){
 				return $http({url: '/hierarchy/create/'+parent.id+'/', method: 'POST', data: hierarchy});
+			},
+			remove: function(hierarchy){				
+				return $http({url: '/hierarchy/remove/'+hierarchy.id+'/', method: 'DELETE'});
 			}
 		}
 		

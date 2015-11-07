@@ -2,6 +2,7 @@ package model.dataobjects;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -20,6 +21,7 @@ import javax.persistence.OneToMany;
 import model.dataobjects.HierarchyNode.HierarchySimpleView;
 import model.dataobjects.SimpleIdDao.SimpleIdDaoView;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -60,6 +62,8 @@ public class Product extends SimpleIdDao{
 	@Column
 	private Boolean owned = Boolean.FALSE;	
 	
+	@Column	
+	private Date releaseDate = null;
 	
 	public Product(){}
 
@@ -141,12 +145,20 @@ public class Product extends SimpleIdDao{
 		}
 	}
 
-	public boolean isOwned() {
+	public boolean getOwned() {
 		return Boolean.TRUE.equals(this.owned);
 	}
 
 	public void setOwned(Boolean owned) {
 		this.owned = owned;
+	}
+	
+	public Date getReleaseDate() {
+		return releaseDate;
+	}
+
+	public void setReleaseDate(Date releaseDate) {
+		this.releaseDate = releaseDate;
 	}
 
 	public String toString(){

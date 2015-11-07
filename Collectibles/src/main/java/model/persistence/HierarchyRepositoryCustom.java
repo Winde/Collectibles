@@ -18,4 +18,10 @@ public interface HierarchyRepositoryCustom {
 
 	@Transactional
 	public HierarchyNode save(HierarchyNode node);
+
+	@Transactional
+	public void delete(HierarchyNode node);
+
+	@Transactional
+	public void delete(Long id);
 }

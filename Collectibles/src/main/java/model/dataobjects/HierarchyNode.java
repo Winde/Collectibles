@@ -20,7 +20,9 @@ import com.fasterxml.jackson.annotation.JsonView;
 public class HierarchyNode extends SimpleIdDao{
 
 	public interface HierarchySimpleView extends SimpleIdDaoView{};
-	public interface HierarchyComplexView extends HierarchySimpleView {};
+	public interface HierarchyTreeView extends HierarchySimpleView{};
+	public interface HierarchyComplexView extends HierarchyTreeView {};
+	
 	
 	@Column
 	@JsonView(HierarchySimpleView.class)
@@ -28,7 +30,7 @@ public class HierarchyNode extends SimpleIdDao{
 	
 	@OneToMany	
 	@JsonIgnoreProperties({"categories"})	
-	@JsonView(HierarchyComplexView.class)
+	@JsonView(HierarchyTreeView.class)
 	private Set<HierarchyNode> children;
 	
 	@ManyToOne
@@ -46,6 +48,7 @@ public class HierarchyNode extends SimpleIdDao{
 	private String lineage;
 	
 	@Column
+	@JsonView(HierarchySimpleView.class)
 	private Integer depth;
 	
 	public HierarchyNode(){
@@ -66,6 +69,13 @@ public class HierarchyNode extends SimpleIdDao{
 		} else {
 			return new ArrayList<>(children);
 		}
+	}
+	
+	public boolean emptyChildren(){
+		if (this.children!=null){
+			this.children.clear();
+		}
+		return true;
 	}
 	
 	public boolean addChildren(HierarchyNode node){
