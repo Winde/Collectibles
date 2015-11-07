@@ -1,13 +1,17 @@
-<div ng-init="product={ hierarchyPlacement: null }; editable = false; forbidedit = false">
+<div class="container">
+	<div ng-init="product={ hierarchyPlacement: null }; editable = false; forbidedit = false">
+			
+		<product-page 
+			product="product" 
+			editable="editable" 
+			is-authenticated="isAuthenticated()"		
+			forbidedit="forbidedit"></product-page>
 		
-	<product-page 
-		product="product" 
-		editable="editable" 
-		forbidedit="forbidedit"></product-page>
-	
-	<product-change 
-		ng-show="editable" 
-		product="product" 
-		createnew="editable"></product-change>
-		
+		<product-change 
+			ng-show="editable" 
+			product="product" 	
+			is-authenticated="isAuthenticated()"	
+			createnew="editable"></product-change>
+			
+	</div>
 </div>

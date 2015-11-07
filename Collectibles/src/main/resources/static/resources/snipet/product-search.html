@@ -27,7 +27,12 @@
 			}">
 		</select>
 	</div>
-	<div class="form-group">
+	
+		
+	<ajax ng-show="ajax" ></ajax>
+	
+	
+	<div>
 		<label>Images:</label>
 		<div class="radio">
 			<label>Any</label>
@@ -48,11 +53,29 @@
 				ng-change="productListCtrl.search()" value="false" />
 		</div>
 	</div>
-		
-	<ajax ng-show="ajax" ></ajax>
+	<div>
+		<label>Owned:</label>
+		<div class="radio">
+			<label>Any</label>
+			<input type="radio" class="form-control"
+				ng-model="owned"			
+				ng-change="productListCtrl.search()" value=""/>
+		</div>
+		<div class="radio">		
+			<label>Yes</label>
+			<input type="radio" class="form-control"
+				ng-model="owned"			
+				ng-change="productListCtrl.search()" value="true"/>
+		</div>
+		<div class="radio">
+			<label>No</label>
+			<input type="radio" class="form-control"
+				ng-model="owned"			
+				ng-change="productListCtrl.search()" value="false" />
+		</div>
+	</div>
 			
 </form>
-
 <div  class="productGrid container-fluid">
 	<product-list-entry ng-repeat="product in products | orderBy:'releaseDate'"></product-list-entry>
 </div>
@@ -60,3 +83,4 @@
 <div ng-show="products.length <=0">
 	No results found
 </div>
+

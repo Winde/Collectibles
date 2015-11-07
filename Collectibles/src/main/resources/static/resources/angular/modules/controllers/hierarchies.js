@@ -55,7 +55,8 @@
 								
 							})
 							.finally(function(){
-								$scope.ajax = false;	
+								$scope.ajax = false;
+								controller.deleting = false;
 							});
 						});
 					} else {

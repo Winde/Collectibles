@@ -24,6 +24,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,6 +70,7 @@ public class ProductController  extends CollectiblesController{
 		}
 	}
 	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/create/from/file/{hierarchy}", method = RequestMethod.POST)
 	public Collection<Product> addProductsFromFile(
 			@PathVariable String hierarchy,
@@ -141,7 +143,7 @@ public class ProductController  extends CollectiblesController{
 		}		
 	}
 	
-	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/create/{hierarchy}", method = RequestMethod.POST)
 	public Product addProduct(@RequestBody Product product,@PathVariable String hierarchy) throws CollectiblesException {
 		Long hierarchyId = this.getId(hierarchy);
@@ -164,6 +166,7 @@ public class ProductController  extends CollectiblesController{
 		
 	}
 	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/remove/{id}", method = RequestMethod.POST)
 	public Long removeProduct(@PathVariable String id) throws CollectiblesException {		
 		Long idLong = this.getId(id);
@@ -180,7 +183,7 @@ public class ProductController  extends CollectiblesController{
 		}
 	}
 	
-	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/find/{productId}/category/value/add/{categoryValueId}", method = RequestMethod.POST)
 	public Product addCategoryValue(@PathVariable String productId, @PathVariable String categoryValueId) throws CollectiblesException {
 		Long longProductId = this.getId(productId);
@@ -203,20 +206,18 @@ public class ProductController  extends CollectiblesController{
 		
 		Category category = categoryValue.getCategory();
 		Collection<Category> productCategories = product.getHierarchyPlacement().getCategories();
-		
-		System.out.println(category);
-		System.out.println(productCategories);
-		
+
 		if (productCategories == null || category == null || !productCategories.contains(category)){
 			throw new IncorrectParameterException(new String[]{"category"});
 		}
 		
 		product.addCategoryValue(categoryValue);
 		productRepository.save(product);		
-		System.out.println("HERE");
+
 		return product;
 	}
 	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/modify/", method = RequestMethod.PUT)
 	public Product modifyProduct(@RequestBody Product product) throws CollectiblesException {		
 		this.validate(product);
@@ -229,13 +230,9 @@ public class ProductController  extends CollectiblesController{
 						product.getHierarchyPlacement()==null || 
 						product.getHierarchyPlacement().getId()==null || 
 						hierarchyRepository.findOne(product.getHierarchyPlacement().getId())==null
-				){				
-					System.out.println("Resetting placement");					
+				){								
 					product.setHierarchyPlacement(productInDb.getHierarchyPlacement());
-				} else {
-					System.out.println("Conserving placement");
-				}
-			 				
+				} 			 				
 				product.setCategoryValues(productInDb.getCategoryValues());
 				product.setImages(productInDb.getImages());
 				Product result = productRepository.save(product);
@@ -248,6 +245,7 @@ public class ProductController  extends CollectiblesController{
 		}			
 	}
 	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/{id}/image/add/", method = RequestMethod.POST)
 	public List<Image> addImageToProduct(@PathVariable String id,			
             @RequestPart("images") MultipartFile[] files)
@@ -288,6 +286,7 @@ public class ProductController  extends CollectiblesController{
 		}
 	}
 	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/{productId}/image/remove/{imageId}", method = RequestMethod.POST)
 	public Long removeImageFromProduct(@PathVariable String productId,@PathVariable String imageId) throws CollectiblesException{
 		Long longProductId = this.getId(productId);

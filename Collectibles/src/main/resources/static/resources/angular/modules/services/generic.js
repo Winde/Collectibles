@@ -43,8 +43,7 @@
 			},
 			confirm: function(message,callback){
 				if (bootbox){
-					bootbox.confirm(message, function(result) {
-						console.log(result);
+					bootbox.confirm(message, function(result) {						
 						if (result){
 							callback();
 						}

@@ -45,8 +45,9 @@
 	                        if (thereIsEmptyOption){
 	                        	index = index +1;
 	                        } 
-	                        
-	                        var option =option = elem.find('option')[index];
+	                        	                        
+	                        var option = elem.find('option')[index];
+	                        	                        
 	                        // now loop through the key/value pairs in the mapping object
 	                        // and apply the classes that evaluated to be truthy.
 	                        angular.forEach(classes, function (add, className) {
@@ -100,13 +101,19 @@
                                 	
                                 	
                                 	if (element.attr("data-collection-name")){
-	                                	var value = scope[element.attr("data-collection-name")][index];	                                		                                	
+                                		if (scope[element.attr("data-collection-name")].length>$(element).find('option').length){
+                                			index = index +1;
+                                		}
+                                		
+	                                	var value = scope[element.attr("data-collection-name")][index];
+	                                		                                		                                	
 	                                	if (element.attr('data-collection-attribute')){
 	                                		value = value[element.attr('data-collection-attribute')];
 	                                	}
                                 	} else {
                                 		var value = $(element).val();
                                 	}
+                                	
                                 	scope.$apply(function () {
 	                                	var parsed = $parse(attrs.ngModel);	
 	                            		parsed.assign(scope, value);

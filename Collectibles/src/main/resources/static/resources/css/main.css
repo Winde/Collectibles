@@ -2,6 +2,12 @@
 	margin-top: 20px;
 }
 
+.productListEntry{
+	border: 1px solid #ccc;
+	padding: 5px;
+	vertical-align: middle;	
+}
+
 .bootstrap-select .root {
 	padding-left: 20px;
 }
@@ -43,3 +49,16 @@ select.ng-invalid,.ng-invalid.ng-dirty,.ng-invalid {
 	display: inline-block;
 }
 
+.mainImage {
+	width: 330px;
+}
+
+.smallImage {
+	width: 100px;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+.carousel {
+	margin-top: 10px;
+}

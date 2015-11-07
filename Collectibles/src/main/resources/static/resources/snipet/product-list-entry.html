@@ -1,12 +1,21 @@
 <div class="row productListEntry">
-	<div class="col-md-6"><a ng-href="#/product/{{product.id}}"><span>{{product.name}}</span></a></div>		
+	<div class="col-md-5"><a ng-href="#/product/{{product.id}}"><span>{{product.name}}</span></a></div>		
 	<div class="col-md-1">
-		<input type="checkbox" 
-			ng-model="product.owned" 
-			ng-change="productManagementCtrl.update(product)" />
+		<div ng-if="isAuthenticated()">
+			<input type="checkbox" 
+				ng-model="product.owned" 
+				ng-change="productManagementCtrl.update(product)" />
+		</div>
+		<div ng-if="!isAuthenticated()">
+			<span ng-if="product.owned">Owned</span>			
+		</div>
 	</div>
-	<div class="col-md-4">		
-		<form>
+	<div class="col-md-2">		
+		<img class="img-responsive img-thumbnail" ng-show="product.selectedImage.data" ng-src="data:image/JPEG;base64,{{product.selectedImage.data}}">		
+	</div>
+		
+	<div class="col-md-3">		
+		<form ng-if="isAuthenticated()">
 			<div class="form-group">
 				<select class="form-control"	
 					selectpicker									
@@ -28,7 +37,8 @@
 					}">
 				</select>
 			</div>
-		</form>		 
+		</form>	
+		<div ng-if="!isAuthenticated()">{{product.hierarchyPlacement.name}}</div>	 
 	</div>
-	<div class="col-md-1"><a href ng-click="productManagementCtrl.remove(product)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></div>
+	<div class="col-md-1"><a href ng-if="isAuthenticated()" ng-click="productManagementCtrl.remove(product)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></div>
 </div>

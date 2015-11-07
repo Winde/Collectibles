@@ -3,8 +3,8 @@
 	angular.module('images-services',[])
 	.factory('Image', function ImageFactory($http){
 		return {
-			one: function(id){
-				
+			one: function(image){
+				return $http({method: 'GET', url: '/images/'+image.id});
 			},
 			multiple: function(images){
 				var parameter = "";

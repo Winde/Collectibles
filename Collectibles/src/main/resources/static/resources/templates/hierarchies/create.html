@@ -1,9 +1,13 @@
-<div ng-init="hierarchies = []">
-	<h1>Manage Hierarchies</h1>
-
-	<hierarchy-tree hierarchies="hierarchies"></hierarchy-tree>
-	
-	<h2>Create Hierarchy</h2>
-	<hierarchy-create hierarchies="hierarchies"></hierarchy-create>
-	
+<div class="container">
+	<div ng-init="hierarchies = []">
+		<h1>Manage Hierarchies</h1>
+		
+		
+		
+		<hierarchy-tree hierarchies="hierarchies" is-authenticated="isAuthenticated()"></hierarchy-tree>
+		
+		<h2>Create Hierarchy</h2>
+		<hierarchy-create hierarchies="hierarchies" is-authenticated="isAuthenticated()"></hierarchy-create>
+		
+	</div>
 </div>

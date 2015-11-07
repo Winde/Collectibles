@@ -1,8 +1,10 @@
 package model.persistence;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -14,6 +16,7 @@ import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
+import model.persistence.queryParameters.ProductSearch;
 
 public class ProductRepositoryImpl implements ProductRepositoryCustom{
 
@@ -75,8 +78,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			imageRepository.save(product.getImages().get(0));
 		}
 				
-		if (!exists){
-			System.out.println("Not exists");
+		if (!exists){			
 			return false;
 		} else {
 			imageRepository.delete(imageId);
@@ -87,12 +89,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 
 
 	@Override
-	public List<Product> searchProduct(HierarchyNode node, String search, Collection<CategoryValue> categoryValues, Boolean withImages) {
+	public Collection<Product> searchProduct(ProductSearch search) {
 		String hql = "";
 		
 		hql = hql + "select p from Product p LEFT JOIN FETCH p.images ";
 		
-		if (categoryValues!=null){
+		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
 			hql = hql + " INNER JOIN p.categoryValues categoryValues ";
 		}
 		
@@ -100,7 +102,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		
 		boolean needsAnd = false;
 		
-		if (search!=null){			
+		if (search.getSearchTerm()!=null){			
 			if (needsAnd){ hql = hql + " AND ";}
 			hql = hql + ""
 					+ "( "
@@ -109,29 +111,35 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 					+ ") ";
 			needsAnd = true;
 		}
-		if (node!=null){		
+		if (search.getHierarchy()!=null){		
 			if (needsAnd){ hql = hql + " AND ";}
 			hql = hql + "(p.hierarchyPlacement.lineage LIKE CONCAT(:lineage,'%')) ";
 			needsAnd = true;
 		}
-		if (categoryValues!=null){
+		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
 			if (needsAnd){ hql = hql + " AND ";}
 			hql = hql + "( categoryValues IN (:categoryValues) ) ";
 			needsAnd = true;			
 		}
 		
-		if (withImages!=null){
+		if (search.getWithImages()!=null){
 			if (needsAnd){ hql = hql + " AND ";}			
-			if (withImages){
-				hql = hql + "(p.images IS NOT EMPTY )";
+			if (search.getWithImages()){
+				hql = hql + "(p.images IS NOT EMPTY ) ";
 			} else {
-				hql = hql + "(p.images IS EMPTY )";
+				hql = hql + "(p.images IS EMPTY ) ";
 			}
 			needsAnd = true;
 		}
 		
+		if (search.getOwned()!=null){
+			if (needsAnd){ hql = hql + " AND ";}			
+			hql = hql + "(p.owned = :owned ) ";			
+			needsAnd = true;
+		}
 		
-		if (categoryValues!=null){
+		
+		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
 			hql = hql + "GROUP BY p having count(categoryValues)=:sizeCategoryValues "; 			
 		}
 		
@@ -139,33 +147,28 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		
 		TypedQuery<Product> query = entityManager.createQuery(hql, Product.class);
 		
-		if (search!=null){ query.setParameter("search",search);}
-		if (node!=null){ query.setParameter("lineage",node.getLineage());}
-		if (categoryValues!=null) {
-				query.setParameter("categoryValues", categoryValues); 
-				query.setParameter("sizeCategoryValues",categoryValues.size());
+		if (search.getSearchTerm()!=null){ query.setParameter("search",search.getSearchTerm());}
+		if (search.getHierarchy()!=null){ query.setParameter("lineage",search.getHierarchy().getLineage());}
+		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0) {
+				query.setParameter("categoryValues", search.getCategoryValues()); 
+				query.setParameter("sizeCategoryValues",search.getCategoryValues().size());
 		}
+		if (search.getOwned()!=null) { query.setParameter("owned",search.getOwned()); }
 		
-		System.out.println(query.toString());
+		System.out.println(hql);
 		
-		return query.getResultList();
+		Set<Product> result = new HashSet<>();
+		result.addAll(query.getResultList());
+		return result;
 	}
 
 	@Override
-	public List<Product> searchProduct(HierarchyNode node) { 
-		return  searchProduct(node, null, null, null);
+	public Collection<Product> searchProduct(HierarchyNode node) {
+		ProductSearch search = new ProductSearch();
+		search.setHierarchy(node);
+		Collection<String> errors = search.errors();
+		return searchProduct(search);		
 	}
-
-	@Override
-	public List<Product> searchProduct(HierarchyNode node, String search) {
-		return  searchProduct(node, search, null, null);
-	}
-
-	@Override
-	public List<Product> searchProduct(String search) {
-		return  searchProduct(null, search, null, null);
-	}
-
 
 
 	

@@ -14,6 +14,10 @@
 			angular.copy($scope.product,controller.product);			
 		};
 		
+		this.setSelectedImage = function(image){			
+			$scope.product.selectedImage = image;
+		}
+		
 		if ($routeParams.id){
 			Product.one($routeParams.id)
 			.success(function(data){
@@ -21,7 +25,18 @@
 				if (data.images!=undefined && data.images!=null && data.images.length>0){				
 					Image.multiple(data.images)
 					.success(function(data){
-						$scope.product.images = data;						
+						$scope.product.images = data;
+						if (data.length>0){							
+							if ($scope.product.mainImage != null) {
+								for (var i=0;i<data.length;i++){
+									if (data[i].id == $scope.product.mainImage.id){
+										$scope.product.selectedImage =data[i]; 
+									}
+								}
+							} else {
+								$scope.product.selectedImage =data[0]; 
+							}
+						}						
 					})
 					.catch(function(){		
 						Message.alert("There was an error");
@@ -39,8 +54,15 @@
 		this.remove = function(image){
 			
 			Product.removeImage($scope.product,image)
-			.success(function(data){
-				$scope.product.images = $scope.product.images.filter(function(e){ return e.id != data}); 
+			.success(function(data){								
+				$scope.product.images = $scope.product.images.filter(function(e){ return e.id != data});
+				if ($scope.product.selectedImage.id == image.id) {					
+					if ($scope.product.images.length>0){						
+						$scope.product.selectedImage = $scope.product.images[0];
+					} else{
+						$scope.product.selectedImage = null;
+					}
+				}				
 			})
 			.catch(function(){	
 				Message.alert("There was an error");
@@ -62,15 +84,46 @@
 		
 	}]);
 	
-	app.controller('ProductListController',['$scope','$filter','Product','Hierarchy','Message',
-	                                        function($scope,$filter,Product,Hierarchy,Message){
+	app.controller('ProductListController',['$scope','$filter','Image','Product','Hierarchy','Message',
+	                                        function($scope,$filter,Image,Product,Hierarchy,Message){
 		var controller = this;
 				
 		if ($scope.$parent && $scope.$parent.root) {
 			$scope.root = $scope.$parent.root;
 		}
 		
+		if ($scope.product && $scope.product.images){
+			var image = null;
+			if ($scope.product.images && $scope.product.images.length){
+				for (var i=0;i<$scope.product.images.length;i++){
+					if ($scope.product.images[i].main == true){
+						image = $scope.product.images[i];
+					}
+				}
+				if (image == null){
+					image = $scope.product.image[0];
+				}
+			}
+			
+			if (image!=null){
+				Image.one(image)
+				.success(function(data){
+					if (data.length>0){
+						$scope.product.selectedImage = data[0];
+					}					
+				})
+				.catch(function(){
+					Message.alert("There was an error");
+				})
+				.finally(function(){
+					
+				});
+			
+			}
+		}
+		
 		$scope.withImages = "";
+		$scope.owned = "";
 		$scope.products = [];
 		if ($scope.hierarchies = null || $scope.hierarchies == undefined) {
 			$scope.hierarchies = [];
@@ -137,16 +190,19 @@
 			if ($scope.withImages == 'true' || $scope.withImages == 'false'){
 				withImages = $scope.withImages;
 			}
-						
+			var owned = null;
+			if ($scope.owned == 'true' || $scope.owned == 'false'){
+				owned = $scope.owned;
+			}			
 			
 			if (	
 					($scope.root.id!=$scope.hierarchy.id) || 
 					(searchTerm!=null && searchTerm !=undefined && searchTerm!="")
 				){
 				$scope.ajax = true;
-				Product.search($scope.root,$scope.hierarchy,searchTerm,withImages)
+				Product.search($scope.root,$scope.hierarchy,searchTerm,withImages,owned)
 				.success(function(data){ 
-					$scope.products = data; 				
+					$scope.products = data;
 				})
 				.catch(function(data){
 					Message.alert("There was an error");
@@ -248,7 +304,11 @@
 			
 			Product.addImage(product,file)
 			.success(function(data){
+				if ((product.images== null || product.images.length==0) && data.length>0) {
+					product.selectedImage = data[0];
+				}
 				product.images = product.images.concat(data);
+				
 			})
 			.catch(function(){
 				Message.alert("There was an error");

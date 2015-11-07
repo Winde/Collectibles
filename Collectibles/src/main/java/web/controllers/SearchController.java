@@ -12,6 +12,7 @@ import model.dataobjects.Product;
 import model.dataobjects.Product.ProductListView;
 import model.persistence.HierarchyRepository;
 import model.persistence.ProductRepository;
+import model.persistence.queryParameters.ProductSearch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,17 +36,38 @@ public class SearchController  extends CollectiblesController{
 	private HierarchyRepository hierarchyRepository;
 	
 	
-	private Collection<Product> findProduct(String hierarchy, String search, Collection<String> categoryValuesIds, String withImagesString) throws CollectiblesException {
+	private Collection<Product> findProduct(
+			String hierarchy, 
+			String search, 
+			Collection<String> categoryValuesIds, 
+			String withImagesString,
+			String ownedString) throws CollectiblesException {
 
 			Boolean withImages = null;
 		
-			System.out.println(withImagesString);
+			
+			ProductSearch searchObject = new ProductSearch();
+			
+			searchObject.setSearchTerm(search);
+			
+
+			Boolean owned = null;
+			
+			if (ownedString!=null && ownedString.equals("true")){
+				owned = Boolean.TRUE;
+			} else if (ownedString!=null && ownedString.equals("false")){
+				owned = Boolean.FALSE;
+			}
+			
+			searchObject.setOwned(owned);
 			
 			if (withImagesString!=null && withImagesString.equals("true")){
 				withImages = Boolean.TRUE;
 			} else if (withImagesString!=null && withImagesString.equals("false")){
 				withImages = Boolean.FALSE;
 			}
+			
+			searchObject.setWithImages(withImages);
 		
 			HierarchyNode node = null;
 			if (hierarchy!=null && !"".equals(hierarchy.trim())){
@@ -60,6 +82,8 @@ public class SearchController  extends CollectiblesController{
 					}
 				}
 			}
+			
+			searchObject.setHierarchy(node);
 			
 						
 			List<CategoryValue> categoryValues = new ArrayList<>();
@@ -76,34 +100,17 @@ public class SearchController  extends CollectiblesController{
 				}
 			}
 			
+			searchObject.setCategoryValues(categoryValues);
+			
 			System.out.println(withImages);
 			
 			Collection<Product> result = null;
-			if (node!=null){										//We search by HierarchyNode
-				if (search!=null && !search.trim().equals("")){		//We have Search String
-					if (categoryValues.size()>0){					//We have list of categories
-						result = productRepository.searchProduct(node, search, categoryValues,withImages );
-					} else {										//We don't have list of categories
-						result = productRepository.searchProduct(node, search,null,withImages);
-					}
-				} else {											//We don't have a Search String
-					if (categoryValues.size()>0){					//We have list of categories
-						result = productRepository.searchProduct(node, null,categoryValues,withImages);
-					} else {										//We don't have list of categories
-						result = productRepository.searchProduct(node,null,null,withImages);
-					}
-				}
-			} else {												//We search without HierarchyNode
-				if (search!=null && !search.trim().equals("")){		//We have Search String
-					if (categoryValues.size()>0){					//We have categories ==> No category search allowed without hierarchy
-						throw new IncorrectParameterException(new String[]{"categories"});
-					} else {										//We don't have list of categories
-						result = productRepository.searchProduct(null,search,null,withImages);
-					}
-				} else {
-					//We don't have search string ==> As category search disallowed, we provided no search criteria
-					throw new IncorrectParameterException(new String[]{"hierarchy","search","categories"});
-				}
+
+			Collection<String> errors = searchObject.errors();
+			if (errors == null || errors.size()<=0){
+				result = productRepository.searchProduct(searchObject);
+			}else {
+				throw new IncorrectParameterException(errors);
 			}
 
 			if (result ==null){
@@ -117,8 +124,9 @@ public class SearchController  extends CollectiblesController{
 	@RequestMapping(value="/product/search")
 	public Collection<Product> search(HttpServletRequest request, 			
 			@RequestParam(required=false, name="withImages") String withImagesString,
-			@RequestParam(required=false, name="search") String searchString) throws CollectiblesException{					
-		return findProduct(null,searchString,null,withImagesString);
+			@RequestParam(required=false, name="search") String searchString,
+			@RequestParam(required=false, name="owned" ) String owned) throws CollectiblesException{					
+		return findProduct(null,searchString,null,withImagesString,owned);
 		
 	}
 	
@@ -128,8 +136,9 @@ public class SearchController  extends CollectiblesController{
 			@PathVariable String hierarchy, 
 			@RequestParam(required=false, name="search") String searchString,
 			@RequestParam(required=false, name="withImages") String withImagesString,
+			@RequestParam(required=false, name="owned" ) String owned,
 			@RequestParam(required=false, name="categoryValues" ) List<String> categories) throws CollectiblesException{					
-		return findProduct(hierarchy,searchString,categories,withImagesString);
+		return findProduct(hierarchy,searchString,categories,withImagesString,owned);
 		
 	}
 }

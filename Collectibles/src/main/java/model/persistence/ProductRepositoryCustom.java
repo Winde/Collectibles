@@ -12,6 +12,7 @@ import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
+import model.persistence.queryParameters.ProductSearch;
 
 public interface ProductRepositoryCustom {
 
@@ -24,13 +25,9 @@ public interface ProductRepositoryCustom {
 	
 	@Transactional
 	boolean removeImage(Product product, Long imageId);
-
-	public List<Product> searchProduct(HierarchyNode node);
 	
-	public List<Product> searchProduct(String search);
+	public Collection<Product> searchProduct(HierarchyNode node);
 	
-	public List<Product> searchProduct(HierarchyNode node,String search);
-	
-	public List<Product> searchProduct(HierarchyNode node, String search, Collection<CategoryValue> categoryValues, Boolean withImages);
+	public Collection<Product> searchProduct(ProductSearch search);
 	
 }

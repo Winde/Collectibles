@@ -6,6 +6,7 @@ import model.persistence.HierarchyRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,7 +52,9 @@ public class HierarchyController extends CollectiblesController{
 			throw new IncorrectParameterException(new String[]{"id"});
 		}
 	}
-
+	
+	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/hierarchy/remove/{id}", method = RequestMethod.DELETE)
 	public boolean removeHierarchyNode(@PathVariable String id) throws CollectiblesException {
 		Long hierarchyId = this.getId(id);
@@ -68,6 +71,7 @@ public class HierarchyController extends CollectiblesController{
 		}
 	}
 	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/hierarchy/create/{father}/", method = RequestMethod.POST)
 	public HierarchyNode addHierarchyNode(@RequestBody HierarchyNode node,@PathVariable String father) throws CollectiblesException {
 		Long fatherId = this.getId(father);

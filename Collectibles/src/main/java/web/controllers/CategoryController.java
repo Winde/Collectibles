@@ -11,6 +11,7 @@ import model.persistence.HierarchyRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,6 +66,7 @@ public class CategoryController extends CollectiblesController{
 		
 	}
 	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/category/add/{hierarchy}", method = RequestMethod.POST)
 	public Category addCategory(@PathVariable String hierarchy,@RequestBody Category category) throws CollectiblesException {		
 		Long hierarchyId = this.getId(hierarchy);
@@ -85,6 +87,7 @@ public class CategoryController extends CollectiblesController{
 		}
 	}
 	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/category/remove/{category}", method = RequestMethod.POST)
 	public boolean removeCategory(@PathVariable String category) throws CollectiblesException {		
 		Long categoryId = this.getId(category);
@@ -101,6 +104,7 @@ public class CategoryController extends CollectiblesController{
 		}
 	}
 	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/category/{category}/dettach/{hierarchy}", method = RequestMethod.POST)
 	public boolean  removeCategoryFromHierarchy(@PathVariable String category, @PathVariable String hierarchy ) throws CollectiblesException {		
 		Long categoryId = this.getId(category);		
@@ -127,6 +131,7 @@ public class CategoryController extends CollectiblesController{
 		}
 	}
 	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/category/add/value/to/{category}", method = RequestMethod.POST)
 	public CategoryValue addCategobyryValue(@PathVariable String category, @RequestBody CategoryValue categoryValue) throws CollectiblesException {		
 		Long categoryId = this.getId(category);

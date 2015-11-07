@@ -1,12 +1,14 @@
-<div ng-init="product = {}; forbidedit = true">
-	<h1>Manage Products</h1>
+<div class="container">
+	<div ng-init="product = {}; forbidedit = true">
+		<h1>Manage Products</h1>
+		
+		<h2>Upload Multiple Products</h2>
+		<product-upload></product-upload>
+							
+		<h2>Create Product</h2>					
+		<product-change product="product" is-authenticated="isAuthenticated()"></product-change>
+		
+		<product-page product="product" forbidedit="forbidedit" is-authenticated="isAuthenticated()"></product-page>
 	
-	<h2>Upload Multiple Products</h2>
-	<product-upload></product-upload>
-						
-	<h2>Create Product</h2>					
-	<product-change product="product"></product-change>
-	
-	<product-page product="product" forbidedit="forbidedit"></product-page>
-
+	</div>
 </div>

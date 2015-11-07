@@ -5,7 +5,8 @@
 		return {
 			restrict: 'E',
 			scope: {
-				hierarchies: "="
+				hierarchies: "=",
+				isAuthenticated: "&"
 			},
 			templateUrl: '/app/snipet/hierarchy-create.html',
 			controllerAs: 'hierarchyCtrl',
@@ -16,7 +17,8 @@
 		return {
 			restrict: 'E',
 			scope: {
-				hierarchies: "="
+				hierarchies: "=",
+				isAuthenticated: "&"
 			},
 			templateUrl: '/app/snipet/hierarchy-tree.html',
 			controllerAs: 'hierarchyCtrl',

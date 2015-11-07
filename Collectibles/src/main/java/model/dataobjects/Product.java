@@ -19,6 +19,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import model.dataobjects.HierarchyNode.HierarchySimpleView;
+import model.dataobjects.Image.ImageSimpleView;
 import model.dataobjects.SimpleIdDao.SimpleIdDaoView;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -30,7 +31,7 @@ public class Product extends SimpleIdDao{
 
 	public interface ProductSimpleView  extends SimpleIdDaoView{};
 	public interface ProductComplexView extends ProductSimpleView {};
-	public interface ProductListView extends ProductSimpleView,HierarchySimpleView{};
+	public interface ProductListView extends ProductSimpleView,HierarchySimpleView,ImageSimpleView{};
 	
 	@ManyToOne
 	@JsonIgnoreProperties({ "father", "children"})
@@ -60,11 +61,12 @@ public class Product extends SimpleIdDao{
 	private List<Image> images = null;
 
 	@Column
+	@JsonView(ProductSimpleView.class)
 	private Boolean owned = Boolean.FALSE;	
 	
 	@Column	
 	private Date releaseDate = null;
-	
+			
 	public Product(){}
 
 	public String getReference() {
@@ -160,7 +162,22 @@ public class Product extends SimpleIdDao{
 	public void setReleaseDate(Date releaseDate) {
 		this.releaseDate = releaseDate;
 	}
-
+	
+	
+	@JsonIgnoreProperties({ "data" })	
+	public Image getMainImage(){
+		if (this.images==null || this.getImages().size()<=0){
+			return null;
+		} else {
+			for (Image image: this.images){
+				if (image.isMain()){
+					return image;
+				}
+			}
+			return null;
+		}
+	}
+	
 	public String toString(){
 		return "{" + this.getId() + " - " + this.getName() + " - " + this.getDescription() +"}";		
 	}

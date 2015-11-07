@@ -1,21 +1,38 @@
 <div class="product">	
 
-	<div ng-if="!productCtrl.isEditForbidden()">
+	<div ng-if="!productCtrl.isEditForbidden() && isAuthenticated()">
 		<button class="btn" ng-click="productCtrl.setEditable(true)" ng-show="!productCtrl.isEditable()">EDIT</button>
 		<button class="btn" ng-click="productCtrl.setEditable(false)" ng-show="productCtrl.isEditable()">STOP EDITING</button>
 	</div>
 
 	<h1>{{product.hierarchyPlacement.name}}</h1>
-
-
+	
 	<h2>{{product.name}}</h2>
 	
-	<div class="images">
-		<div ng-repeat="image in product.images" style="display: inline-block">
-			<a href ng-if="productCtrl.isEditable()" ng-click="productCtrl.remove(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>			
-			<img style="width: 100px" ng-id="image.data" ng-src="data:image/JPEG;base64,{{image.data}}">		
-		</div>
-	</div>
 	
-	<p>{{product.description}}</p> 					
+	
+	<div class="images" style="float: right">	
+		<div ng-if="product.selectedImage" > 		
+			<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.remove(product.selectedImage)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+			<img class="mainImage" ng-id="image.data" ng-src="data:image/JPEG;base64,{{product.selectedImage.data}}">
+		</div>
+	
+		<div class="carousel">
+			<div ng-repeat="image in product.images" style="display: inline-block">
+				<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.remove(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>			
+				<img class="smallImage img-thumbnail" 
+					ng-click="productCtrl.setSelectedImage(image)" 
+					ng-id="image.data" 
+					ng-src="data:image/JPEG;base64,{{image.data}}">		
+			</div>
+		</div>	
+	</div>
+
+	<p><span ng-bind-html="product.description"></span></p> 		
+
+	<div style="clear: both"></div>
+	
+	
+	
+				
 </div>

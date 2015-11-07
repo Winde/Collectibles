@@ -13,7 +13,7 @@
 			remove: function(product){
 				return $http.post('/product/remove/'+product.id);
 			},
-			search: function(root,hierarchy,searchTerm,withImages){				
+			search: function(root,hierarchy,searchTerm,withImages,owned){				
 				var url = "/product/search/";
 												
 				if (
@@ -35,6 +35,12 @@
 				if (withImages!=null){
 					if (needsQuestionMark) { url = url + '?';} else {url = url + '&';}
 					url = url + "withImages=" + withImages;
+					needsQuestionMark = false;
+				}
+				
+				if (owned!=null){
+					if (needsQuestionMark) { url = url + '?';} else {url = url + '&';}
+					url = url + "owned=" + owned;
 					needsQuestionMark = false;
 				}
 				

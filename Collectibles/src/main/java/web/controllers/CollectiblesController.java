@@ -8,6 +8,7 @@ import model.dataobjects.CategoryValue;
 import model.dataobjects.validator.DaoValidator;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -26,6 +27,17 @@ public abstract class CollectiblesController {
 		ex.printStackTrace();
 		ErrorCode errorCode = new ErrorCode(new GenericException());		
 		response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR  );
+		return errorCode;
+	}
+	
+	@ExceptionHandler(AccessDeniedException.class)
+	@ResponseBody
+	public ErrorCode accessDenied(Exception ex,final HttpServletResponse response){
+		ex.printStackTrace();
+		ErrorCode errorCode = new ErrorCode(new GenericException());
+		System.out.println("**************EXECUTING2**************************");
+		response.setStatus( HttpServletResponse.SC_FORBIDDEN  );
+		response.setHeader("WWW-Authenticate", "FormBased");
 		return errorCode;
 	}
 	
