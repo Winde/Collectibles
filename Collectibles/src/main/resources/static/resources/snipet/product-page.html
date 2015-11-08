@@ -9,28 +9,48 @@
 	
 	<h2>{{product.name}}</h2>
 	
+	<div class="row">
 	
-	
-	<div class="images" style="float: right">	
-		<div ng-if="product.selectedImage" > 		
-			<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.remove(product.selectedImage)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-			<img class="mainImage" ng-id="image.data" ng-src="data:image/JPEG;base64,{{product.selectedImage.data}}">
+		<div class="col-md-8">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="productDescription">
+						<div ng-bind-html="product.description"></div>
+					</div> 	
+				</div>
+			</div>
+			<div class="row amazonBlock">
+				<div class="col-md-2">
+					<a ng-if="product.amazonUrl" class="btn btn-block btn-lg btn-amazon" ng-href="{{product.amazonUrl}}">amazon</a>
+				</div>
+			</div>
 		</div>
 	
-		<div class="carousel">
-			<div ng-repeat="image in product.images" style="display: inline-block">
-				<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.remove(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>			
-				<img class="smallImage img-thumbnail" 
-					ng-click="productCtrl.setSelectedImage(image)" 
-					ng-id="image.data" 
-					ng-src="data:image/JPEG;base64,{{image.data}}">		
+		<div class="col-md-4">
+			<div class="images">	
+				<div ng-if="product.selectedImage" > 		
+					<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.remove(product.selectedImage)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+					<img class="img-responsive" ng-id="image.data" ng-src="data:image/JPEG;base64,{{product.selectedImage.data}}">
+				</div>
+			
+				<div class="carousel">
+					<div class="row">
+						<div class="col-md-4" ng-repeat="image in product.images">
+							<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.remove(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>			
+							<img class="img-responsive img-thumbnail" 
+								ng-click="productCtrl.setSelectedImage(image)" 
+								ng-id="image.data" 
+								ng-src="data:image/JPEG;base64,{{image.data}}">		
+						</div>
+					</div>
+				</div>	
 			</div>
-		</div>	
+		</div>
+		
+	
 	</div>
-
-	<p><span ng-bind-html="product.description"></span></p> 		
-
-	<div style="clear: both"></div>
+	
+	
 	
 	
 	

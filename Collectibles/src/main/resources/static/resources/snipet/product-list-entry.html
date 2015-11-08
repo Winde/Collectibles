@@ -10,8 +10,10 @@
 			<span ng-if="product.owned">Owned</span>			
 		</div>
 	</div>
-	<div class="col-md-2">		
-		<img class="img-responsive img-thumbnail" ng-show="product.selectedImage.data" ng-src="data:image/JPEG;base64,{{product.selectedImage.data}}">		
+	<div class="col-md-2">
+		<div class="squareImage">		
+			<img class="img-responsive img-thumbnail" ng-show="product.selectedImage.data" ng-src="data:image/JPEG;base64,{{product.selectedImage.data}}">		
+		</div>
 	</div>
 		
 	<div class="col-md-3">		

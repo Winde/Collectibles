@@ -5,6 +5,7 @@ import java.util.List;
 
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
+import model.dataobjects.Image;
 import model.dataobjects.Product;
 
 import org.springframework.data.jpa.repository.Query;
@@ -20,5 +21,7 @@ public interface ProductRepository extends CrudRepository<Product,Long>, Product
 	public Product findOne(Long id);
 	
 	@Query("select p from Product p where p.reference = ?1")
-	public Product findOneByReference(String reference);	
+	public Product findOneByReference(String reference);
+
+		
 }

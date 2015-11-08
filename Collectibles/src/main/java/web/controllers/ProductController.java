@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import model.connection.amazon.TooFastConnectionException;
 import model.dataobjects.Category;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
@@ -47,6 +48,10 @@ public class ProductController  extends CollectiblesController{
 
 	@Autowired
 	private ProductRepository productRepository;
+
+	@Autowired
+	private ProductRepository imageRepository;
+
 	
 	@Autowired
 	private CategoryValueRepository categoryValueRepository;
@@ -62,6 +67,65 @@ public class ProductController  extends CollectiblesController{
 			throw new IncorrectParameterException(new String[]{"id"});
 		} else {
 			Product product = productRepository.findOne(idLong);
+			
+			boolean modified = false;
+			
+			if (product.getDescription()==null && product.getAmazonReference()!=null){
+				String amazonDescription = null;
+				try {
+					amazonDescription = product.fetchAmazonDescription();
+					System.out.println("Obtained Description from Amazon: " + amazonDescription);
+				} catch (TooFastConnectionException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}	
+				if (amazonDescription!=null){
+					product.setDescription(amazonDescription);
+					modified = true;
+				}
+			}
+			
+			if (product.getAmazonUrl()==null && product.getAmazonReference()!=null){
+				String amazonUrl = null;
+				try {
+					amazonUrl = product.fetchAmazonUrl();
+					System.out.println("Obtained Url from Amazon: " + amazonUrl);
+				} catch (TooFastConnectionException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}	
+				if (amazonUrl!=null){
+					product.setAmazonUrl(amazonUrl);
+					modified = true;
+				}
+			}
+			
+			if (product.getImages()==null || product.getImages().size()<=0){
+				boolean techError = false;
+				byte[] data = null;
+				try {
+					data = product.fetchAmazonImage();
+				} catch (TooFastConnectionException e) { 
+					techError = true;
+					e.printStackTrace();
+				}
+				
+				if (data==null && !techError){
+					product.setHasAmazonImage(Boolean.FALSE);
+					productRepository.save(product);
+				} else if(data!=null){				
+					Image image = new Image();
+					image.setData(data);
+					image.setMain(true);					
+					product = productRepository.addImage(product, image);
+					modified = false;
+				}
+			}
+			if (modified){
+				productRepository.save(product);
+			}
+			
+			
 			if (product==null){
 				throw new NotFoundException();
 			} else {
@@ -83,7 +147,7 @@ public class ProductController  extends CollectiblesController{
 			if (hierarchyNode!=null){
 				if (file!=null){
 					Collection<Product> products = new ArrayList<>();
-					
+					Collection<Image> images = new ArrayList<>();
 					InputStream inputStream = null;
 					try {
 						inputStream = file.getInputStream();					
@@ -101,11 +165,13 @@ public class ProductController  extends CollectiblesController{
 							String owned = record.get("owned");
 							String reference = record.get("reference");
 							String date = record.get("date");
+							String ISBN = record.get("ISBN");							
 							Product product = new Product();
 							if (name!=null && !"".equals(name.trim())){ product.setName(name); }
 							if (description!=null && !"".equals(description.trim())){ product.setDescription(description); }
 							if (reference!=null && !"".equals(reference.trim())){ product.setReference(reference); }
 							if (owned !=null && owned.trim().equals("true")){product.setOwned(true); }
+							if (ISBN !=null) { product.setAmazonReference(ISBN.replaceAll("-", "")); }
 							if (date!=null && !date.trim().equals("")){
 								for (SimpleDateFormat format : formats ){
 									try {
@@ -114,17 +180,53 @@ public class ProductController  extends CollectiblesController{
 											product.setReleaseDate(parsedDate);
 										}
 									} catch (ParseException e) {}
-								}
-								
+								}							
 							}
 							product.setHierarchyPlacement(hierarchyNode);							
 							validate(product);
 							
 							
+							if (product.getAmazonReference()!=null){
+								
+								boolean techError = false;
+								byte[] data = null;
+								try {
+									data = product.fetchAmazonImage();
+								} catch (TooFastConnectionException e1) {
+									techError = true;
+									e1.printStackTrace();
+								}
+								if (techError){
+									try {
+										Thread.sleep(1000);
+									} catch (InterruptedException e) { 
+										e.printStackTrace();
+									}
+								} else {
+									try {
+										Thread.sleep(250);
+									} catch (InterruptedException e) { 
+										e.printStackTrace();
+									}									
+								}
+								if (data!=null){
+									Image image = new Image();
+									image.setData(data);
+									image.setMain(true);
+									images.add(image);
+									product.addImage(image);
+									product.setHasAmazonImage(Boolean.TRUE);
+								} else if (!techError){
+									product.setHasAmazonImage(Boolean.FALSE);
+								}
+							}
 							
-							products.add(product);														
-						}
-						productRepository.save(products);
+							products.add(product);
+							
+						}				
+																		
+						productRepository.saveWithImages(products,images);
+						//productRepository.save(products);
 						return products;
 					} catch (IOException e) {
 						// TODO Auto-generated catch block

@@ -1,5 +1,13 @@
 package model.dataobjects;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -7,7 +15,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.imageio.ImageIO;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -18,11 +28,16 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.apache.http.client.HttpResponseException;
+
+import model.connection.amazon.AmazonConnector;
+import model.connection.amazon.TooFastConnectionException;
 import model.dataobjects.HierarchyNode.HierarchySimpleView;
 import model.dataobjects.Image.ImageSimpleView;
 import model.dataobjects.SimpleIdDao.SimpleIdDaoView;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -55,7 +70,7 @@ public class Product extends SimpleIdDao{
 	@JsonView(ProductSimpleView.class)
 	private String name = null;
 
-	@OneToMany(fetch=FetchType.LAZY)
+	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.REMOVE})
 	@JsonIgnoreProperties({ "data" })
 	@JsonView(ProductSimpleView.class)
 	private List<Image> images = null;
@@ -67,6 +82,15 @@ public class Product extends SimpleIdDao{
 	@Column	
 	private Date releaseDate = null;
 			
+	@Column
+	private String amazonReference = null;
+	
+	@Column
+	private Boolean hasAmazonImage = null;
+	
+	@Column
+	private String amazonUrl = null;
+	
 	public Product(){}
 
 	public String getReference() {
@@ -177,7 +201,97 @@ public class Product extends SimpleIdDao{
 			return null;
 		}
 	}
+
 	
+	
+
+	public Boolean getHasAmazonImage() {
+		return hasAmazonImage;
+	}
+
+	public void setHasAmazonImage(Boolean hasAmazonImage) {
+		this.hasAmazonImage = hasAmazonImage;
+	}
+	
+	public String fetchAmazonDescription() throws TooFastConnectionException{
+		return AmazonConnector.getDescription(this.getAmazonReference());
+	}
+	
+	
+	private String fetchAmazonImageURL(){
+		try {
+			String url = AmazonConnector.geImageUrl(this.getAmazonReference());
+			System.out.println("Url has been found for: " + this.getName() + " {"+this.getAmazonReference()+"}");
+			System.out.println("URL: " + url);
+			return url;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}		
+	}
+	
+	public String fetchAmazonUrl() throws TooFastConnectionException{
+		return AmazonConnector.getAmazonUrl(this.getAmazonReference());
+	}
+	
+	public byte[] fetchAmazonImage() throws TooFastConnectionException {
+		
+		String url = this.fetchAmazonImageURL();
+		if (url!=null){
+			URL imageURL;
+			try {
+				imageURL = new URL(url);
+			} catch (MalformedURLException e) {				
+				e.printStackTrace();
+				return null;
+			}
+		    BufferedImage originalImage = null;
+			try {
+				originalImage = ImageIO.read(imageURL);
+			}catch (HttpResponseException hre) {
+	        	hre.printStackTrace();
+			   if (hre.getStatusCode() == 503) {
+				   throw new TooFastConnectionException();
+			   }				
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+		    ByteArrayOutputStream baos=new ByteArrayOutputStream();				
+			try {
+				ImageIO.write(originalImage, "jpg", baos );
+			} catch (IOException e) {				
+				e.printStackTrace();
+				return null;
+			}
+			byte[] imageInByte=baos.toByteArray();
+			System.out.println("Image has been found for " + this.getName());
+			return imageInByte;
+		}
+		 
+		return null;
+	}
+	
+	
+
+	public String getAmazonReference() {
+		return amazonReference;
+	}
+
+	public void setAmazonReference(String amazonReference) {
+		this.amazonReference = amazonReference;
+	}
+
+	public String getAmazonUrl() {
+		return amazonUrl;
+	}
+
+	public void setAmazonUrl(String amazonUrl) {
+		this.amazonUrl = amazonUrl;
+	}
+	
+	
+
 	public String toString(){
 		return "{" + this.getId() + " - " + this.getName() + " - " + this.getDescription() +"}";		
 	}

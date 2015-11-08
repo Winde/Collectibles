@@ -34,8 +34,7 @@ public abstract class CollectiblesController {
 	@ResponseBody
 	public ErrorCode accessDenied(Exception ex,final HttpServletResponse response){
 		ex.printStackTrace();
-		ErrorCode errorCode = new ErrorCode(new GenericException());
-		System.out.println("**************EXECUTING2**************************");
+		ErrorCode errorCode = new ErrorCode(new GenericException());		
 		response.setStatus( HttpServletResponse.SC_FORBIDDEN  );
 		response.setHeader("WWW-Authenticate", "FormBased");
 		return errorCode;

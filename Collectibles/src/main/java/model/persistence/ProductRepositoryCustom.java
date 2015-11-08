@@ -30,4 +30,6 @@ public interface ProductRepositoryCustom {
 	
 	public Collection<Product> searchProduct(ProductSearch search);
 	
+	@Transactional
+	public void saveWithImages(Collection<Product> products,Collection<Image> images);
 }

@@ -155,7 +155,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		}
 		if (search.getOwned()!=null) { query.setParameter("owned",search.getOwned()); }
 		
-		System.out.println(hql);
 		
 		Set<Product> result = new HashSet<>();
 		result.addAll(query.getResultList());
@@ -168,6 +167,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		search.setHierarchy(node);
 		Collection<String> errors = search.errors();
 		return searchProduct(search);		
+	}
+
+	@Override
+	public void saveWithImages(Collection<Product> products, Collection<Image> images) {
+		imageRepository.save(images);
+		productRepository.save(products);		
 	}
 
 
