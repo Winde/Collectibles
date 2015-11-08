@@ -8,7 +8,7 @@
 			forbidedit="forbidedit"></product-page>
 		
 		<product-change 
-			ng-show="editable" 
+			ng-show="editable && isAuthenticated()" 
 			product="product" 	
 			is-authenticated="isAuthenticated()"	
 			createnew="editable"></product-change>

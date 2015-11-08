@@ -1,5 +1,5 @@
 <div class="row productListEntry">
-	<div class="col-md-5"><a ng-href="#/product/{{product.id}}"><span>{{product.name}}</span></a></div>		
+	<div class="col-md-4"><a ng-href="#/product/{{product.id}}"><span>{{product.name}}</span></a></div>		
 	<div class="col-md-1">
 		<div ng-if="isAuthenticated()">
 			<input type="checkbox" 
@@ -12,7 +12,7 @@
 	</div>
 	<div class="col-md-2">
 		<div class="squareImage">		
-			<img class="img-responsive img-thumbnail" ng-show="product.selectedImage.data" ng-src="data:image/JPEG;base64,{{product.selectedImage.data}}">		
+			<a ng-if="product.selectedImage.data" ng-href="#/product/{{product.id}}"><img class="img-responsive img-thumbnail" ng-src="data:image/JPEG;base64,{{product.selectedImage.data}}"></a>		
 		</div>
 	</div>
 		
@@ -41,6 +41,9 @@
 			</div>
 		</form>	
 		<div ng-if="!isAuthenticated()">{{product.hierarchyPlacement.name}}</div>	 
+	</div>
+	<div class="col-md-1">
+		<span>{{product.amazonReference}}</span>
 	</div>
 	<div class="col-md-1"><a href ng-if="isAuthenticated()" ng-click="productManagementCtrl.remove(product)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></div>
 </div>

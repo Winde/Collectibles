@@ -134,8 +134,7 @@
 		}
 		
 		$scope.hierarchy = {};
-		$scope.searchTerm = "";
-		$scope.ajax = false;
+		$scope.searchTerm = "";		
 			
 		if ($scope.root == undefined || $scope.root == null){
 			Hierarchy.root()
@@ -152,8 +151,7 @@
 			});
 		}
 		
-		this.update = function(product) {
-			$scope.ajax = true;
+		this.update = function(product) {			
 			
 			Product.modify(product)
 			.success(function(data){
@@ -167,19 +165,17 @@
 			});
 		},
 		
-		this.remove = function(product){			
-			$scope.ajax = true;		
+		this.remove = function(product){							
 			Product.remove(product)			
 			.success(function(data){				
-				if ($scope.$parent.products){					
+				if ($scope.$parent.products){							
 					$scope.$parent.products = $scope.$parent.products.filter(function(e){ return e.id != data});					
-				}				
+				}			
 			})
 			.catch(function(data){		
 				Message.alert("There was an error");
 			})
-			.finally(function(){ 
-				$scope.ajax = false; 
+			.finally(function(){ 				
 			});
 		}
 
@@ -198,8 +194,7 @@
 			if (	
 					($scope.root.id!=$scope.hierarchy.id) || 
 					(searchTerm!=null && searchTerm !=undefined && searchTerm!="")
-				){
-				$scope.ajax = true;
+				){				
 				Product.search($scope.root,$scope.hierarchy,searchTerm,withImages,owned)
 				.success(function(data){ 
 					$scope.products = data;
@@ -207,8 +202,7 @@
 				.catch(function(data){
 					Message.alert("There was an error");
 					$scope.products = [];				
-				}).finally(function(data){
-					$scope.ajax = false;
+				}).finally(function(data){					
 				});
 			} else {
 				$scope.products = [];
@@ -307,7 +301,12 @@
 				if ((product.images== null || product.images.length==0) && data.length>0) {
 					product.selectedImage = data[0];
 				}
-				product.images = product.images.concat(data);
+				if (product.images){
+					product.images = product.images.concat(data);
+				} else {
+					product.images = data;
+				}
+				console.log(product);
 				
 			})
 			.catch(function(){

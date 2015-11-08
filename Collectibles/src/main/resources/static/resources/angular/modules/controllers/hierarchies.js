@@ -54,8 +54,7 @@
 							.catch(function(){
 								
 							})
-							.finally(function(){
-								$scope.ajax = false;
+							.finally(function(){								
 								controller.deleting = false;
 							});
 						});

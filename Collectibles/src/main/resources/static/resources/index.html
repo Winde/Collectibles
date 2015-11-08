@@ -4,8 +4,10 @@
 		<link rel="stylesheet" type="text/css" href="/app/bootstrap/css/bootstrap.min.css" />
 		<link rel="stylesheet" type="text/css" href="/app/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" />
 		<link rel="stylesheet" type="text/css" href="/app/css/angular.css" />
-		<link rel="stylesheet" type="text/css" href="/app/css/main.css" />
+		<link rel="stylesheet" type="text/css" href="/app/vendor/ng-progress/ngProgress.css">
 		<link rel="stylesheet" type="text/css" href="/app/vendor/brand-buttons/dist/brand-buttons.min.css" />
+		<link rel="stylesheet" type="text/css" href="/app/css/main.css" />
+		
 		
 		
 		
@@ -14,6 +16,8 @@
 		<script type="text/javascript" src="/app/angular/angular-resource.min.js"></script>		
 		<script type="text/javascript" src="/app/angular/angular-sanitize.min.js"></script>
 		<script type="text/javascript" src="/app/angular/angular-animate.min.js"></script>
+		<script type="text/javascript" src="/app/angular/angular-cookies.min.js"></script>
+		
 		<script type="text/javascript" src="/app/angular/modules/app.js"></script>		
 		<script type="text/javascript" src="/app/angular/modules/routes.js"></script>
 		
@@ -36,7 +40,9 @@
 		<script type="text/javascript" src="/app/vendor/bootbox/bootbox.min.js"></script>
 		<script type="text/javascript" src="/app/vendor/bootstrap-growl/jquery.bootstrap-growl.min.js"></script>
 		<script type="text/javascript" src="/app/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>		
+		
 		<script type="text/javascript" src="/app/vendor/ng-file-upload-master/dist/ng-file-upload.min.js"></script>
+		<script type="text/javascript" src="/app/vendor/ng-progress/build/ngprogress.min.js"></script>
 		
 	</head>	
 	<body>
@@ -62,6 +68,7 @@
 								<li ng-class="{ active: isActive('/products/')}"><a href="#/products/">Products</a></li>																											
 								<li ng-show="isAuthenticated()" ng-class="{ active: isActive('/products/create/')}"><a href="#/products/create/">Add Products</a></li>
 								<li ng-show="isAuthenticated()" ng-class="{ active: isActive('/hierarchy/create/')}"><a href="#/hierarchy/create/">Manage Hierarchies</a></li>
+								<li ng-show="isAuthenticated()" ng-class="{ active: isActive('/logout/')}"><a href="" ng-click="logout()">Logout</a></li>
 							</ul>
 						</div>
 					</div>

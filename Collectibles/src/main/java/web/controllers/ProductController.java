@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import model.connection.amazon.AmazonConnector;
 import model.connection.amazon.TooFastConnectionException;
 import model.dataobjects.Category;
 import model.dataobjects.CategoryValue;
@@ -18,6 +19,7 @@ import model.dataobjects.Image;
 import model.dataobjects.Product;
 import model.persistence.CategoryValueRepository;
 import model.persistence.HierarchyRepository;
+import model.persistence.ImageRepository;
 import model.persistence.ProductRepository;
 
 import org.apache.commons.csv.CSVFormat;
@@ -50,7 +52,7 @@ public class ProductController  extends CollectiblesController{
 	private ProductRepository productRepository;
 
 	@Autowired
-	private ProductRepository imageRepository;
+	private ImageRepository imageRepository;
 
 	
 	@Autowired
@@ -59,6 +61,9 @@ public class ProductController  extends CollectiblesController{
 	@Autowired
 	private HierarchyRepository hierarchyRepository;
 
+	@Autowired
+	private AmazonConnector amazonConnector;
+	
 	@RequestMapping(value="/product/find/{id}")
 	public Product product(@PathVariable String id) throws CollectiblesException {
 		Long idLong = this.getId(id);
@@ -69,60 +74,15 @@ public class ProductController  extends CollectiblesController{
 			Product product = productRepository.findOne(idLong);
 			
 			boolean modified = false;
-			
-			if (product.getDescription()==null && product.getAmazonReference()!=null){
-				String amazonDescription = null;
-				try {
-					amazonDescription = product.fetchAmazonDescription();
-					System.out.println("Obtained Description from Amazon: " + amazonDescription);
-				} catch (TooFastConnectionException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}	
-				if (amazonDescription!=null){
-					product.setDescription(amazonDescription);
-					modified = true;
-				}
+			Collection<Image> images = new ArrayList<>();
+			try {
+				modified = amazonConnector.updateProduct(product, images);
+			} catch (TooFastConnectionException e) {
+				e.printStackTrace();
 			}
-			
-			if (product.getAmazonUrl()==null && product.getAmazonReference()!=null){
-				String amazonUrl = null;
-				try {
-					amazonUrl = product.fetchAmazonUrl();
-					System.out.println("Obtained Url from Amazon: " + amazonUrl);
-				} catch (TooFastConnectionException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}	
-				if (amazonUrl!=null){
-					product.setAmazonUrl(amazonUrl);
-					modified = true;
-				}
-			}
-			
-			if (product.getImages()==null || product.getImages().size()<=0){
-				boolean techError = false;
-				byte[] data = null;
-				try {
-					data = product.fetchAmazonImage();
-				} catch (TooFastConnectionException e) { 
-					techError = true;
-					e.printStackTrace();
-				}
-				
-				if (data==null && !techError){
-					product.setHasAmazonImage(Boolean.FALSE);
-					productRepository.save(product);
-				} else if(data!=null){				
-					Image image = new Image();
-					image.setData(data);
-					image.setMain(true);					
-					product = productRepository.addImage(product, image);
-					modified = false;
-				}
-			}
-			if (modified){
-				productRepository.save(product);
+					
+			if (modified){				
+				productRepository.saveWithImages(product,images);
 			}
 			
 			
@@ -171,7 +131,7 @@ public class ProductController  extends CollectiblesController{
 							if (description!=null && !"".equals(description.trim())){ product.setDescription(description); }
 							if (reference!=null && !"".equals(reference.trim())){ product.setReference(reference); }
 							if (owned !=null && owned.trim().equals("true")){product.setOwned(true); }
-							if (ISBN !=null) { product.setAmazonReference(ISBN.replaceAll("-", "")); }
+							if (ISBN !=null && !"".equals(ISBN.trim())) { product.setAmazonReference(ISBN.replaceAll("-", "")); }
 							if (date!=null && !date.trim().equals("")){
 								for (SimpleDateFormat format : formats ){
 									try {
@@ -185,42 +145,25 @@ public class ProductController  extends CollectiblesController{
 							product.setHierarchyPlacement(hierarchyNode);							
 							validate(product);
 							
-							
-							if (product.getAmazonReference()!=null){
-								
-								boolean techError = false;
-								byte[] data = null;
+																					
+							try {
+								amazonConnector.updateProductOnlyImage(product, images);
 								try {
-									data = product.fetchAmazonImage();
-								} catch (TooFastConnectionException e1) {
-									techError = true;
+									Thread.sleep(1000);
+								} catch (InterruptedException e1) {
+									// TODO Auto-generated catch block
 									e1.printStackTrace();
 								}
-								if (techError){
-									try {
-										Thread.sleep(1000);
-									} catch (InterruptedException e) { 
-										e.printStackTrace();
-									}
-								} else {
-									try {
-										Thread.sleep(250);
-									} catch (InterruptedException e) { 
-										e.printStackTrace();
-									}									
+							} catch (TooFastConnectionException e) {
+								try {
+									Thread.sleep(5000);
+								} catch (InterruptedException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
 								}
-								if (data!=null){
-									Image image = new Image();
-									image.setData(data);
-									image.setMain(true);
-									images.add(image);
-									product.addImage(image);
-									product.setHasAmazonImage(Boolean.TRUE);
-								} else if (!techError){
-									product.setHasAmazonImage(Boolean.FALSE);
-								}
+								e.printStackTrace();
 							}
-							
+
 							products.add(product);
 							
 						}				

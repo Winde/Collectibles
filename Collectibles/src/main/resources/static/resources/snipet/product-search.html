@@ -76,11 +76,22 @@
 	</div>
 			
 </form>
-<div  class="productGrid container-fluid">
+<div class="productGrid container-fluid" style="" ng-if="products && products.length && products.length>0" >
+
+	
+	<div class="row productListEntry rowTitles">
+		<div class="col-md-4">Product Name</div>		
+		<div class="col-md-1">Ownership</div>
+		<div class="col-md-2">Image</div>				
+		<div class="col-md-3">Classification</div>
+		<div class="col-md-1">Reference</div>
+		<div class="col-md-1"></div>
+	</div>
+
 	<product-list-entry ng-repeat="product in products | orderBy:'releaseDate'"></product-list-entry>
 </div>
 
-<div ng-show="products.length <=0">
+<div ng-if="products && products.length && products.length <=0">
 	No results found
 </div>
 

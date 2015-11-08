@@ -3,6 +3,8 @@
 	['ngRoute',
 	 'ngSanitize',
 	 'ngAnimate',
+	 'ngCookies',
+	 'ngProgress',
 	 'login-services',
 	 'login-controllers',
 	 'products-controllers',
@@ -17,8 +19,26 @@
 	
 	
 	
-	app.controller('NavigationController',['$rootScope','$scope','$location','Auth', function($rootScope,$scope, $location,Auth){
-				
+	app.controller('NavigationController',['$rootScope','$scope','$location','$routeParams','Auth','ngProgressFactory', 
+	                                       function($rootScope,$scope,$location,$routeParams,Auth,ngProgressFactory){
+		
+
+		Auth.checkSessionIsSet();
+		
+		$rootScope.$on('$routeChangeStart', function (event, next) {            
+            if (next.secured !== undefined) {            	
+            	$rootScope.secured = next.secured;
+            }
+        });
+		
+		$scope.logout = function(){
+			Auth.logout();
+			console.log("Scope is Secured? " + $scope.secured);
+			if ($scope.secured == true){
+				$location.path('/products').replace();
+			}
+		}
+		
 		$scope.isAuthenticated = function(){			
 			return Auth.isloggedIn();
 		} 

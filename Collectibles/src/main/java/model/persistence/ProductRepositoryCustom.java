@@ -32,4 +32,7 @@ public interface ProductRepositoryCustom {
 	
 	@Transactional
 	public void saveWithImages(Collection<Product> products,Collection<Image> images);
+	
+	@Transactional
+	public void saveWithImages(Product product,Collection<Image> images);
 }

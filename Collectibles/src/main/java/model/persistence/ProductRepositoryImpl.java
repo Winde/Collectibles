@@ -174,6 +174,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		imageRepository.save(images);
 		productRepository.save(products);		
 	}
+	
+	@Override
+	public void saveWithImages(Product products, Collection<Image> images) {
+		imageRepository.save(images);
+		productRepository.save(products);		
+	}
 
 
 	

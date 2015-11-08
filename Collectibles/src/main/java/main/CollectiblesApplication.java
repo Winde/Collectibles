@@ -20,7 +20,8 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 @ComponentScan({
 	"web.controllers",
 	"configuration",
-	"model.authentication"
+	"model.authentication",
+	"model.connection"	
 })
 @EnableJpaRepositories(basePackages = {"model.persistence"})
 @EntityScan("model.dataobjects")

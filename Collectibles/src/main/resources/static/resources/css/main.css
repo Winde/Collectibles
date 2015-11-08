@@ -10,12 +10,26 @@
 	margin-top: 15px;	
 }
 
-.productListEntry{
-	border: 1px solid #ccc;
-	padding: 5px;
-	vertical-align: middle;	
+.productGrid {
+	border: solid 1px #ccc; 
+	border-radius: 10px; 
+	padding: 0px
 }
 
+.productGrid .row{
+	margin: 0px;
+}
+
+.productGrid .productListEntry{
+	padding: 5px;	
+	border-bottom: solid 1px #ccc;
+}
+
+.productGrid .rowTitles{
+	background-color: #f0f0f0; 
+	border-top-left-radius: 10px; 
+	border-top-right-radius: 10px;
+}
 .bootstrap-select .root {
 	padding-left: 20px;
 }

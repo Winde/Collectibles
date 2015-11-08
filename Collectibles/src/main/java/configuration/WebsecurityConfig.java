@@ -19,8 +19,10 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
 	private RestAuthenticationEntryPoint entryPoint;
 
 	@Autowired
-	private RestAccessDeniedHandler handler;
+	private RestAccessDeniedHandler accessDeniedhandler;
 
+	@Autowired
+	private LogoutSuccessHandler logoutHandler;
 	
 	//@Autowired 
 	//private AuthenticationService authenticationService; 
@@ -29,7 +31,7 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
     http    	        	
       	.csrf().disable()      	
-      	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+      	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
     .and()
     	.httpBasic()
     .and()
@@ -38,8 +40,12 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
 	.and()
 		.exceptionHandling()
 			//.authenticationEntryPoint(entryPoint)
-	    	.accessDeniedHandler(handler);    	
-	    
+	    	.accessDeniedHandler(accessDeniedhandler)
+	.and()
+	    .logout()
+		    .logoutUrl("/logout")
+		    .logoutSuccessHandler(logoutHandler)
+		    .deleteCookies("JSESSIONID"); 
 		    
       	
       

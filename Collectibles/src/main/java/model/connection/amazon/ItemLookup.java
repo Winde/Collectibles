@@ -138,13 +138,11 @@ public class ItemLookup {
         Document doc = null;
         try {
         	doc = db.parse(requestUrl);
-        }catch (HttpResponseException hre) {
-        	hre.printStackTrace();
-		   if (hre.getStatusCode() == 503) {
-			   throw new TooFastConnectionException();
-		   }			
-    	} catch (IOException ioe) {
+        } catch (IOException ioe) {
     		ioe.printStackTrace();
+    		if (ioe.getMessage()!=null && ioe.getMessage().contains("HTTP response code: 503")){    			
+    			throw new TooFastConnectionException();    				
+    		}    		
         	return null;
         } catch (SAXException saxe) {
         	saxe.printStackTrace();

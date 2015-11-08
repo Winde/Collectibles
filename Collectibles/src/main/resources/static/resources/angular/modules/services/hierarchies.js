@@ -28,10 +28,19 @@
 				}
 			},
 			create: function(hierarchy, parent){
-				return $http({url: '/hierarchy/create/'+parent.id+'/', method: 'POST', data: hierarchy});
+				return $http({
+					url: '/hierarchy/create/'+parent.id+'/', 
+					method: 'POST', 
+					data: hierarchy,
+					progressbar: true
+				});
 			},
 			remove: function(hierarchy){				
-				return $http({url: '/hierarchy/remove/'+hierarchy.id+'/', method: 'DELETE'});
+				return $http({
+					url: '/hierarchy/remove/'+hierarchy.id+'/', 
+					method: 'DELETE',
+					progressbar: true
+				});
 			}
 		}
 		

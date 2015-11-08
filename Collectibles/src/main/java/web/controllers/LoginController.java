@@ -1,5 +1,7 @@
 package web.controllers;
 
+import javax.servlet.http.HttpServletRequest;
+
 import model.dataobjects.User;
 
 import org.springframework.security.access.annotation.Secured;
@@ -11,8 +13,11 @@ public class LoginController extends CollectiblesController {
 
 	@Secured({"ROLE_ADMIN"})
 	@RequestMapping("/login")
-	public User login(){
+	public User login(HttpServletRequest request){
+		request.getSession();
+		
 		return new User();		
 	}
+	
 	
 }

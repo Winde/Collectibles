@@ -2,16 +2,44 @@
 	
 	angular.module('products-services',['ngFileUpload'])
 	.factory('Product', function ProductFactory($http,Upload){
-		return {
-			
-			one: function(id) {
-				return $http({ method: 'GET', url: '/product/find/'+id });
+		var factory = this;
+		
+		this.cleanUpProduct = function cleanUpProduct(product){
+			if (product.amazonReference == ""){
+				product.amazonReference = null;
+			}
+		}
+		
+		return {		
+			one: function(id) {				
+				return $http({ 
+					method: 'GET', 
+					url: '/product/find/'+id, 
+					progressbar: true 
+				});
 			},			
 			create: function(product){
-				return $http({ method: 'POST', url: '/product/create/'+product.hierarchyPlacement.id, data: product });				
+				factory.cleanUpProduct(product);
+				return $http({ 
+					method: 'POST', 
+					url: '/product/create/'+product.hierarchyPlacement.id, 
+					data: product,
+					progressbar: true
+				});				
+			},
+			modify: function(product){
+				factory.cleanUpProduct(product);
+				return $http({ 
+					method: 'PUT', 
+					url: '/product/modify/', 
+					data: product,
+					progressbar: true
+				});
 			},
 			remove: function(product){
-				return $http.post('/product/remove/'+product.id);
+				return $http.post('/product/remove/'+product.id,{
+					progressbar: true
+				});
 			},
 			search: function(root,hierarchy,searchTerm,withImages,owned){				
 				var url = "/product/search/";
@@ -44,25 +72,30 @@
 					needsQuestionMark = false;
 				}
 				
-				return $http.get(url);
-			},
-			modify: function(product){
-				return $http({ method: 'PUT', url: '/product/modify/', data: product });
-			},
+				return $http.get(url,{
+					progressbar: true
+				});
+			},			
 			addImage: function(product,file){
 				var upload = Upload.upload({
 					url: '/product/'+product.id+'/image/add/',
-					data: { images: file }
+					data: { images: file },
+					progressbar: true
 				});
 				return upload;
 			},
 			removeImage: function(product,image){
-				return $http({method: 'POST', url: '/product/'+product.id+'/image/remove/'+image.id});
+				return $http({
+					method: 'POST', 
+					url: '/product/'+product.id+'/image/remove/'+image.id,
+					progressbar: true
+				});
 			},
 			uploadFile: function(hierarchy,file){
 				var upload = Upload.upload({
 		            url: '/product/create/from/file/'+hierarchy.id,
-		            data: {file: file}
+		            data: {file: file},
+		            progressbar: true
 				});
 								
 				return upload;

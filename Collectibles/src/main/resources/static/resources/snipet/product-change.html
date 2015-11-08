@@ -40,11 +40,18 @@
 	</div>
 	
 	<div class="form-group">
+		<label>Amazon Reference</label>
+		<input class="form-control"
+			ng-model="product.amazonReference"/>
+	</div>	
+	
+	<div class="form-group">
 		<label>Description</label>
 		<textarea class="form-control"
 			ng-model="product.description" 
 			></textarea>
-	</div>		
+	</div>
+		
 	<button type="submit" value="Submit">Save</button>		
 	<button ng-click="productChangeCtrl.newProduct()" ng-if="productChangeCtrl.canCreateNew()">New Product</button>
 </form>

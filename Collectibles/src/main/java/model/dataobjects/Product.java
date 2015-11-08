@@ -80,9 +80,11 @@ public class Product extends SimpleIdDao{
 	private Boolean owned = Boolean.FALSE;	
 	
 	@Column	
+	@JsonView(ProductSimpleView.class)
 	private Date releaseDate = null;
 			
 	@Column
+	@JsonView(ProductSimpleView.class)
 	private String amazonReference = null;
 	
 	@Column
@@ -212,67 +214,6 @@ public class Product extends SimpleIdDao{
 	public void setHasAmazonImage(Boolean hasAmazonImage) {
 		this.hasAmazonImage = hasAmazonImage;
 	}
-	
-	public String fetchAmazonDescription() throws TooFastConnectionException{
-		return AmazonConnector.getDescription(this.getAmazonReference());
-	}
-	
-	
-	private String fetchAmazonImageURL(){
-		try {
-			String url = AmazonConnector.geImageUrl(this.getAmazonReference());
-			System.out.println("Url has been found for: " + this.getName() + " {"+this.getAmazonReference()+"}");
-			System.out.println("URL: " + url);
-			return url;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}		
-	}
-	
-	public String fetchAmazonUrl() throws TooFastConnectionException{
-		return AmazonConnector.getAmazonUrl(this.getAmazonReference());
-	}
-	
-	public byte[] fetchAmazonImage() throws TooFastConnectionException {
-		
-		String url = this.fetchAmazonImageURL();
-		if (url!=null){
-			URL imageURL;
-			try {
-				imageURL = new URL(url);
-			} catch (MalformedURLException e) {				
-				e.printStackTrace();
-				return null;
-			}
-		    BufferedImage originalImage = null;
-			try {
-				originalImage = ImageIO.read(imageURL);
-			}catch (HttpResponseException hre) {
-	        	hre.printStackTrace();
-			   if (hre.getStatusCode() == 503) {
-				   throw new TooFastConnectionException();
-			   }				
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			}
-		    ByteArrayOutputStream baos=new ByteArrayOutputStream();				
-			try {
-				ImageIO.write(originalImage, "jpg", baos );
-			} catch (IOException e) {				
-				e.printStackTrace();
-				return null;
-			}
-			byte[] imageInByte=baos.toByteArray();
-			System.out.println("Image has been found for " + this.getName());
-			return imageInByte;
-		}
-		 
-		return null;
-	}
-	
-	
 
 	public String getAmazonReference() {
 		return amazonReference;
