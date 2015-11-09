@@ -17,5 +17,11 @@ public interface HierarchyRepository extends CrudRepository<HierarchyNode,Long>,
 	public HierarchyNode findOne(Long id);
 	
 	@Query("select h from HierarchyNode h where h.father IS NULL")
-	public HierarchyNode findRoot();	
+	public HierarchyNode findRoot();
+	
+	@Override
+	public void delete(Long id);
+	
+	@Override
+	public void delete(HierarchyNode node);
 }
