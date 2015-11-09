@@ -1,14 +1,10 @@
 package model.dataobjects;
 
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
-import model.dataobjects.HierarchyNode.HierarchySimpleView;
-import model.dataobjects.Product.ProductSimpleView;
 
 @Entity(name="image")
 public class Image extends SimpleIdDao{

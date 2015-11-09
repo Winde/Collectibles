@@ -4,6 +4,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.orm.jpa.EntityScan;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.cache.guava.GuavaCache;
+import org.springframework.cache.guava.GuavaCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +21,9 @@ import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
+import com.google.common.cache.CacheBuilder;
+
+
 @SpringBootApplication
 @Configuration
 @EnableAutoConfiguration
@@ -23,12 +33,23 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 	"model.authentication",
 	"model.connection"	
 })
+@EnableCaching
 @EnableJpaRepositories(basePackages = {"model.persistence"})
 @EntityScan("model.dataobjects")
 public class CollectiblesApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(CollectiblesApplication.class, args);
+    }
+    
+    @Bean
+    public CacheManager getCacheManager() {
+    	GuavaCacheManager cacheManager = new GuavaCacheManager();
+        cacheManager.setCacheBuilder(
+            CacheBuilder.
+            newBuilder().            
+            maximumSize(200));
+        return cacheManager;           
     }
     
     @Bean

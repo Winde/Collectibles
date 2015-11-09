@@ -50,9 +50,17 @@ public class ImageController extends CollectiblesController{
 			final HttpHeaders headers = new HttpHeaders();
 		    headers.setContentType(MediaType.IMAGE_PNG);
 		    
-			Image image = imageRepository.findOne(imageId);
-			if (image!=null){
-			    return new ResponseEntity<byte[]>(image.getData(), headers, HttpStatus.OK);
+			//byte [] data = imageRepository.obtainBytes(imageId);
+		    byte [] data = null;
+		    Image image = imageRepository.findOne(imageId);
+		    if (image!=null){
+		    	data = image.getData();
+		    }
+		    
+			if (data!=null){
+				headers.setCacheControl("no-transform,public,max-age=3600,s-maxage=3600");				
+				
+			    return new ResponseEntity<byte[]>(data, headers, HttpStatus.OK);			    
 			}else {
 				return new ResponseEntity<byte[]>(null, headers, HttpStatus.NOT_FOUND);
 			}

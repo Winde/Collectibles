@@ -82,14 +82,35 @@
 			<artifactId>aws-java-sdk</artifactId>
 			<version>1.10.32</version>
 		</dependency>
-		
+		<!--
+		<dependency>
+			<groupId>org.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+			<version>3.0.0.m3</version>
+		</dependency>
+		<dependency>
+      		<groupId>javax.cache</groupId>
+      		<artifactId>cache-api</artifactId>
+      		<version>1.0.0</version>
+    	</dependency>
+		-->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>4.1.7.RELEASE</version>			
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
+		</dependency>
 	</dependencies>
 	
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+				<artifactId>spring-boot-maven-plugin</artifactId>				
 			</plugin>
 		</plugins>
 	</build>
