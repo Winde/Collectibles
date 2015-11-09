@@ -2,16 +2,24 @@ package configuration.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import configuration.security.jwt.StatelessAuthenticationFilter;
+import configuration.security.jwt.StatelessLoginFilter;
+import configuration.security.jwt.TokenAuthenticationService;
+import configuration.security.jwt.UserDetailsServiceImpl;
 
 @Configuration
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true, proxyTargetClass = true)
+//@EnableWebSecurity
+//@EnableGlobalMethodSecurity(securedEnabled = true, proxyTargetClass = true)
 public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
 
 
@@ -23,14 +31,19 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private LogoutSuccessHandler logoutHandler;
-
 	
-	//@Autowired 
-	//private AuthenticationService authenticationService; 
+	@Autowired
+	private TokenAuthenticationService tokenAuthenticationService;
+	
+	@Autowired
+	private UserDetailsServiceImpl userDetailsService;
+	
+	@Autowired
+	private AuthenticationManagerBuilder authenticationManagerBuilder;
 	
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-    
+    /*
     http    	        	
       	.csrf().disable()      	
       	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
@@ -53,37 +66,43 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
      	//.antMatchers("/image/content/**")     		
      			.cacheControl()
      				.disable();
-	
+	*/
+    http    
+    	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
+    .and()
+    	.authorizeRequests()
+    	.antMatchers("/app/**").permitAll()		
+	.and()	     
+     	.headers()     	
+     	//.antMatchers("/image/content/**")     		
+     			.cacheControl()
+     				.disable()
+    .and()
+	// custom JSON based authentication by POST of 
+	// {"username":"<name>","password":"<password>"} 
+	// which sets the token header upon authentication
+	.addFilterBefore(new StatelessLoginFilter("/login",tokenAuthenticationService,
+            userDetailsService,authenticationManagerBuilder.getOrBuild()), UsernamePasswordAuthenticationFilter.class)
+ 
+	// custom Token based authentication based on 
+	// the header previously given to the client
+	.addFilterBefore(new StatelessAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);	
     	
-    /*	
-    http
-    // custom JSON based authentication by POST of 
- 	// {"username":"<name>","password":"<password>"} 
- 	// which sets the token header upon authentication
-    .addFilterBefore(new StatelessLoginFilter("/login",
-			tokenAuthenticationService,
-			userDetailsService,
-			tokenAuthenticationManager),UsernamePasswordAuthenticationFilter.class)
-
- 	// custom Token based authentication based on 
- 	// the header previously given to the client
- 	.addFilterBefore(new StatelessAuthenticationFilter(),UsernamePasswordAuthenticationFilter.class);
-    */
-    /*
-      .and().
-      
-    
-        .authorizeRequests()
-          .antMatchers("/app/**").permitAll()
-          .anyRequest().authenticated();
-    */
     }
     
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth
+       
+    	auth
             .inMemoryAuthentication()
-                .withUser("user").password("password").roles("USER","ADMIN");
+                .withUser("username").password("password").roles("USER","ADMIN");
+       
+    	/*
+    	auth
+        	.userDetailsService(userDetailsService)
+        	.passwordEncoder(new ShaPasswordEncoder(256));
+       */
+        
     }
 
 	
