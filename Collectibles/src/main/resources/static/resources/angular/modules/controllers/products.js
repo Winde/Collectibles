@@ -238,8 +238,8 @@
 		this.remove = function(product){							
 			Product.remove(product)			
 			.success(function(data){				
-				if ($scope.$parent.products){							
-					$scope.$parent.products = $scope.$parent.products.filter(function(e){ return e.id != data});					
+				if ($scope.products){							
+					$scope.products = $scope.products.filter(function(e){ return e.id != data});					
 				}			
 			})
 			.catch(function(data){		
