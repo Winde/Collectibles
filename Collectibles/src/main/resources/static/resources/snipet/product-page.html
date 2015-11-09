@@ -30,7 +30,7 @@
 			<div class="images">	
 				<div ng-if="product.selectedImage" > 		
 					<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.remove(product.selectedImage)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-					<img class="img-responsive" ng-id="image.data" ng-src="data:image/JPEG;base64,{{product.selectedImage.data}}">
+					<img class="img-responsive" ng-id="image.id" ng-src="/image/content/{{product.selectedImage.id}}">
 				</div>
 			
 				<div class="carousel">
@@ -39,8 +39,8 @@
 							<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.remove(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>			
 							<img class="img-responsive img-thumbnail" 
 								ng-click="productCtrl.setSelectedImage(image)" 
-								ng-id="image.data" 
-								ng-src="data:image/JPEG;base64,{{image.data}}">		
+								ng-id="image.id" 
+								ng-src="/image/content/{{image.id}}">		
 						</div>
 					</div>
 				</div>	

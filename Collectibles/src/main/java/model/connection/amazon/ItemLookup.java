@@ -106,22 +106,27 @@ public class ItemLookup {
         return requestUrl;
     }
     
+    public String getMultipleUseUrl(String id) throws TooFastConnectionException {
+    	String url = getUrl("AWSECommerceService","ItemLookup","Large",id);
+    	return url;
+    }
+    
     public String getDescription(String id) throws TooFastConnectionException {
     	String url = getUrl("AWSECommerceService","ItemLookup","Large",id);
     	System.out.println("Fecthing url: " + url);
-    	return fetchDescription(url);
+    	return parseDescription(url);
     }
     
     public String getImage(String id) throws TooFastConnectionException {        
     	String url = getUrl("AWSECommerceService","ItemLookup","Images",id);
     	System.out.println("Fecthing url: " + url);
-        return fetchImage(url);
+        return parseImage(url);
     }
     
 	public String getAmazonUrl(String id) throws TooFastConnectionException {
 		String url = getUrl("AWSECommerceService","ItemLookup","Large",id);
 		System.out.println("Fecthing url: " + url);
-		return fetchAmazonUrl(url);
+		return parseAmazonUrl(url);
 	}
 
 
@@ -151,7 +156,7 @@ public class ItemLookup {
         return doc;
     }
 	
-    private String fetchAmazonUrl(String requestUrl) throws TooFastConnectionException {
+    public String parseAmazonUrl(String requestUrl) throws TooFastConnectionException {
     	String amazonUrl = null;
     	Document doc = fetchDoc(requestUrl);
     	if (doc!=null){
@@ -164,7 +169,7 @@ public class ItemLookup {
 	}
 
     
-    private String fetchDescription(String requestUrl) throws TooFastConnectionException{
+    public String parseDescription(String requestUrl) throws TooFastConnectionException{
     	String description = null;
     	Document doc = fetchDoc(requestUrl);
     	if (doc!=null){
@@ -180,7 +185,7 @@ public class ItemLookup {
     	return description;    	
     }
     
-    private String fetchImage(String requestUrl) throws TooFastConnectionException{
+    public String parseImage(String requestUrl) throws TooFastConnectionException{
         String image = null;
         Document doc = fetchDoc(requestUrl);
         if (doc!=null){

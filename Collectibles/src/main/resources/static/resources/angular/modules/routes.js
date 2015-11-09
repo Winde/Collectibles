@@ -26,7 +26,8 @@
 		})
 		.when('/products/', {
 			templateUrl: '/app/templates/products/search.html',
-			secured: false
+			secured: false,
+			reloadOnSearch: false
 		})
 		.when('/product/:id', {
 			templateUrl: '/app/templates/products/details.html',

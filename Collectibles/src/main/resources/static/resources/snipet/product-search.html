@@ -3,7 +3,7 @@
 		<input type="text" class="form-control"
 			ng-model="searchTerm"
 			ng-model-options="{ debounce: 500 }"
-			ng-change="productListCtrl.search()" />					 
+			ng-change="productListCtrl.updateSearch()" />					 
 		</div>
 	<div class="form-group" ><!-- selectpicker -->
 		<select class="form-control"	
@@ -12,7 +12,7 @@
 			data-collection-attribute="id"
 			data-collection-name="hierarchies"			 
 			ng-options="item.id as item.name for item in hierarchies" 
-			ng-change="productListCtrl.search()"			
+			ng-change="productListCtrl.updateSearch()"			
 				options-class="{ 
 				root: isRoot == true,
 				depth0: depth == 0,
@@ -38,19 +38,19 @@
 			<label>Any</label>
 			<input type="radio" class="form-control"
 				ng-model="withImages"			
-				ng-change="productListCtrl.search()" value=""/>
+				ng-change="productListCtrl.updateSearch()" value=""/>
 		</div>
 		<div class="radio">		
 			<label>With</label>
 			<input type="radio" class="form-control"
 				ng-model="withImages"			
-				ng-change="productListCtrl.search()" value="true"/>
+				ng-change="productListCtrl.updateSearch()" value="true"/>
 		</div>
 		<div class="radio">
 			<label>Without</label>
 			<input type="radio" class="form-control"
 				ng-model="withImages"			
-				ng-change="productListCtrl.search()" value="false" />
+				ng-change="productListCtrl.updateSearch()" value="false" />
 		</div>
 	</div>
 	<div>
@@ -59,19 +59,19 @@
 			<label>Any</label>
 			<input type="radio" class="form-control"
 				ng-model="owned"			
-				ng-change="productListCtrl.search()" value=""/>
+				ng-change="productListCtrl.updateSearch()" value=""/>
 		</div>
 		<div class="radio">		
 			<label>Yes</label>
 			<input type="radio" class="form-control"
 				ng-model="owned"			
-				ng-change="productListCtrl.search()" value="true"/>
+				ng-change="productListCtrl.updateSearch()" value="true"/>
 		</div>
 		<div class="radio">
 			<label>No</label>
 			<input type="radio" class="form-control"
 				ng-model="owned"			
-				ng-change="productListCtrl.search()" value="false" />
+				ng-change="productListCtrl.updateSearch()" value="false" />
 		</div>
 	</div>
 			

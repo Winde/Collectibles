@@ -87,11 +87,13 @@ public class Product extends SimpleIdDao{
 	@JsonView(ProductSimpleView.class)
 	private String amazonReference = null;
 	
-	@Column
-	private Boolean hasAmazonImage = null;
 	
 	@Column
 	private String amazonUrl = null;
+	
+	@Column
+	private Boolean isAmazonProcessed = null;
+	
 	
 	public Product(){}
 
@@ -204,15 +206,12 @@ public class Product extends SimpleIdDao{
 		}
 	}
 
-	
-	
-
-	public Boolean getHasAmazonImage() {
-		return hasAmazonImage;
+	public Boolean getIsAmazonProcessed() {
+		return isAmazonProcessed;
 	}
 
-	public void setHasAmazonImage(Boolean hasAmazonImage) {
-		this.hasAmazonImage = hasAmazonImage;
+	public void setIsAmazonProcessed(Boolean isAmazonProcessed) {
+		this.isAmazonProcessed = isAmazonProcessed;
 	}
 
 	public String getAmazonReference() {
@@ -220,6 +219,9 @@ public class Product extends SimpleIdDao{
 	}
 
 	public void setAmazonReference(String amazonReference) {
+		if (this.getAmazonReference()!=null && !this.getAmazonReference().equals(amazonReference)){
+			this.setIsAmazonProcessed(isAmazonProcessed);
+		}
 		this.amazonReference = amazonReference;
 	}
 

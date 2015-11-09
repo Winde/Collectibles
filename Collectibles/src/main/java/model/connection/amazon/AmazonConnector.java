@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.imageio.ImageIO;
+import javax.transaction.Transactional;
 
 import model.dataobjects.Image;
 import model.dataobjects.Product;
@@ -19,19 +20,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AmazonConnector {
 
-	
-	private String getAmazonImageUrl(String id) throws TooFastConnectionException{
-		return ItemLookup.getInstance().getImage(id);
-	}
-	
-	private String getDescription(String id) throws TooFastConnectionException{
-		return ItemLookup.getInstance().getDescription(id);
-	}
-
-	private String getAmazonUrl(String id) throws TooFastConnectionException {
-		return ItemLookup.getInstance().getAmazonUrl(id);
-	}
-			
+		
 	private byte[] fetchAmazonImage(String url) throws TooFastConnectionException {
 				
 		if (url!=null){
@@ -69,56 +58,87 @@ public class AmazonConnector {
 		return null;
 	}
 	
-	public boolean updateProductOnlyImage(Product product, Collection<Image> imageList) throws TooFastConnectionException{
-		return updateProduct(product,imageList,true);		
+	public boolean updateProduct(Product product, Collection<Image> images) throws TooFastConnectionException{		
+		return updateProductDo(product,images); 
+	}
+		
+	@Transactional
+	public boolean updateProductTransaction(Product product,ProductRepository productRepository){		
+		
+		Collection<Image> images = new ArrayList<>();
+		
+		productRepository.findOne(product.getId());
+		boolean updated = false;
+		try {
+			updated = this.updateProduct(product, images);
+		} catch (TooFastConnectionException e) {
+			e.printStackTrace();
+		}
+		productRepository.saveWithImages(product, images);	
+		
+		return updated;
 	}
 	
-	public boolean updateProduct(Product product, Collection<Image> imageList) throws TooFastConnectionException{
-		return updateProduct(product,imageList,false); 
-	}
-	
-	private boolean updateProduct(Product product, Collection<Image> imageList, boolean onlyImage) throws TooFastConnectionException{
+	private boolean updateProductDo(Product product, Collection<Image> imageList) throws TooFastConnectionException{
 		boolean modified = false;
 		if (product.getAmazonReference()!=null){
-			if (product.getDescription()==null && !onlyImage){
-				String amazonDescription = null;
-				
-				amazonDescription = getDescription(product.getAmazonReference());
-				System.out.println("Obtained Description from Amazon: " + amazonDescription);
-				if (amazonDescription!=null){
-					product.setDescription(amazonDescription);
-					modified = true;
-				}				
-			}
 			
-			if (product.getAmazonUrl()==null && !onlyImage){
-				String amazonUrl = null;
+			if (!Boolean.TRUE.equals(product.getIsAmazonProcessed())
+					&&(product.getDescription()==null 
+						|| product.getImages()==null
+						|| product.getImages().size()==0
+						|| product.getAmazonUrl()==null)
+					) {
 				
-				amazonUrl = getAmazonUrl(product.getAmazonReference());
-				System.out.println("Obtained Url from Amazon: " + amazonUrl);
+				ItemLookup lookup = ItemLookup.getInstance();
+				
+				String genericAmazonDataUrl = lookup.getMultipleUseUrl(product.getAmazonReference());
+				
+				if (product.getDescription()==null){
+					String amazonDescription = null;
 					
-				if (amazonUrl!=null){
-					product.setAmazonUrl(amazonUrl);
-					modified = true;
+					amazonDescription = lookup.parseDescription(genericAmazonDataUrl);
+					System.out.println("Obtained Description from Amazon: " + amazonDescription);
+					if (amazonDescription!=null){
+						product.setDescription(amazonDescription);
+						modified = true;
+					}				
 				}
+				
+				if (product.getAmazonUrl()==null){
+					String amazonUrl = null;
+					
+					amazonUrl = lookup.parseAmazonUrl(genericAmazonDataUrl);
+					System.out.println("Obtained Url from Amazon: " + amazonUrl);
+						
+					if (amazonUrl!=null){
+						product.setAmazonUrl(amazonUrl);
+						modified = true;
+					}
+				}
+				
+				if (product.getImages()==null || product.getImages().size()<=0){				
+					byte[] data = null;
+					
+					String url = lookup.parseImage(genericAmazonDataUrl);
+					System.out.println("Obtained Image URL from Amazon: " + url);
+					data = this.fetchAmazonImage(url);
+									
+					if(data!=null){				
+						Image image = new Image();
+						image.setData(data);
+						image.setMain(true);					
+						product.addImage(image);
+						modified = true;
+						imageList.add(image);
+					}						
+				}
+				
+				product.setIsAmazonProcessed(Boolean.TRUE);
+								
 			}
 			
-			if (product.getImages()==null || product.getImages().size()<=0){				
-				byte[] data = null;
-				
-				String url = this.getAmazonImageUrl(product.getAmazonReference());
-				System.out.println("Obtained Image URL from Amazon: " + url);
-				data = this.fetchAmazonImage(url);
-								
-				if(data!=null){				
-					Image image = new Image();
-					image.setData(data);
-					image.setMain(true);					
-					product.addImage(image);
-					modified = true;
-					imageList.add(image);
-				}						
-			}			
+						
 		}
 		return modified;
 	}

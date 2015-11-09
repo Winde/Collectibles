@@ -74,19 +74,8 @@ public class ProductController  extends CollectiblesController{
 		} else {
 			Product product = productRepository.findOne(idLong);
 			
-			boolean modified = false;
-			Collection<Image> images = new ArrayList<>();
-			try {
-				modified = amazonConnector.updateProduct(product, images);
-			} catch (TooFastConnectionException e) {
-				e.printStackTrace();
-			}
-					
-			if (modified){				
-				productRepository.saveWithImages(product,images);
-			}
-			
-			
+			amazonConnector.updateProductTransaction(product, productRepository);
+						
 			if (product==null){
 				throw new NotFoundException();
 			} else {
@@ -107,8 +96,7 @@ public class ProductController  extends CollectiblesController{
 			HierarchyNode hierarchyNode = hierarchyRepository.findOne(hierarchyId);
 			if (hierarchyNode!=null){
 				if (file!=null){
-					Collection<Product> products = new ArrayList<>();
-					Collection<Image> images = new ArrayList<>();
+					Collection<Product> products = new ArrayList<>();					
 					InputStream inputStream = null;
 					try {
 						inputStream = file.getInputStream();					
@@ -262,7 +250,9 @@ public class ProductController  extends CollectiblesController{
 						hierarchyRepository.findOne(product.getHierarchyPlacement().getId())==null
 				){								
 					product.setHierarchyPlacement(productInDb.getHierarchyPlacement());
-				} 			 				
+				} 	
+				
+				product.setIsAmazonProcessed(Boolean.FALSE);				
 				product.setCategoryValues(productInDb.getCategoryValues());
 				product.setImages(productInDb.getImages());
 				Product result = productRepository.save(product);

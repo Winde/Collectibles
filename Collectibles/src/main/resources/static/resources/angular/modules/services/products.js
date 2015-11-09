@@ -41,13 +41,12 @@
 					progressbar: true
 				});
 			},
-			search: function(root,hierarchy,searchTerm,withImages,owned){				
+			search: function(hierarchy,searchTerm,withImages,owned){				
 				var url = "/product/search/";
 												
 				if (
 						hierarchy!=null &&
-						hierarchy.id!=null &&
-						hierarchy.id!=root.id	
+						hierarchy!=undefined 	
 				){
 					url = url + hierarchy.id + "/";
 				}

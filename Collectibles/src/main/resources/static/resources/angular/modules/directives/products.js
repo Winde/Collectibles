@@ -34,7 +34,7 @@
 		return {
 			restrict: 'E',	
 			templateUrl: '/app/snipet/product-list-entry.html',
-			controller: 'ProductListController',
+			controller: 'ProductDetailsController',
 			controllerAs: 'productManagementCtrl'			
 		};		
 	});

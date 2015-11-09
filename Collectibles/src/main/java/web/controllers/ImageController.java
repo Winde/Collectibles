@@ -7,6 +7,10 @@ import model.dataobjects.Image;
 import model.persistence.ImageRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,6 +37,24 @@ public class ImageController extends CollectiblesController{
 				throw new NotFoundException();
 			} else {
 				return image;
+			}
+		}
+	}
+	
+	@RequestMapping(value="/image/content/{id}", method = RequestMethod.GET)
+	public ResponseEntity<byte[]> getImageContent(@PathVariable String id) throws CollectiblesException{
+		Long imageId = this.getId(id);
+		if (imageId==null){
+			throw new IncorrectParameterException(new String[]{"id"});
+		} else {
+			final HttpHeaders headers = new HttpHeaders();
+		    headers.setContentType(MediaType.IMAGE_PNG);
+		    
+			Image image = imageRepository.findOne(imageId);
+			if (image!=null){
+			    return new ResponseEntity<byte[]>(image.getData(), headers, HttpStatus.OK);
+			}else {
+				return new ResponseEntity<byte[]>(null, headers, HttpStatus.NOT_FOUND);
 			}
 		}
 	}

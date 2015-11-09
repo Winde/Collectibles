@@ -17,32 +17,37 @@
 		this.setSelectedImage = function(image){			
 			$scope.product.selectedImage = image;
 		}
+				
+		if ($scope.product && $scope.product.images){
+			var image = null;
+			if ($scope.product.images && $scope.product.images.length){
+				for (var i=0;i<$scope.product.images.length;i++){
+					if ($scope.product.images[i].main == true){
+						image = $scope.product.images[i];
+					}
+				}
+				if (image == null){
+					image = $scope.product.image[0];
+				}
+				$scope.product.selectedImage = image;
+			}			
+		}
+		
 		
 		if ($routeParams.id){
 			Product.one($routeParams.id)
 			.success(function(data){
 				controller.setProduct(data);			
-				if (data.images!=undefined && data.images!=null && data.images.length>0){				
-					Image.multiple(data.images)
-					.success(function(data){
-						$scope.product.images = data;
-						if (data.length>0){							
-							if ($scope.product.mainImage != null) {
-								for (var i=0;i<data.length;i++){
-									if (data[i].id == $scope.product.mainImage.id){
-										$scope.product.selectedImage =data[i]; 
-									}
-								}
-							} else {
-								$scope.product.selectedImage =data[0]; 
+				if (data.images!=undefined && data.images!=null && data.images.length>0){
+					if ($scope.product.mainImage != null) {
+						for (var i=0;i<data.images.length;i++){
+							if (data.images[i].id == $scope.product.mainImage.id){
+								$scope.product.selectedImage =data.images[i]; 
 							}
-						}						
-					})
-					.catch(function(){		
-						Message.alert("There was an error");
-					})
-					.finally(function(){					
-					});
+						}
+					} else {
+						$scope.product.selectedImage =data.images[0]; 
+					}										
 				}
 			})
 			.catch(function(){	
@@ -84,46 +89,14 @@
 		
 	}]);
 	
-	app.controller('ProductListController',['$scope','$filter','Image','Product','Hierarchy','Message',
-	                                        function($scope,$filter,Image,Product,Hierarchy,Message){
+	app.controller('ProductListController',['$scope','$filter','$location','Image','Product','Hierarchy','Message',
+	                                        function($scope,$filter,$location,Image,Product,Hierarchy,Message){
 		var controller = this;
 				
 		if ($scope.$parent && $scope.$parent.root) {
 			$scope.root = $scope.$parent.root;
 		}
 		
-		if ($scope.product && $scope.product.images){
-			var image = null;
-			if ($scope.product.images && $scope.product.images.length){
-				for (var i=0;i<$scope.product.images.length;i++){
-					if ($scope.product.images[i].main == true){
-						image = $scope.product.images[i];
-					}
-				}
-				if (image == null){
-					image = $scope.product.image[0];
-				}
-			}
-			
-			if (image!=null){
-				Image.one(image)
-				.success(function(data){
-					if (data.length>0){
-						$scope.product.selectedImage = data[0];
-					}					
-				})
-				.catch(function(){
-					Message.alert("There was an error");
-				})
-				.finally(function(){
-					
-				});
-			
-			}
-		}
-		
-		$scope.withImages = "";
-		$scope.owned = "";
 		$scope.products = [];
 		if ($scope.hierarchies = null || $scope.hierarchies == undefined) {
 			$scope.hierarchies = [];
@@ -133,16 +106,93 @@
 			$scope.hierarchies = $scope.$parent.hierarchies;
 		}
 		
-		$scope.hierarchy = {};
-		$scope.searchTerm = "";		
+		this.updateSearch = function(){
+			var searchObject = {};
 			
+			if ($scope.hierarchy && $scope.hierarchy.id){ searchObject.hierarchy = $scope.hierarchy.id;}			
+			
+			if ($scope.searchTerm){ searchObject.search = $scope.searchTerm; }			
+			
+			if ($scope.withImages){ searchObject.withImages = $scope.withImages; }
+			
+			if ($scope.owned){ searchObject.owned = $scope.owned}
+			
+			$location.search(searchObject);
+			controller.search();
+		}
+		
+		this.obtainSearchParameters = function(){
+			return $location.search()
+		};
+		
+		this.setSearchParameters = function(){
+			var searchObject = controller.obtainSearchParameters();
+			
+			if (searchObject.hierarchy){	$scope.hierarchy = {id: searchObject.hierarchy};
+			} else {	$scope.hierarchy = {};}
+			
+			if (searchObject.search){		$scope.searchTerm = searchObject.search;
+			} else {	$scope.searchTerm = "";}
+			
+			if (searchObject.withImages){	$scope.withImages = searchObject.withImages;
+			} else {	$scope.withImages = "";}
+			
+			if (searchObject.owned){	$scope.owned = searchObject.owned;
+			} else {	$scope.owned = "";}
+			
+		};
+				
+		this.setSearchParameters();
+		
+		this.search = function() {
+			
+			var searchTerm = $scope.searchTerm;
+			var withImages = null;
+			if ($scope.withImages == 'true' || $scope.withImages == 'false'){
+				withImages = $scope.withImages;
+			}
+			var owned = null;
+			if ($scope.owned == 'true' || $scope.owned == 'false'){
+				owned = $scope.owned;
+			}			
+			
+			if (	
+					($scope.root==undefined 
+							|| $scope.root.id == undefined
+							|| $scope.hierarchy == undefined 
+							|| $scope.hierarchy.id == undefined
+							|| $scope.root.id!=$scope.hierarchy.id) 
+					|| (searchTerm!=null && searchTerm !=undefined && searchTerm!="")
+				){				
+				Product.search($scope.hierarchy,searchTerm,withImages,owned)
+				.success(function(data){ 
+					$scope.products = data;					
+				})
+				.catch(function(data){
+					Message.alert("There was an error");
+					$scope.products = [];				
+				}).finally(function(data){					
+				});
+			} else {
+				$scope.products = [];
+			}
+		}
+		
+		if (!angular.equals({}, controller.obtainSearchParameters())){
+			this.search();
+		}
+		
+		
 		if ($scope.root == undefined || $scope.root == null){
 			Hierarchy.root()
 			.success(function(data){
 				$scope.root = { id: data.id };
-				$scope.hierarchy = { id: data.id };
+				if ($scope.hierarchy == null || $scope.hierarchy == undefined){
+					$scope.hierarchy = { id: data.id };
+				}
 				$scope.hierarchies.push({ id: data.id, name: "All", isRoot: true});			
-				Hierarchy.calculateTree(data,$scope.hierarchies);			
+				Hierarchy.calculateTree(data,$scope.hierarchies);
+				console.log($scope.hierarchy);
 			})
 			.catch(function(){	
 				Message.alert("There was an error");
@@ -151,6 +201,7 @@
 			});
 		}
 		
+
 		this.update = function(product) {			
 			
 			Product.modify(product)
@@ -179,35 +230,19 @@
 			});
 		}
 
-		this.search = function() {
+		this.calculateUrl = function(){
+			var url = '/products/';
 			
-			var searchTerm = $scope.searchTerm;
-			var withImages = null;
-			if ($scope.withImages == 'true' || $scope.withImages == 'false'){
-				withImages = $scope.withImages;
+			if ($scope.root.id!=null && $scope.hierarchy.id!=null) {
+				url = url + $scope.hierarchy.id + '/';				
 			}
-			var owned = null;
-			if ($scope.owned == 'true' || $scope.owned == 'false'){
-				owned = $scope.owned;
-			}			
 			
-			if (	
-					($scope.root.id!=$scope.hierarchy.id) || 
-					(searchTerm!=null && searchTerm !=undefined && searchTerm!="")
-				){				
-				Product.search($scope.root,$scope.hierarchy,searchTerm,withImages,owned)
-				.success(function(data){ 
-					$scope.products = data;
-				})
-				.catch(function(data){
-					Message.alert("There was an error");
-					$scope.products = [];				
-				}).finally(function(data){					
-				});
-			} else {
-				$scope.products = [];
-			}
-		}
+			return url;
+		};
+		
+		
+		
+		
 		
 	}]);
 		

@@ -12,7 +12,7 @@
 	</div>
 	<div class="col-md-2">
 		<div class="squareImage">		
-			<a ng-if="product.selectedImage.data" ng-href="#/product/{{product.id}}"><img class="img-responsive img-thumbnail" ng-src="data:image/JPEG;base64,{{product.selectedImage.data}}"></a>		
+			<a ng-if="product.selectedImage.id" ng-href="#/product/{{product.id}}"><img class="img-responsive img-thumbnail" ng-src="/image/content/{{product.selectedImage.id}}"></a>		
 		</div>
 	</div>
 		
