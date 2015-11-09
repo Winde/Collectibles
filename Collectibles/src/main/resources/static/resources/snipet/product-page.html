@@ -29,14 +29,14 @@
 		<div class="col-md-4">
 			<div class="images">	
 				<div ng-if="product.selectedImage" > 		
-					<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.remove(product.selectedImage)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+					<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.removeImage(product.selectedImage)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
 					<img class="img-responsive" ng-id="image.id" ng-src="/image/content/{{product.selectedImage.id}}">
 				</div>
 			
 				<div class="carousel">
 					<div class="row">
 						<div class="col-md-4" ng-repeat="image in product.images">
-							<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.remove(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>			
+							<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.removeImage(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>			
 							<img class="img-responsive img-thumbnail" 
 								ng-click="productCtrl.setSelectedImage(image)" 
 								ng-id="image.id" 

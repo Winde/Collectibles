@@ -21,7 +21,8 @@
 				product: "=",
 				editable: "=",
 				forbidedit: "=",
-				isAuthenticated: "&"
+				isAuthenticated: "&",
+				remove: "&"
 			},
 			link: function(scope,element,attrs){
 			},

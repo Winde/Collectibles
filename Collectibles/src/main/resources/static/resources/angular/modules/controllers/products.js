@@ -56,7 +56,7 @@
 			.finally(function(){			
 			});
 		}
-		this.remove = function(image){
+		this.removeImage = function(image){
 			
 			Product.removeImage($scope.product,image)
 			.success(function(data){								
@@ -127,8 +127,17 @@
 		
 		this.setSearchParameters = function(){
 			var searchObject = controller.obtainSearchParameters();
+
+			console.log("Hierarchy: " + searchObject.hierarchy);
+			console.log("Hierarchy: " + parseInt(searchObject.hierarchy));
 			
-			if (searchObject.hierarchy){	$scope.hierarchy = {id: searchObject.hierarchy};
+			
+			
+			if (searchObject.hierarchy){
+				var hierarchy = parseInt(searchObject.hierarchy)
+				if (!isNaN(hierarchy)){
+					$scope.hierarchy = {id: hierarchy};
+				}
 			} else {	$scope.hierarchy = {};}
 			
 			if (searchObject.search){		$scope.searchTerm = searchObject.search;
@@ -142,9 +151,11 @@
 			
 		};
 				
-		this.setSearchParameters();
-		
+				
 		this.search = function() {
+			
+			console.log("BEFORE SEARCH: ");
+			console.log($scope.hierarchy);
 			
 			var searchTerm = $scope.searchTerm;
 			var withImages = null;
@@ -178,27 +189,35 @@
 			}
 		}
 		
-		if (!angular.equals({}, controller.obtainSearchParameters())){
-			this.search();
-		}
+		
 		
 		
 		if ($scope.root == undefined || $scope.root == null){
 			Hierarchy.root()
 			.success(function(data){
-				$scope.root = { id: data.id };
+				$scope.root = { id: data.id };				
 				if ($scope.hierarchy == null || $scope.hierarchy == undefined){
 					$scope.hierarchy = { id: data.id };
-				}
+				}				
 				$scope.hierarchies.push({ id: data.id, name: "All", isRoot: true});			
 				Hierarchy.calculateTree(data,$scope.hierarchies);
-				console.log($scope.hierarchy);
+				/**/
+				controller.setSearchParameters();			
+				if (!angular.equals({}, controller.obtainSearchParameters())){
+					controller.search();
+				}
+				/**/
 			})
 			.catch(function(){	
 				Message.alert("There was an error");
 			})
 			.finally(function(){			
 			});
+		} else {
+			controller.setSearchParameters();			
+			if (!angular.equals({}, controller.obtainSearchParameters())){
+				controller.search();
+			}
 		}
 		
 

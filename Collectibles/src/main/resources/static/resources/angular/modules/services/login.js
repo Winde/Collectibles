@@ -31,9 +31,9 @@
 				return factory.session;
 			},						
 			checkSessionIsSet: function(){
-				var storedSession = factory.getStoredSession();;
-				console.log("Checking Stored Session: " +  storedSession);
-				if (factory.getStoredSession()!=null){
+				console.log("Checking Stored Session");
+				var storedSession = factory.getStoredSession();				
+				//if (factory.getStoredSession()!=null){
 					$injector.invoke(function($http){
 						$http({
 							url: '/login', 
@@ -43,14 +43,20 @@
 								'JSESSIONID' : factory.getStoredSession(),
 								'X-Requested-With': 'XMLHttpRequest'
 							}						
-						}).success(function(){
-							console.log("Checking Stored Session Request End");
+						})
+						.success(function(){		
+							console.log("Checking Stored Session Success");
 							factory.authenticated = true;
 							factory.session = storedSession;
-						});
+						})
+						.catch(function(){
+							console.log("Checking Stored Session Failure");
+						})
 					});
-				}
-				console.log("Checking Stored Session End");				
+				//} else {
+				//	console.log("Skipping because no session");
+				//}
+								
 			},			
 			login: function(credentials,callbackError){						
 				$injector.invoke(function($http) {										
@@ -58,7 +64,6 @@
 					if (credentials && credentials.username && credentials.password){
 						authdata = Base64.encode(credentials.username + ':' + credentials.password);
 					}
-					console.log("HERE1");
 					
 					$http({
 						url: '/login', 
@@ -69,19 +74,13 @@
 							'X-Requested-With': 'XMLHttpRequest'						
 						}						
 					})
-					.success(function(data){
-						console.log("success1");
-						factory.session = factory.getStoredSession();
-						console.log("success2");
-						factory.authenticated = true;
-						console.log("success3");
-						$location.path("/products/").replace();
-						console.log("success4");
+					.success(function(data){						
+						factory.session = factory.getStoredSession();						
+						factory.authenticated = true;						
+						$location.path("/products/").replace();						
 					})
-					.catch(function(){
-						console.log("HERE2");
+					.catch(function(){						
 						callbackError();
-						console.log("HERE3");
 						Message.alert("Username / Password is not correct");
 					})
 					.finally(function(){

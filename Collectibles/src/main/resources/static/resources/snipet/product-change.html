@@ -6,6 +6,8 @@
 	<div class="form-group" ng-if="product.id">
 		<label>Add Image</label>
 		<div class="btn btn-default" 
+			accept="image/*"
+			ngf-pattern="'image/*'"
 			ngf-select="productChangeCtrl.uploadImage($file)" >Upload</span></div>
 	</div>
 	

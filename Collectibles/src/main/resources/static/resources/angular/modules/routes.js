@@ -87,8 +87,7 @@
 		    			}
 		    		}	        		            
 	        	} 
-	        	//return $q.reject(responseError);
-	        	return responseError;
+	        	return $q.reject(responseError);	        	
 			 }
 		  }
 	}])
@@ -126,7 +125,7 @@
 			            }	        				        			
 			            //return $q.reject(responseError);		        				        					            
 		        	}
-		        	return responseError;
+		        	return $q.reject(responseError);
 		        }
 		    };
 	}]);

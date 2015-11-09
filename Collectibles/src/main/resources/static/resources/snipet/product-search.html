@@ -88,7 +88,7 @@
 		<div class="col-md-1"></div>
 	</div>
 
-	<product-list-entry ng-repeat="product in products | orderBy:'releaseDate'"></product-list-entry>
+	<product-list-entry remove="remove" ng-repeat="product in products | orderBy:'releaseDate'"></product-list-entry>
 </div>
 
 <div ng-if="products && products.length && products.length <=0">
