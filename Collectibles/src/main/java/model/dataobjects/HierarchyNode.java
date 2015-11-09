@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 
 
-@Entity
+@Entity(name="HierarchyNode")
 public class HierarchyNode extends SimpleIdDao{
 
 	public interface HierarchySimpleView extends SimpleIdDaoView{};
@@ -24,7 +24,7 @@ public class HierarchyNode extends SimpleIdDao{
 	public interface HierarchyComplexView extends HierarchyTreeView {};
 	
 	
-	@Column
+	@Column(name="name")
 	@JsonView(HierarchySimpleView.class)
 	private String name;
 	
@@ -43,11 +43,11 @@ public class HierarchyNode extends SimpleIdDao{
 	@JsonView(HierarchyComplexView.class)
 	private Set<Category> categories; 
 	
-	@Column
+	@Column(name="lineage")
 	@JsonView(HierarchySimpleView.class)
 	private String lineage;
 	
-	@Column
+	@Column(name="depth")
 	@JsonView(HierarchySimpleView.class)
 	private Integer depth;
 	

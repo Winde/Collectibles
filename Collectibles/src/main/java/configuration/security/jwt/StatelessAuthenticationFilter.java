@@ -10,6 +10,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class StatelessAuthenticationFilter implements Filter{
@@ -28,7 +29,9 @@ public class StatelessAuthenticationFilter implements Filter{
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		
-		SecurityContextHolder.getContext().setAuthentication(tokenAuthenticationService.getAuthentication((HttpServletRequest) request));
+		Authentication authentication = tokenAuthenticationService.getAuthentication((HttpServletRequest) request);
+		
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 		chain.doFilter(request, response); // always continue
 		
 	}

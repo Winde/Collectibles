@@ -11,10 +11,10 @@ import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@Entity
+@Entity(name="CategoryValue")
 public class CategoryValue extends SimpleIdDao{
 	
-	@Column
+	@Column(name="name")
 	private String name;
 
 	@ManyToOne(fetch=FetchType.LAZY)	

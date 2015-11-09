@@ -6,7 +6,7 @@ import javax.persistence.Lob;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
-@Entity(name="image")
+@Entity(name="Image")
 public class Image extends SimpleIdDao{
 
 	

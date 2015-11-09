@@ -103,7 +103,7 @@
 		    			if (Auth.isloggedIn()){
 			    			var session = Auth.getSession();
 			    			if (session!=null){
-			    				request.headers['JSESSIONID'] = session;
+			    				request.headers[Auth.getHeaderRequestParameter()] = session;
 			    			}
 			    		}			 			    		
 			    		request.headers['X-Requested-With'] = 'XMLHttpRequest';		    	

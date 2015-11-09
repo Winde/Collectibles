@@ -1,47 +1,27 @@
 package model.dataobjects;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.imageio.ImageIO;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.apache.http.client.HttpResponseException;
-
-import model.connection.amazon.AmazonConnector;
-import model.connection.amazon.TooFastConnectionException;
 import model.dataobjects.HierarchyNode.HierarchySimpleView;
 import model.dataobjects.Image.ImageSimpleView;
-import model.dataobjects.SimpleIdDao.SimpleIdDaoView;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 
-@Entity
+@Entity(name="Product")
 public class Product extends SimpleIdDao{
 
 	public interface ProductSimpleView  extends SimpleIdDaoView{};
@@ -57,16 +37,16 @@ public class Product extends SimpleIdDao{
 	@JsonView(ProductComplexView.class)
 	private Set<CategoryValue> categoryValues;
 	
-	@Column(unique=true )
+	@Column(name="reference",unique=true )
 	@JsonView(ProductSimpleView.class)
 	private String reference = null;
 	
-	@Column
+	@Column(name="description")
 	@Lob @Basic
 	@JsonView(ProductSimpleView.class)
 	private String description = null;
 
-	@Column
+	@Column(name="name")
 	@JsonView(ProductSimpleView.class)
 	private String name = null;
 
@@ -75,23 +55,23 @@ public class Product extends SimpleIdDao{
 	@JsonView(ProductSimpleView.class)
 	private List<Image> images = null;
 
-	@Column
+	@Column(name="owned")
 	@JsonView(ProductSimpleView.class)
 	private Boolean owned = Boolean.FALSE;	
 	
-	@Column	
+	@Column(name="release_date")
 	@JsonView(ProductSimpleView.class)
 	private Date releaseDate = null;
 			
-	@Column
+	@Column(name="amazon_reference")
 	@JsonView(ProductSimpleView.class)
 	private String amazonReference = null;
 	
 	
-	@Column
+	@Column(name="amazon_url")
 	private String amazonUrl = null;
 	
-	@Column
+	@Column(name="is_amazon_processed")
 	private Boolean isAmazonProcessed = null;
 	
 	

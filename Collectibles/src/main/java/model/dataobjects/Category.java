@@ -8,19 +8,15 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@Entity
+@Entity(name="Category")
 public class Category extends SimpleIdDao{
 
-	@Column(unique=true)
+	@Column(name="name",unique=true)
 	private String name;
 	
 	@OneToMany(mappedBy="category", cascade=CascadeType.ALL)

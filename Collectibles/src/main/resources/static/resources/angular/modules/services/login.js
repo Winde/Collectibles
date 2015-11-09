@@ -6,12 +6,21 @@
 		this.session = null;		
 		var factory = this;
 		
-		this.getStoredSession = function(){
-			return $cookies.get('JSESSIONID');
+		this.headerWithSessionRequest = "X-AUTH-TOKEN";
+		this.headerWithSessionResponse = "X-AUTH-TOKEN";
+		var localStorageKeyForSession = "X-AUTH-TOKEN";
+		
+		this.getStoredSession = function() {
+			return localStorage.getItem(localStorageKeyForSession);			
+		}
+		
+		this.setStoredSession = function(session){
+			localStorage.setItem(localStorageKeyForSession,session);
 		}
 		
 		this.removeStoredSession = function(){			
-		    $cookies.remove('JSESSIONID');
+			localStorage.removeItem(localStorageKeyForSession);
+			/*
 		    $injector.invoke(function($http){
 			    $http({
 					url: '/logout', 
@@ -23,59 +32,53 @@
 					}						
 				});
 		    });
-		    
+		    */		    
 		}
 		
 		return {
+			getHeaderRequestParameter: function(){
+				return factory.headerWithSessionRequest;
+			},			
 			getSession: function(){
 				return factory.session;
 			},						
 			checkSessionIsSet: function(){
-				console.log("Checking Stored Session");
 				var storedSession = factory.getStoredSession();				
-				//if (factory.getStoredSession()!=null){
+				if (factory.getStoredSession()!=null){
 					$injector.invoke(function($http){
+						
+						headers = {};
+						headers[factory.headerWithSessionRequest] = factory.getStoredSession();
 						$http({
-							url: '/login', 
+							url: '/checksession', 
 							method: 'POST', 
 							nointercept: true, 
-							headers: {
-								'JSESSIONID' : factory.getStoredSession(),
-								'X-Requested-With': 'XMLHttpRequest'
-							}						
+							headers: headers				
 						})
-						.success(function(){		
-							console.log("Checking Stored Session Success");
+						.success(function(data ,status,headers){		
 							factory.authenticated = true;
-							factory.session = storedSession;
+							factory.session = headers(factory.headerWithSessionResponse) ;
 						})
 						.catch(function(){
-							console.log("Checking Stored Session Failure");
 						})
 					});
-				//} else {
-				//	console.log("Skipping because no session");
-				//}
+				} else {
+					console.log("Skipping because no session");
+				}
 								
 			},			
 			login: function(credentials,callbackError){						
-				$injector.invoke(function($http) {										
-					var authdata = null;
-					if (credentials && credentials.username && credentials.password){
-						authdata = Base64.encode(credentials.username + ':' + credentials.password);
-					}
-					
+				$injector.invoke(function($http) {															
 					$http({
 						url: '/login', 
 						method: 'POST', 
 						nointercept: true, 
-						headers: {
-							'Authorization' : 'Basic ' + authdata,
-							'X-Requested-With': 'XMLHttpRequest'						
-						}						
+						data: $.param(credentials),
+						headers: {'Content-Type': 'application/x-www-form-urlencoded'}				
 					})
-					.success(function(data){						
-						factory.session = factory.getStoredSession();						
+					.success(function(data ,status,headers){						
+						factory.session = headers(factory.headerWithSessionResponse);
+						factory.setStoredSession(factory.session);
 						factory.authenticated = true;						
 						$location.path("/products/").replace();						
 					})

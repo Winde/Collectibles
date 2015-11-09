@@ -128,11 +128,6 @@
 		this.setSearchParameters = function(){
 			var searchObject = controller.obtainSearchParameters();
 
-			console.log("Hierarchy: " + searchObject.hierarchy);
-			console.log("Hierarchy: " + parseInt(searchObject.hierarchy));
-			
-			
-			
 			if (searchObject.hierarchy){
 				var hierarchy = parseInt(searchObject.hierarchy)
 				if (!isNaN(hierarchy)){
@@ -154,8 +149,6 @@
 				
 		this.search = function() {
 			
-			console.log("BEFORE SEARCH: ");
-			console.log($scope.hierarchy);
 			
 			var searchTerm = $scope.searchTerm;
 			var withImages = null;

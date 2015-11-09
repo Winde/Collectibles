@@ -4,20 +4,23 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.springframework.security.core.GrantedAuthority;
+import model.dataobjects.User;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import model.dataobjects.User;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class UserDetailsImpl implements UserDetails{
 
+
+	
 	/**
 	 * 
 	 */
@@ -27,11 +30,16 @@ public class UserDetailsImpl implements UserDetails{
 	
 	private Long expires = null;
 	
+	public UserDetailsImpl(){
+		
+	}
+	
 	public UserDetailsImpl(User user){
 		this.user = user;
 	}
 	
 	@Override
+	@JsonIgnore
 	public String getUsername() {
 		return user.getUsername();
 	}
@@ -49,13 +57,26 @@ public class UserDetailsImpl implements UserDetails{
 	public void setExpires(Long expires) {
 		this.expires = expires;
 	}
-	
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	public static UserDetailsImpl fromJSON(String json){
 		
-		ObjectMapper mapper = new ObjectMapper();
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		SimpleModule module = new SimpleModule("SimpleGrantDeSerializer", new Version(0, 1, 0, "SNAPSHOT","winde","simplegrant"));
+		module.addDeserializer(SimpleGrantedAuthority.class, new SimpleGrantedAuthorityDeserializer());		
+		objectMapper.registerModule(module);
+		
 		UserDetailsImpl result = null;
 		try {
-			result = mapper.readValue(json, UserDetailsImpl.class);
+			result = objectMapper.readValue(json, UserDetailsImpl.class);
 		} catch (JsonParseException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
@@ -73,7 +94,7 @@ public class UserDetailsImpl implements UserDetails{
 		
 		if (userDetails!=null){		
 			try {
-				mapper.writeValueAsBytes(userDetails);
+				result = mapper.writeValueAsBytes(userDetails);
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 			}
@@ -83,8 +104,8 @@ public class UserDetailsImpl implements UserDetails{
 	}
 
 	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		Collection<GrantedAuthority> authorities = new ArrayList<>();
+	public Collection<SimpleGrantedAuthority> getAuthorities() {
+		Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority("USER"));
 		authorities.add(new SimpleGrantedAuthority("ADMIN"));
 		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
@@ -93,23 +114,26 @@ public class UserDetailsImpl implements UserDetails{
 	}
 
 
-
 	@Override
+	@JsonIgnore
 	public boolean isAccountNonExpired() {
-		return false;
+		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isAccountNonLocked() {
-		return false;
+		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isCredentialsNonExpired() {
-		return false;
+		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isEnabled() {
 		return true;
 	}

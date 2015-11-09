@@ -10,16 +10,18 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import configuration.security.jwt.JwtAuthenticationProvider;
 import configuration.security.jwt.StatelessAuthenticationFilter;
 import configuration.security.jwt.StatelessLoginFilter;
 import configuration.security.jwt.TokenAuthenticationService;
 import configuration.security.jwt.UserDetailsServiceImpl;
 
 @Configuration
-//@EnableWebSecurity
-//@EnableGlobalMethodSecurity(securedEnabled = true, proxyTargetClass = true)
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true, proxyTargetClass = true)
 public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
 
 
@@ -41,8 +43,14 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private AuthenticationManagerBuilder authenticationManagerBuilder;
 	
+	@Autowired
+	private JwtAuthenticationProvider jwtAuthenticationProvider;
+	
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+    
+    	
+	
     /*
     http    	        	
       	.csrf().disable()      	
@@ -68,6 +76,7 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
      				.disable();
 	*/
     http    
+    	.csrf().disable()  
     	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
     .and()
     	.authorizeRequests()
@@ -78,6 +87,7 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
      			.cacheControl()
      				.disable()
     .and()
+    
 	// custom JSON based authentication by POST of 
 	// {"username":"<name>","password":"<password>"} 
 	// which sets the token header upon authentication
@@ -93,9 +103,15 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
        
+    	BCryptPasswordEncoder passWordEncoder = new BCryptPasswordEncoder();
+    	
     	auth
+    	.authenticationProvider(jwtAuthenticationProvider)
+    	.userDetailsService(userDetailsService)
+    	.passwordEncoder(passWordEncoder);
+    	/*.and()
             .inMemoryAuthentication()
-                .withUser("username").password("password").roles("USER","ADMIN");
+                .withUser("username").password("password").roles("USER","ADMIN");*/
        
     	/*
     	auth

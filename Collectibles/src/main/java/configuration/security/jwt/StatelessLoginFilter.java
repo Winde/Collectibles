@@ -37,10 +37,12 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 
 		System.out.println("Obtaining Login Authentication");
 		
-		final UsernamePasswordAuthenticationToken loginToken = new UsernamePasswordAuthenticationToken(
-				request.getParameter("username").toString(), request.getParameter("password").toString());
+		String username = request.getParameter("username"); 
+		String password = request.getParameter("password");
+		
+		final UsernamePasswordAuthenticationToken loginToken = new UsernamePasswordAuthenticationToken(username,password);
         
-		System.out.println("Obtainined LoginToken:" + loginToken);
+		System.out.println("Obtained LoginToken");
 		
 		return getAuthenticationManager().authenticate(loginToken);
     }
@@ -55,7 +57,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 		final UserDetailsImpl authenticatedUser = userDetailsService.loadUserByUsername(authentication.getName());
 		final UserAuthentication userAuthentication = new UserAuthentication(authenticatedUser);
 
-		System.out.println("Adding token: " + userAuthentication);
+		System.out.println("Adding token");
 		
 		tokenAuthenticationService.addAuthentication(response, userAuthentication);
 		SecurityContextHolder.getContext().setAuthentication(userAuthentication);

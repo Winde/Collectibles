@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class LoginController extends CollectiblesController {
 
-	//@Secured({"ROLE_ADMIN"})
+	@Secured({"ROLE_ADMIN"})
 	@RequestMapping("/login")
 	public User login(HttpServletRequest request){
 		//request.getSession();
@@ -19,5 +19,12 @@ public class LoginController extends CollectiblesController {
 		return new User();		
 	}
 	
+	@Secured({"ROLE_ADMIN"})
+	@RequestMapping("/checksession")
+	public User checksession(HttpServletRequest request){
+		//request.getSession();
+		
+		return new User();		
+	}
 	
 }

@@ -1,33 +1,22 @@
 package model.dataobjects;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Entity
+@Entity(name="User")
 public class User {
 
 	@Id
-	@Column
+	@Column(name="username")
 	private String username;
 	
-	@Column
+	@Column(name="password")
 	@JsonIgnore	
 	private String password;
 
-	private Long expires;
-	
 	public String getUsername() {
 		return username;
 	}
@@ -36,6 +25,7 @@ public class User {
 		this.username = username;
 	}
 
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
