@@ -54,21 +54,21 @@ public class HierarchyRepositoryImpl implements HierarchyRepositoryCustom{
 	}
 	
 	@Override
-	public void delete(Long id){		
+	public void deleteCascade(Long id){		
 		HierarchyNode node = hierarchyRepository.findOne(id);
 		if (node!=null){
-			this.delete(node);
+			this.deleteCascade(node);
 		}
 	}
 	
 	@Override
-	public void delete(HierarchyNode node){		
+	public void deleteCascade(HierarchyNode node){		
 		Collection<Product> products = productRepository.searchProduct(node);
 		productRepository.delete(products);
 		
 		if (node.getChildren()!=null && node.getChildren().size()>0){			
 			for (HierarchyNode child : node.getChildren()){
-				this.delete(child);				
+				this.deleteCascade(child);				
 			}
 		}
 		

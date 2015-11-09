@@ -61,7 +61,7 @@ public class HierarchyController extends CollectiblesController{
 		
 		if (hierarchyId!=null){
 			try {
-				hierarchyRepository.delete(hierarchyId);
+				hierarchyRepository.deleteCascade(hierarchyId);
 			}catch(EmptyResultDataAccessException ex) {				
 				throw new NotFoundException(new String[]{"hierarchy"});
 			}

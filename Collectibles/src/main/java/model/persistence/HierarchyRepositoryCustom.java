@@ -20,8 +20,8 @@ public interface HierarchyRepositoryCustom {
 	public HierarchyNode save(HierarchyNode node);
 
 	@Transactional
-	public void delete(HierarchyNode node);
+	public void deleteCascade(HierarchyNode node);
 
 	@Transactional
-	public void delete(Long id);
+	public void deleteCascade(Long id);
 }
