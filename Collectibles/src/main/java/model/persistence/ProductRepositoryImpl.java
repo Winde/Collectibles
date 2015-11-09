@@ -181,6 +181,18 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		productRepository.save(products);		
 	}
 
+	@Override
+	public boolean mergeAndSaveProductWithoutImages(Product product,Collection<Image> images) {
+
+		product = productRepository.findOne(product.getId());
+		if (product!=null && product.getImages()!=null && product.getImages().size()<=0){
+			productRepository.addImage(product, images);
+			return true;
+		}		
+		return false;
+		
+	}
+
 
 	
 	

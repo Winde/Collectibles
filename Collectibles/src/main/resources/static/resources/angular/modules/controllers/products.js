@@ -306,7 +306,6 @@
 				} else {
 					product.images = data;
 				}
-				console.log(product);
 				
 			})
 			.catch(function(){

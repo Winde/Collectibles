@@ -33,30 +33,32 @@
 			checkSessionIsSet: function(){
 				var storedSession = factory.getStoredSession();;
 				console.log("Checking Stored Session: " +  storedSession);
-				$injector.invoke(function($http){
-					$http({
-						url: '/login', 
-						method: 'POST', 
-						nointercept: true, 
-						headers: {
-							'JSESSIONID' : factory.getStoredSession(),
-							'X-Requested-With': 'XMLHttpRequest'
-						}						
-					}).success(function(){
-						factory.authenticated = true;
-						factory.session = storedSession;
+				if (factory.getStoredSession()!=null){
+					$injector.invoke(function($http){
+						$http({
+							url: '/login', 
+							method: 'POST', 
+							nointercept: true, 
+							headers: {
+								'JSESSIONID' : factory.getStoredSession(),
+								'X-Requested-With': 'XMLHttpRequest'
+							}						
+						}).success(function(){
+							console.log("Checking Stored Session Request End");
+							factory.authenticated = true;
+							factory.session = storedSession;
+						});
 					});
-				});
-				
+				}
+				console.log("Checking Stored Session End");				
 			},			
-			login: function(credentials,callbackError){		
-				console.log("DO LOGIN");
+			login: function(credentials,callbackError){						
 				$injector.invoke(function($http) {										
 					var authdata = null;
-					if (credentials.username && credentials.password){
+					if (credentials && credentials.username && credentials.password){
 						authdata = Base64.encode(credentials.username + ':' + credentials.password);
 					}
-					
+					console.log("HERE1");
 					
 					$http({
 						url: '/login', 
@@ -67,13 +69,19 @@
 							'X-Requested-With': 'XMLHttpRequest'						
 						}						
 					})
-					.success(function(data){						
+					.success(function(data){
+						console.log("success1");
 						factory.session = factory.getStoredSession();
-						factory.authenticated = true;						
+						console.log("success2");
+						factory.authenticated = true;
+						console.log("success3");
 						$location.path("/products/").replace();
+						console.log("success4");
 					})
 					.catch(function(){
+						console.log("HERE2");
 						callbackError();
+						console.log("HERE3");
 						Message.alert("Username / Password is not correct");
 					})
 					.finally(function(){
@@ -82,8 +90,7 @@
 				});
 				
 			},
-			logout: function(){
-				console.log("DO LOGOUT");
+			logout: function(){				
 				factory.authenticated = false;
 				factory.session = null;
 				factory.removeStoredSession();

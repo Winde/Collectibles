@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import model.connection.amazon.AmazonConnector;
+import model.connection.amazon.AmazonBackgroundImageProcessor;
 import model.connection.amazon.TooFastConnectionException;
 import model.dataobjects.Category;
 import model.dataobjects.CategoryValue;
@@ -145,31 +146,15 @@ public class ProductController  extends CollectiblesController{
 							product.setHierarchyPlacement(hierarchyNode);							
 							validate(product);
 							
-																					
-							try {
-								amazonConnector.updateProductOnlyImage(product, images);
-								try {
-									Thread.sleep(1000);
-								} catch (InterruptedException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-							} catch (TooFastConnectionException e) {
-								try {
-									Thread.sleep(5000);
-								} catch (InterruptedException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-								e.printStackTrace();
-							}
-
 							products.add(product);
 							
 						}				
 																		
-						productRepository.saveWithImages(products,images);
-						//productRepository.save(products);
+						//productRepository.saveWithImages(products,images);
+						productRepository.save(products);
+												
+						amazonConnector.processImagesInBackground(products, productRepository);
+						
 						return products;
 					} catch (IOException e) {
 						// TODO Auto-generated catch block

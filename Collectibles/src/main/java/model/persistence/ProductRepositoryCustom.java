@@ -35,4 +35,8 @@ public interface ProductRepositoryCustom {
 	
 	@Transactional
 	public void saveWithImages(Product product,Collection<Image> images);
+	
+	@Transactional
+	public boolean mergeAndSaveProductWithoutImages(Product product, Collection<Image> image);
+
 }

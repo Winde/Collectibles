@@ -1,4 +1,4 @@
-package configuration;
+package configuration.web;
 
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter;
 import org.springframework.context.annotation.Bean;

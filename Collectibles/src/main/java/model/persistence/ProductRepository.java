@@ -23,5 +23,7 @@ public interface ProductRepository extends CrudRepository<Product,Long>, Product
 	@Query("select p from Product p where p.reference = ?1")
 	public Product findOneByReference(String reference);
 
+
+
 		
 }

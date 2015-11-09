@@ -8,6 +8,7 @@
 		var routerConfig = this;
 		
 		
+		
 		this.secured = function($location,$q,Auth){
 			var deferred = $q.defer();			
 			if (!Auth.isloggedIn()){							
@@ -76,16 +77,17 @@
 	    		}
 	    		return response;
 	    	},
-			 'responseError': function(responseError){
-	        	if (errorResponse && errorResponse.config && errorResponse.config.nointercept) {	        	
-	        	} else {		        		
-	        		if (errorResponse && errorResponse.config && errorResponse.config.progressbar){
-		        		if ($scope.progressbar){
-		    				$scope.progressbar.complete();
+			 'responseError': function(responseError){								
+	        	if (responseError && responseError.config && responseError.config.nointercept) {	        	
+	        	} else {		    	        		
+	        		if (responseError && responseError.config && responseError.config.progressbar){
+		        		if ($rootScope.progressbar){
+		        			$rootScope.progressbar.complete();
 		    			}
-		    		}
-		            return errorResponse;	            
+		    		}	        		            
 	        	} 
+	        	//return $q.reject(responseError);
+	        	return responseError;
 			 }
 		  }
 	}])
@@ -94,34 +96,36 @@
 	     function httpInjectAuth($q, Auth,$location) {
 			
 		    return {		    	
-		    	'request': function(request){
+		    	'request': function(request){		    		
 		    		if (request && request.nointercept){		    			
 		    		
 		    		}else{		    			    			
 		    			if (Auth.isloggedIn()){
-			    			var session = Auth.getSession();					    			
-				    		request.headers['JSESSIONID'] = session;			    			
+			    			var session = Auth.getSession();
+			    			if (session!=null){
+			    				request.headers['JSESSIONID'] = session;
+			    			}
 			    		}			 			    		
 			    		request.headers['X-Requested-With'] = 'XMLHttpRequest';		    	
-		    		}
+		    		}		    		
 		    		return request;
 		    	},	
-		        'responseError': function(errorResponse) {
-
-		        	if (errorResponse && errorResponse.config && errorResponse.config.nointercept) {
-		        		return $q.reject(errorResponse);
+		        'responseError': function(responseError) {		        	
+		        	if (responseError && responseError.config && responseError.config.nointercept) {		        		
+		        		//return $q.reject(responseError);
 		        	} else {		        				
 	                    // $http is already constructed at the time and you may
 	                    // use it, just as any other service registered in your
-	                    // app module and modules on which app depends on.	        			
-	        			switch (errorResponse.status) {
-				            case 403:			            	
-				            	Auth.logout();			            				            
-				            	$location.path('/login/').replace();			            	
+	                    // app module and modules on which app depends on.		        		
+	        			switch (responseError.status) {
+				            case 403:				            	
+				            	Auth.logout();			            						            	
+				            	$location.path('/login/').replace();						            	
 				            break;	            
-			            }
-			            return $q.reject(errorResponse);		        				        					            
+			            }	        				        			
+			            //return $q.reject(responseError);		        				        					            
 		        	}
+		        	return responseError;
 		        }
 		    };
 	}]);

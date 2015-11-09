@@ -5,12 +5,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.imageio.ImageIO;
 
 import model.dataobjects.Image;
 import model.dataobjects.Product;
+import model.persistence.ProductRepository;
 
 import org.springframework.stereotype.Component;
 
@@ -119,5 +121,14 @@ public class AmazonConnector {
 			}			
 		}
 		return modified;
+	}
+
+	public void processImagesInBackground(Collection<Product> products, ProductRepository productRepository){
+		
+		Collection<Product> clonedProducts = new ArrayList<Product>();
+		
+		clonedProducts.addAll(products);
+		AmazonBackgroundImageProcessor thread = new AmazonBackgroundImageProcessor(clonedProducts, productRepository, this);
+		thread.start();
 	}
 }

@@ -1,4 +1,4 @@
-package configuration;
+package configuration.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -23,12 +23,14 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private LogoutSuccessHandler logoutHandler;
+
 	
 	//@Autowired 
 	//private AuthenticationService authenticationService; 
 	
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+    
     http    	        	
       	.csrf().disable()      	
       	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
@@ -46,9 +48,22 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
 		    .logoutUrl("/logout")
 		    .logoutSuccessHandler(logoutHandler)
 		    .deleteCookies("JSESSIONID"); 
-		    
-      	
-      
+	
+    	
+    /*	
+    http
+    // custom JSON based authentication by POST of 
+ 	// {"username":"<name>","password":"<password>"} 
+ 	// which sets the token header upon authentication
+    .addFilterBefore(new StatelessLoginFilter("/login",
+			tokenAuthenticationService,
+			userDetailsService,
+			tokenAuthenticationManager),UsernamePasswordAuthenticationFilter.class)
+
+ 	// custom Token based authentication based on 
+ 	// the header previously given to the client
+ 	.addFilterBefore(new StatelessAuthenticationFilter(),UsernamePasswordAuthenticationFilter.class);
+    */
     /*
       .and().
       
