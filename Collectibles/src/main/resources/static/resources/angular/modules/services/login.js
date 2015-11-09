@@ -10,6 +10,8 @@
 		this.headerWithSessionResponse = "X-AUTH-TOKEN";
 		var localStorageKeyForSession = "X-AUTH-TOKEN";
 		
+		
+		
 		this.getStoredSession = function() {
 			return localStorage.getItem(localStorageKeyForSession);			
 		}
@@ -35,12 +37,16 @@
 		    */		    
 		}
 		
+		if (this.getStoredSession()!=null){
+			this.authenticated = true;
+		}
+		
 		return {
 			getHeaderRequestParameter: function(){
 				return factory.headerWithSessionRequest;
 			},			
 			getSession: function(){
-				return factory.session;
+				return factory.getStoredSession();
 			},						
 			checkSessionIsSet: function(){
 				var storedSession = factory.getStoredSession();				
@@ -56,10 +62,11 @@
 							headers: headers				
 						})
 						.success(function(data ,status,headers){		
-							factory.authenticated = true;
-							factory.session = headers(factory.headerWithSessionResponse) ;
+							factory.authenticated = true;							
 						})
 						.catch(function(){
+							factory.authenticated = false;
+							factory.removeStoredSession();
 						})
 					});
 				} else {
@@ -76,9 +83,8 @@
 						data: $.param(credentials),
 						headers: {'Content-Type': 'application/x-www-form-urlencoded'}				
 					})
-					.success(function(data ,status,headers){						
-						factory.session = headers(factory.headerWithSessionResponse);
-						factory.setStoredSession(factory.session);
+					.success(function(data ,status,headers){												
+						factory.setStoredSession(headers(factory.headerWithSessionResponse));
 						factory.authenticated = true;						
 						$location.path("/products/").replace();						
 					})
@@ -94,7 +100,6 @@
 			},
 			logout: function(){				
 				factory.authenticated = false;
-				factory.session = null;
 				factory.removeStoredSession();
 			},
 			isloggedIn: function(){
