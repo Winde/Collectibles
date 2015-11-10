@@ -4,6 +4,8 @@
 	                                       function($rootScope,$scope,$location,Auth){
 
 		
+		$scope.isCollapsed = true;
+		
 		Auth.checkSessionIsSet();
 		
 	

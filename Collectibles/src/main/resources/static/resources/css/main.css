@@ -69,11 +69,11 @@
 	margin-top: 15px;
 }
 
-select.ng-invalid,.ng-invalid.ng-dirty,.ng-invalid {
+select.ng-invalid,.ng-invalid.ng-dirty:not(.btn),.ng-invalid:not(.btn) {
 	border-color: #FA787E;
 }
 
-.ng-valid.ng-dirty {
+.ng-valid.ng-dirty:not(.btn) {
 	border-color: #78FA89;
 }
 
