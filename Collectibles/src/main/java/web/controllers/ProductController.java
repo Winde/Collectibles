@@ -144,7 +144,7 @@ public class ProductController  extends CollectiblesController{
 						//productRepository.saveWithImages(products,images);
 						productRepository.save(products);
 												
-						amazonConnector.processImagesInBackground(products, productRepository);
+						amazonConnector.processInBackground(products, productRepository);
 						
 						return products;
 					} catch (IOException e) {

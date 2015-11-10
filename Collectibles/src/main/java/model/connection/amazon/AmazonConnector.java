@@ -11,6 +11,7 @@ import java.util.Collection;
 import javax.imageio.ImageIO;
 import javax.transaction.Transactional;
 
+import model.connection.ProductInfoConnector;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
 import model.persistence.ProductRepository;
@@ -19,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AmazonConnector {
+public class AmazonConnector implements ProductInfoConnector{
 
 	@Autowired
 	private AmazonItemLookupService itemLookup;
@@ -143,7 +144,7 @@ public class AmazonConnector {
 		return modified;
 	}
 
-	public void processImagesInBackground(Collection<Product> products, ProductRepository productRepository){
+	public void processInBackground(Collection<Product> products, ProductRepository productRepository){
 		
 		Collection<Product> clonedProducts = new ArrayList<Product>();
 		
