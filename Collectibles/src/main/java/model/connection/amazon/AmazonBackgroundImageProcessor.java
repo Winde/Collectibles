@@ -29,10 +29,18 @@ public class AmazonBackgroundImageProcessor  extends Thread {
 		   	
 	    	try {
 	    		connector.updateProductTransaction(product, productRepository);
-	    		Thread.sleep(1000);
-	    	}catch(Exception ex){
-	    		ex.printStackTrace();
-	    	}						
+	    		Thread.sleep(1400);
+	    	}catch(TooFastConnectionException ex){
+	    		try {
+					Thread.sleep(2500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    	} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}						
 	    }	 
 	    System.out.println("Background Process Finished");
 		

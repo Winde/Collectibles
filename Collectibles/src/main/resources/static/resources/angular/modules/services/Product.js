@@ -1,6 +1,6 @@
 (function(){
 	
-	angular.module('products-services',['ngFileUpload'])
+	angular.module('product')
 	.factory('Product', function ProductFactory($http,Upload){
 		var factory = this;
 		

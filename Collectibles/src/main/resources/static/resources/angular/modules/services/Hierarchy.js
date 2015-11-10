@@ -1,6 +1,6 @@
 (function(){
 	
-	angular.module('hierarchies-services',[])
+	angular.module('hierarchy')
 	.factory('Hierarchy', function HierarchyFactory($http){
 		
 		var maxHierarchyLevels = 3;

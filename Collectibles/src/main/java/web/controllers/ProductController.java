@@ -73,8 +73,11 @@ public class ProductController  extends CollectiblesController{
 			throw new IncorrectParameterException(new String[]{"id"});
 		} else {
 			Product product = productRepository.findOne(idLong);
-			
-			amazonConnector.updateProductTransaction(product, productRepository);
+			try{
+				amazonConnector.updateProductTransaction(product, productRepository);
+			}catch (Exception ex){
+				ex.printStackTrace();
+			}
 						
 			if (product==null){
 				throw new NotFoundException();

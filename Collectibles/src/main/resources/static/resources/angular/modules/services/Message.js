@@ -1,6 +1,6 @@
 (function(){
 	
-	angular.module('generic-services',[])
+	angular.module('generic-functionalities')
 	.factory('Message', function MessageFactory(){
 		
 		var factory = this;

@@ -1,6 +1,6 @@
 (function(){
 	
-	angular.module('images-services',[])
+	angular.module('image')
 	.factory('Image', function ImageFactory($http){
 		return {
 			one: function(image){

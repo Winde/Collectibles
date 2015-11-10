@@ -1,5 +1,5 @@
 (function(){
-	angular.module('login-controllers',[])
+	angular.module('login')
 	.controller('LoginController',
 			['$scope','Auth','Message','$location',
 	        function($scope,Auth,Message,$location){

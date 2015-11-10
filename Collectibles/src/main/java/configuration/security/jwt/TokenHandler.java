@@ -56,7 +56,6 @@ public class TokenHandler {
 
 	public UserDetailsImpl parseUserFromToken(String token) {
 		
-		System.out.println("Parsing User from Token");
 		
 		final String[] parts = token.split(SEPARATOR_SPLITTER);
 
@@ -69,19 +68,18 @@ public class TokenHandler {
 				
 				
 				
-				if (validHash) {
-					System.out.println("Valid Hash");
-					
+				if (validHash) {					
 					String json = new String(userBytes,"UTF-8");
 										
 					final UserDetailsImpl user = UserDetailsImpl.fromJSON(json);
 					
-					if (user!=null && new Date().getTime() < user.getExpires()) {
-						System.out.println("User is not expired");						
+					if (user!=null && new Date().getTime() < user.getExpires()) {											
 						return user;
 					} else {
 						System.out.println("User is expired");
 					}
+				} else{
+					System.out.println("Invalid hash received");
 				}
 			} catch (IllegalArgumentException e) {
 				//log tampering attempt here

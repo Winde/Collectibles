@@ -1,56 +1,28 @@
 (function(){
+	
+	angular.module('login',[]);
+	angular.module('product',[])	
+	angular.module('hierarchy',[]);
+	angular.module('image',[]);
+	angular.module('generic-functionalities',[]);
+	angular.module('projectProgressBar',['ngProgress']);
+	
 	var app = angular.module('collections', 
 	['ngRoute',
 	 'ngSanitize',
 	 'ngAnimate',
-	 'ngCookies',
-	 'ngProgress',
+	 'projectProgressBar',
+	 'ngFileUpload',
+	 //'ngCookies',	 
 	 'ui.bootstrap',
-	 'login-services',
-	 'login-controllers',
-	 'products-controllers',
-	 'products-directives',
-	 'products-services',
-	 'images-services',	 
-	 'hierarchies-controllers',
-	 'hierarchies-directives',
-	 'hierarchies-services',
-	 'generic-services',
-	 'generic-directives']);
+	 'login',
+	 'product',	 	 
+	 'hierarchy',
+	 'image', 	 
+	 'generic-functionalities']);
 	
 	
-	
-	app.controller('NavigationController',['$rootScope','$scope','$location','$routeParams','Auth','ngProgressFactory', 
-	                                       function($rootScope,$scope,$location,$routeParams,Auth,ngProgressFactory){
 
-		
-		Auth.checkSessionIsSet();
-		
-	
-		$rootScope.$on('$routeChangeStart', function (event, next) {            
-            if (next.secured !== undefined) {            	
-            	$rootScope.secured = next.secured;
-            }
-        });
-		
-		
-		$scope.logout = function(){
-			Auth.logout();					
-			if ($scope.secured == true){
-				$location.path('/products').replace();
-			}
-		}
-		
-
-		$scope.isAuthenticated = function(){			
-			return Auth.isloggedIn();
-		} 
-		
-	
-		$scope.isActive = function (viewLocation) { 
-	        return viewLocation === $location.path();
-	    };
-	}]);
 	
 
 })();

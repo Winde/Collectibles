@@ -1,6 +1,6 @@
 (function(){
 
-	angular.module('hierarchies-controllers',[])
+	angular.module('hierarchy')
 	.controller('HierarchyCreateController',
 			['$scope','Hierarchy','Message',
 	        function($scope,Hierarchy,Message){

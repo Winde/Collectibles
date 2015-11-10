@@ -101,9 +101,7 @@ public class SearchController  extends CollectiblesController{
 			}
 			
 			searchObject.setCategoryValues(categoryValues);
-			
-			System.out.println(withImages);
-			
+						
 			Collection<Product> result = null;
 
 			Collection<String> errors = searchObject.errors();

@@ -66,18 +66,16 @@ public class AmazonConnector {
 	}
 		
 	@Transactional
-	public boolean updateProductTransaction(Product product,ProductRepository productRepository){		
+	public boolean updateProductTransaction(Product product,ProductRepository productRepository) throws TooFastConnectionException{		
 		
 		Collection<Image> images = new ArrayList<>();
 		
 		productRepository.findOne(product.getId());
-		boolean updated = false;
-		try {
-			updated = this.updateProduct(product, images);
-		} catch (TooFastConnectionException e) {
-			e.printStackTrace();
+		boolean updated = false;		
+		updated = this.updateProduct(product, images);
+		if (updated){
+			productRepository.saveWithImages(product, images);
 		}
-		productRepository.saveWithImages(product, images);	
 		
 		return updated;
 	}

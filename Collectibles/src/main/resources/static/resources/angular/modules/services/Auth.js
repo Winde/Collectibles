@@ -1,7 +1,7 @@
 (function(){
 
-	angular.module('login-services',[])	
-	.factory('Auth', function HierarchyFactory(Base64,Message,$injector,$location,$cookies){
+	angular.module('login')	
+	.factory('Auth', function HierarchyFactory(Base64,Message,$injector,$location){
 		this.authenticated = false;
 		this.session = null;		
 		var factory = this;
