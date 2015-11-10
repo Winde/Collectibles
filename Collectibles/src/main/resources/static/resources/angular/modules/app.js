@@ -5,6 +5,7 @@
 	 'ngAnimate',
 	 'ngCookies',
 	 'ngProgress',
+	 'ui.bootstrap',
 	 'login-services',
 	 'login-controllers',
 	 'products-controllers',

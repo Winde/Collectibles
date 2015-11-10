@@ -31,48 +31,46 @@
 		
 	<ajax ng-show="ajax" ></ajax>
 	
-	
-	<div>
-		<label>Images:</label>
-		<div class="radio">
-			<label>Any</label>
-			<input type="radio" class="form-control"
+	<span>Images:</span>
+		
+	<div class="btn-group">
+		
+		<label class="btn btn-default" uib-btn-radio="''" ng-model="withImages" ng-change="productListCtrl.updateSearch()">
+			<!-- <input type="radio"
 				ng-model="withImages"			
-				ng-change="productListCtrl.updateSearch()" value=""/>
-		</div>
-		<div class="radio">		
-			<label>With</label>
-			<input type="radio" class="form-control"
+				ng-change="pro1ductListCtrl.updateSearch()" value=""/>  -->Any
+		</label>
+		
+		<label class="btn btn-default" uib-btn-radio="'true'" ng-model="withImages" ng-change="productListCtrl.updateSearch()">
+			<!-- <input type="radio" 
 				ng-model="withImages"			
-				ng-change="productListCtrl.updateSearch()" value="true"/>
-		</div>
-		<div class="radio">
-			<label>Without</label>
-			<input type="radio" class="form-control"
+				ng-change="productListCtrl.updateSearch()" value="true"/> -->With			
+		</label>		
+		
+		<label class="btn btn-default" uib-btn-radio="'false'" ng-model="withImages" ng-change="productListCtrl.updateSearch()">
+			<!-- <input type="radio" 
 				ng-model="withImages"			
-				ng-change="productListCtrl.updateSearch()" value="false" />
-		</div>
+				ng-change="productListCtrl.updateSearch()" value="false" />-->Without
+		</label>		
 	</div>
-	<div>
-		<label>Owned:</label>
-		<div class="radio">
-			<label>Any</label>
-			<input type="radio" class="form-control"
+	
+	<span>Owned:</span>
+	<div class="btn-group">				
+		<label class="btn btn-default" uib-btn-radio="''" ng-model="owned" ng-change="productListCtrl.updateSearch()">
+			<!-- <input type="radio" class="form-control"
 				ng-model="owned"			
-				ng-change="productListCtrl.updateSearch()" value=""/>
-		</div>
-		<div class="radio">		
-			<label>Yes</label>
-			<input type="radio" class="form-control"
+				ng-change="productListCtrl.updateSearch()" value=""/> -->Any
+		</label>		
+		<label class="btn btn-default" uib-btn-radio="'true'" ng-model="owned" ng-change="productListCtrl.updateSearch()">
+			<!-- <input type="radio"
 				ng-model="owned"			
-				ng-change="productListCtrl.updateSearch()" value="true"/>
-		</div>
-		<div class="radio">
-			<label>No</label>
-			<input type="radio" class="form-control"
+				ng-change="productListCtrl.updateSearch()" value="true"/> -->Yes
+				</label>				
+		<label class="btn btn-default" uib-btn-radio="'false'" ng-model="owned" ng-change="productListCtrl.updateSearch()">
+			<!-- <input type="radio" 
 				ng-model="owned"			
-				ng-change="productListCtrl.updateSearch()" value="false" />
-		</div>
+				ng-change="productListCtrl.updateSearch()" value="false" /> -->No
+		</label>		
 	</div>
 			
 </form>

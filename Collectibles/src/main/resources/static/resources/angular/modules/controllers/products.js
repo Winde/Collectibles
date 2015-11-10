@@ -109,6 +109,8 @@
 		this.updateSearch = function(){
 			var searchObject = {};
 			
+			console.log($scope.owned);
+			
 			if ($scope.hierarchy && $scope.hierarchy.id){ searchObject.hierarchy = $scope.hierarchy.id;}			
 			
 			if ($scope.searchTerm){ searchObject.search = $scope.searchTerm; }			
