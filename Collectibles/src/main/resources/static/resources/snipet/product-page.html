@@ -11,17 +11,19 @@
 	
 	<div class="row">
 	
-		<div class="col-md-8">
+		<div class="col-xs-8">
 			<div class="row">
-				<div class="col-md-12">
+				<div class="col-xs-12">
 					<div class="productDescription">
 						<div ng-bind-html="product.description"></div>
 					</div> 	
 				</div>
 			</div>
 			<div class="row amazonBlock">
-				<div class="col-md-2">
-					<a ng-if="product.amazonUrl" class="btn btn-block btn-lg btn-amazon" ng-href="{{product.amazonUrl}}">amazon</a>
+				<div class="col-md-4 col-sm-6 col-xs-12">
+					<a ng-if="product.amazonUrl" class="btn btn-block btn-lg btn-amazon" ng-href="{{product.amazonUrl}}">
+						<i class="fa fa-amazon"></i> amazon
+					</a>
 				</div>
 			</div>
 		</div>
@@ -35,7 +37,7 @@
 			
 				<div class="carousel">
 					<div class="row">
-						<div class="col-md-4" ng-repeat="image in product.images">
+						<div class="col-xs-4" ng-repeat="image in product.images">
 							<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.removeImage(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>			
 							<img class="img-responsive img-thumbnail" 
 								ng-click="productCtrl.setSelectedImage(image)" 

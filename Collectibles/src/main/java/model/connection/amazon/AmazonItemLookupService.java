@@ -22,33 +22,37 @@
 package model.connection.amazon;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.http.client.HttpResponseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+@Service
+public class AmazonItemLookupService {
 
-public class ItemLookup {
-
-	private static ItemLookup instance = null;
-	
     private String AWS_ACCESS_KEY_ID = null;
     private String AWS_SECRET_KEY = null;
     private String ENDPOINT = null;
     private String ASSOCIATE_TAG = null;
-    
-    
-    private ItemLookup(){
+        
+    @Autowired
+    public AmazonItemLookupService(
+    		@Value("${AWS_ACCESS_KEY_ID}")String AWS_ACCESS_KEY_ID,
+    		@Value("${AWS_SECRET_KEY}")String AWS_SECRET_KEY,
+    		@Value("${ENDPOINT}") String ENDPOINT,
+    		@Value("${ASSOCIATE_TAG}")String ASSOCIATE_TAG){
+    	/*
     	Properties prop = new Properties();
     	String propFileName = "amazon.properties";
     	InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(propFileName);
@@ -65,14 +69,12 @@ public class ItemLookup {
     	    ENDPOINT = prop.getProperty("ENDPOINT");
     	    ASSOCIATE_TAG = prop.getProperty("ASSOCIATE_TAG");
     	}
-    }
-    
-    public static ItemLookup getInstance(){
-    	if (instance == null){
-    		instance = new ItemLookup();
-    	} 
-    	return instance;
-    }
+    	*/
+    	this.AWS_SECRET_KEY = AWS_SECRET_KEY;
+    	this.AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID;    	    
+    	this.ENDPOINT = ENDPOINT;
+	    this.ASSOCIATE_TAG = ASSOCIATE_TAG;
+    }    
     
     private String getUrl(String service,String operation,String responseGroup, String id){
     	/*

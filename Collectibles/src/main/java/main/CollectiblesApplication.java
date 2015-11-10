@@ -14,6 +14,7 @@ import org.springframework.cache.guava.GuavaCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.View;
@@ -36,6 +37,7 @@ import com.google.common.cache.CacheBuilder;
 @EnableCaching
 @EnableJpaRepositories(basePackages = {"model.persistence"})
 @EntityScan("model.dataobjects")
+@PropertySource("classpath:amazon.properties")
 public class CollectiblesApplication {
 
     public static void main(String[] args) {

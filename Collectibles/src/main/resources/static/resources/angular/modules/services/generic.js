@@ -2,6 +2,9 @@
 	
 	angular.module('generic-services',[])
 	.factory('Message', function MessageFactory(){
+		
+		var factory = this;
+		
 		var config = {
 				  ele: 'body', // which element to append to
 				  type: 'info', // (null, 'info', 'danger', 'success')
@@ -13,32 +16,32 @@
 				  stackup_spacing: 10 // spacing between consecutively stacked growls.
 		};
 		
+		this.newConfig = function(important,time){
+			var newconfig = angular.copy(config,newconfig);
+			if (important){
+				newconfig.align = "center";
+				newconfig.offset =  {from: 'top', amount: 150};	
+			}
+			if (time){
+				newconfig.delay = time;
+			}
+			return newconfig;
+		};
+		
 		return {
-			info: function(message,important){
-				var newconfig = angular.copy(config,newconfig);
-				newconfig.type = "info";	
-				if (important){
-					newconfig.align = "center";
-					newconfig.offset =  {from: 'top', amount: 150};	
-				}
+			info: function(message,important,time){
+				var newconfig = factory.newConfig(important,time);
+				newconfig.type = "info";					
 				jQuery.bootstrapGrowl(message,newconfig); 
 			},
-			alert: function(message,important){
-				var newconfig = angular.copy(config,newconfig);
-				newconfig.type = "danger";
-				if (important){
-					newconfig.align = "center";
-					newconfig.offset =  {from: 'top', amount: 150};	
-				}
+			alert: function(message,important,time){
+				var newconfig = factory.newConfig(important,time);
+				newconfig.type = "danger";							
 				jQuery.bootstrapGrowl(message,newconfig); 
 			},
-			success: function(message,important){
-				var newconfig = angular.copy(config,newconfig);
-				newconfig.type = "success";		
-				if (important){
-					newconfig.align = "center";
-					newconfig.offset =  {from: 'top', amount: 150};	
-				}
+			success: function(message,important,time){
+				var newconfig = factory.newConfig(important,time);
+				newconfig.type = "success";						
 				jQuery.bootstrapGrowl(message,newconfig); 
 			},
 			confirm: function(message,callback){

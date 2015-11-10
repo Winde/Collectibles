@@ -88,9 +88,16 @@
 						factory.authenticated = true;						
 						$location.path("/products/").replace();						
 					})
-					.catch(function(){						
+					.catch(function(error){
 						callbackError();
-						Message.alert("Username / Password is not correct");
+						credentials.password = null;
+						if (error && error.status == 401){
+							Message.alert("Username / Password is not correct",true,3000);
+						} else if (error && error.status == 404){
+							Message.info("Service is unavailable at this time",true,3000);
+						} else {
+							Message.info("An error has occurred, please try again",true,3000);
+						}						
 					})
 					.finally(function(){
 						

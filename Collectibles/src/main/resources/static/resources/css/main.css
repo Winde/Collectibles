@@ -8,6 +8,7 @@
 
 .amazonBlock {
 	margin-top: 15px;	
+	margin-bottom: 15px;
 }
 
 .productGrid {
@@ -23,6 +24,14 @@
 .productGrid .productListEntry{
 	padding: 5px;	
 	border-bottom: solid 1px #ccc;
+}
+
+.productGrid .productListEntry .btn {
+	margin-top: 10px;	
+}
+
+.productGrid .productListEntry .imageContainer  {
+	margin-top: 10px;
 }
 
 .productGrid .rowTitles{
@@ -86,8 +95,8 @@ select.ng-invalid,.ng-invalid.ng-dirty,.ng-invalid {
 }
 
 .squareImage {
-    width: 100px;
-    height: 100px;
+    width: 125px;
+    height: 125px;
     overflow: hidden;
     position: relative;
 }

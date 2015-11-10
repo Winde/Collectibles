@@ -15,11 +15,14 @@ import model.dataobjects.Image;
 import model.dataobjects.Product;
 import model.persistence.ProductRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AmazonConnector {
 
+	@Autowired
+	private AmazonItemLookupService itemLookup;
 		
 	private byte[] fetchAmazonImage(String url) throws TooFastConnectionException {
 				
@@ -90,14 +93,13 @@ public class AmazonConnector {
 						|| product.getAmazonUrl()==null)
 					) {
 				
-				ItemLookup lookup = ItemLookup.getInstance();
 				
-				String genericAmazonDataUrl = lookup.getMultipleUseUrl(product.getAmazonReference());
+				String genericAmazonDataUrl = itemLookup.getMultipleUseUrl(product.getAmazonReference());
 				
 				if (product.getDescription()==null){
 					String amazonDescription = null;
 					
-					amazonDescription = lookup.parseDescription(genericAmazonDataUrl);
+					amazonDescription = itemLookup.parseDescription(genericAmazonDataUrl);
 					System.out.println("Obtained Description from Amazon: " + amazonDescription);
 					if (amazonDescription!=null){
 						product.setDescription(amazonDescription);
@@ -108,7 +110,7 @@ public class AmazonConnector {
 				if (product.getAmazonUrl()==null){
 					String amazonUrl = null;
 					
-					amazonUrl = lookup.parseAmazonUrl(genericAmazonDataUrl);
+					amazonUrl = itemLookup.parseAmazonUrl(genericAmazonDataUrl);
 					System.out.println("Obtained Url from Amazon: " + amazonUrl);
 						
 					if (amazonUrl!=null){
@@ -120,7 +122,7 @@ public class AmazonConnector {
 				if (product.getImages()==null || product.getImages().size()<=0){				
 					byte[] data = null;
 					
-					String url = lookup.parseImage(genericAmazonDataUrl);
+					String url = itemLookup.parseImage(genericAmazonDataUrl);
 					System.out.println("Obtained Image URL from Amazon: " + url);
 					data = this.fetchAmazonImage(url);
 									

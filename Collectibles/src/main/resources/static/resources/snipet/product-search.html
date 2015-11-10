@@ -31,59 +31,60 @@
 		
 	<ajax ng-show="ajax" ></ajax>
 	
-	<span>Images:</span>
-		
-	<div class="btn-group">
-		
-		<label class="btn btn-default" uib-btn-radio="''" ng-model="withImages" ng-change="productListCtrl.updateSearch()">
-			<!-- <input type="radio"
-				ng-model="withImages"			
-				ng-change="pro1ductListCtrl.updateSearch()" value=""/>  -->Any
-		</label>
-		
-		<label class="btn btn-default" uib-btn-radio="'true'" ng-model="withImages" ng-change="productListCtrl.updateSearch()">
-			<!-- <input type="radio" 
-				ng-model="withImages"			
-				ng-change="productListCtrl.updateSearch()" value="true"/> -->With			
-		</label>		
-		
-		<label class="btn btn-default" uib-btn-radio="'false'" ng-model="withImages" ng-change="productListCtrl.updateSearch()">
-			<!-- <input type="radio" 
-				ng-model="withImages"			
-				ng-change="productListCtrl.updateSearch()" value="false" />-->Without
-		</label>		
-	</div>
-	
-	<span>Owned:</span>
-	<div class="btn-group">				
-		<label class="btn btn-default" uib-btn-radio="''" ng-model="owned" ng-change="productListCtrl.updateSearch()">
-			<!-- <input type="radio" class="form-control"
-				ng-model="owned"			
-				ng-change="productListCtrl.updateSearch()" value=""/> -->Any
-		</label>		
-		<label class="btn btn-default" uib-btn-radio="'true'" ng-model="owned" ng-change="productListCtrl.updateSearch()">
-			<!-- <input type="radio"
-				ng-model="owned"			
-				ng-change="productListCtrl.updateSearch()" value="true"/> -->Yes
-				</label>				
-		<label class="btn btn-default" uib-btn-radio="'false'" ng-model="owned" ng-change="productListCtrl.updateSearch()">
-			<!-- <input type="radio" 
-				ng-model="owned"			
-				ng-change="productListCtrl.updateSearch()" value="false" /> -->No
-		</label>		
-	</div>
+	<div class="form-group">
+		<span>Images:</span>		
+		<div class="btn-group">
 			
+			<label class="btn btn-default" uib-btn-radio="''" ng-model="withImages" ng-change="productListCtrl.updateSearch()">
+				<!-- <input type="radio"
+					ng-model="withImages"			
+					ng-change="pro1ductListCtrl.updateSearch()" value=""/>  -->Any
+			</label>
+			
+			<label class="btn btn-default" uib-btn-radio="'true'" ng-model="withImages" ng-change="productListCtrl.updateSearch()">
+				<!-- <input type="radio" 
+					ng-model="withImages"			
+					ng-change="productListCtrl.updateSearch()" value="true"/> -->With			
+			</label>		
+			
+			<label class="btn btn-default" uib-btn-radio="'false'" ng-model="withImages" ng-change="productListCtrl.updateSearch()">
+				<!-- <input type="radio" 
+					ng-model="withImages"			
+					ng-change="productListCtrl.updateSearch()" value="false" />-->Without
+			</label>		
+		</div>
+	</div>
+	<div class="form-group">
+		<span>Owned:</span>
+		<div class="btn-group">				
+			<label class="btn btn-default" uib-btn-radio="''" ng-model="owned" ng-change="productListCtrl.updateSearch()">
+				<!-- <input type="radio" class="form-control"
+					ng-model="owned"			
+					ng-change="productListCtrl.updateSearch()" value=""/> -->Any
+			</label>		
+			<label class="btn btn-default" uib-btn-radio="'true'" ng-model="owned" ng-change="productListCtrl.updateSearch()">
+				<!-- <input type="radio"
+					ng-model="owned"			
+					ng-change="productListCtrl.updateSearch()" value="true"/> -->Yes
+					</label>				
+			<label class="btn btn-default" uib-btn-radio="'false'" ng-model="owned" ng-change="productListCtrl.updateSearch()">
+				<!-- <input type="radio" 
+					ng-model="owned"			
+					ng-change="productListCtrl.updateSearch()" value="false" /> -->No
+			</label>		
+		</div>
+	</div>	
 </form>
 <div class="productGrid container-fluid" style="" ng-if="products && products.length && products.length>0" >
 
 	
-	<div class="row productListEntry rowTitles">
-		<div class="col-md-4">Product Name</div>		
-		<div class="col-md-1">Ownership</div>
-		<div class="col-md-2">Image</div>				
-		<div class="col-md-3">Classification</div>
-		<div class="col-md-1">Reference</div>
-		<div class="col-md-1"></div>
+	<div class="row productListEntry rowTitles hidden-sm hidden-xs">
+		<div class="col-lg-4 col-md-2 col-sm-3 col-xs-12">Product Name</div>				
+		<div class="col-lg-2 col-md-2 col-sm-4 col-xs-6">Image</div>
+		<div class="col-lg-1 col-md-1 col-sm-3 col-xs-3">Ownership</div>				
+		<div class="col-lg-3 col-md-3 hidden-sm hidden-xs">Classification</div>
+		<div class="col-lg-1 col-md-2 hidden-sm hidden-xs">Reference</div>
+		<div class="col-lg-1 col-md-1 col-sm-2 col-xs-3"></div>
 	</div>
 
 	<product-list-entry ng-repeat="product in products | orderBy:'releaseDate'"></product-list-entry>
