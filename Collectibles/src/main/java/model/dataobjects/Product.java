@@ -78,6 +78,11 @@ public class Product extends SimpleIdDao{
 	@JsonView(ProductComplexView.class)
 	private String amazonUrl = null;
 	
+	@Column(name="goodreads_url")
+	@JsonView(ProductComplexView.class)
+	private String goodreadsUrl = null;
+	
+	
 	@Column(name="is_amazon_processed")
 	private Boolean isAmazonProcessed = null;
 	
@@ -254,6 +259,14 @@ public class Product extends SimpleIdDao{
 
 	public void setIsGoodreadsProcessed(Boolean isGoodreadsProcessed) {
 		this.isGoodreadsProcessed = isGoodreadsProcessed;
+	}
+
+	public String getGoodreadsUrl() {
+		return goodreadsUrl;
+	}
+
+	public void setGoodreadsUrl(String goodreadsUrl) {
+		this.goodreadsUrl = goodreadsUrl;
 	}
 
 	public String toString(){

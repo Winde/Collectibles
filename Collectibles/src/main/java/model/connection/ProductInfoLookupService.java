@@ -22,5 +22,6 @@ public interface ProductInfoLookupService<E> {
     public String getAmazonUrl(E doc) throws TooFastConnectionException;
     
     public String getDescription(Document doc ) throws TooFastConnectionException;
-        
+     
+    public String getGoodReadsUrl(E doc) throws TooFastConnectionException;
 }

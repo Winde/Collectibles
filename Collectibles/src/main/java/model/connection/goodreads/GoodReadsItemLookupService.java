@@ -54,6 +54,12 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 		return result;
 	}
 	
+	@Override
+	public String getGoodReadsUrl(Document doc)
+			throws TooFastConnectionException {
+		return this.getField(doc, "/GoodreadsResponse/book/url");
+	}
+	
 	public List<String> getAuthors(Document doc){
 		return this.getFields(doc, "/GoodreadsResponse/book/authors/author/name");		
 	}
@@ -85,6 +91,8 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	public String getAmazonUrl(Document doc) throws TooFastConnectionException {
 		return null;
 	}
+
+
 	
 	
 }

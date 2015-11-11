@@ -96,8 +96,7 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
  
 	// custom Token based authentication based on 
 	// the header previously given to the client
-	.addFilterBefore(new StatelessAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);	
-    	
+	.addFilterBefore(new StatelessAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);	        
     }
     
     @Autowired

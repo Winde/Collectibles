@@ -100,6 +100,17 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						}
 					}
 					
+					if (product.getGoodreadsUrl()==null){
+						String goodreadsUrl = null;
+						
+						goodreadsUrl = itemLookup.getGoodReadsUrl(doc);
+						System.out.println("Obtained Url from Goodreads: " + goodreadsUrl);
+							
+						if (goodreadsUrl!=null){
+							product.setGoodreadsUrl(goodreadsUrl);
+						}
+					}
+					
 					byte [] imageData = null;
 					if (doc!=null){
 						imageData = itemLookup.getImageData(doc);
@@ -125,7 +136,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 							
 							imagesAdd.add(newImage);
 							
-							
+							System.out.println("Obtained image from: " + this.getClass() );
 							List<Image> images = new ArrayList<>();
 							images.add(newImage);							
 							product.setImages(images);

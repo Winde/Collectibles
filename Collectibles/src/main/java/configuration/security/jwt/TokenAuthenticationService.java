@@ -1,5 +1,7 @@
 package configuration.security.jwt;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
@@ -27,6 +29,8 @@ public class TokenAuthenticationService {
 	public void addAuthentication(HttpServletResponse response, UserAuthentication authentication) {
 		final UserDetailsImpl user = authentication.getDetails();
 		user.setExpires(System.currentTimeMillis() + THIRTY_MINUTES);
+		
+		System.out.println("Setting authentication for user, expires: " + user.getExpires() );
 		response.addHeader(AUTH_HEADER_NAME, tokenHandler.createTokenForUser(user));
 	}
  
@@ -36,6 +40,9 @@ public class TokenAuthenticationService {
 		if (token != null) {
 			final UserDetailsImpl user = tokenHandler.parseUserFromToken(token);
 			if (user != null) {
+				if (user.getExpires()!=null){
+					System.out.println("Obtaining authentication for user, expires: " + user.getExpires() );
+				}
 				return new UserAuthentication(user);
 			}
 		}

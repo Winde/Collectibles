@@ -96,46 +96,16 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
     }
 
     public String getAmazonUrl(Document doc) throws TooFastConnectionException {
-    	String amazonUrl = null;
-    	if (doc!=null){
-    		NodeList nodes = doc.getElementsByTagName("DetailPageURL");
-    		if (nodes!=null && nodes.getLength()>0){
-    			amazonUrl = nodes.item(0).getTextContent();
-    		}
-    	}
-    	return amazonUrl;
+    	return this.getField(doc, "/ItemLookupResponse/Items/Item/DetailPageURL");		    	
 	}
     
     public String getDescription(Document doc ) throws TooFastConnectionException{
-    	String description = null;
-    	if (doc!=null){
-    		NodeList nodes = doc.getElementsByTagName("EditorialReviews");
-    		if (nodes!=null && nodes.getLength()>0){
-    			Element element = ((Element) nodes.item(0));
-    			NodeList contentNodes = element.getElementsByTagName("Content");
-    			if (contentNodes!=null && contentNodes.getLength()>0){
-    				description = contentNodes.item(0).getTextContent();
-	        	}    			
-    		}
-    	}
-    	return description;    	
+    	return this.getField(doc, "/ItemLookupResponse/Items/Item/EditorialReviews/EditorialReview/Content");
     }
     
     private String parseImageUrl(Document doc) throws TooFastConnectionException{
-        String image = null;
-    	if (doc!=null){
-	        NodeList nodes = doc.getElementsByTagName("LargeImage");
-	        if (nodes!=null && nodes.getLength()>0){
-	        	Element element = ((Element) nodes.item(0));
-	        	NodeList urlNodes = element.getElementsByTagName("URL");
-	        	if (urlNodes!=null && urlNodes.getLength()>0){
-	        		image = urlNodes.item(0).getTextContent();
-	        	}
-	        	
-	        }    
-        }
-        return image;
-    }
+    	return this.getField(doc, "/ItemLookupResponse/Items/Item/LargeImage/URL");       
+    }        
     
     public byte[] getImageData(Document doc) throws TooFastConnectionException{
     	byte [] data = null;
@@ -167,6 +137,12 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 
 	@Override
 	public String getSeriesUrl(Document doc) throws TooFastConnectionException {
+		return null;
+	}
+
+	@Override
+	public String getGoodReadsUrl(Document doc)
+			throws TooFastConnectionException {
 		return null;
 	}
 }

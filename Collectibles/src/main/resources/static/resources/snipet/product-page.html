@@ -35,9 +35,14 @@
 						<i class="fa fa-amazon"></i> amazon
 					</a>
 				</div>
+				<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.goodreadsUrl">
+					<a ng-if="product.goodreadsUrl" class="btn btn-block btn-lg btn-android" ng-href="{{product.goodreadsUrl}}">
+						<span style="font-family:helvetica;">g</span> Goodreads
+					</a>
+				</div>
 				<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.goodreadsRelatedLink">
 					<a ng-if="product.goodreadsRelatedLink" class="btn btn-block btn-lg btn-android" ng-href="{{product.goodreadsRelatedLink}}">
-						Goodreads series
+						<span style="font-family:helvetica;">g</span> Related items
 					</a>
 				</div>
 			</div>

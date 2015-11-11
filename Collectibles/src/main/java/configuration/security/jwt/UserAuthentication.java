@@ -51,4 +51,7 @@ public class UserAuthentication implements Authentication {
 		
 	}
 
+	public String toString(){
+		return "{"+ this.getName() + "}";
+	}
 }
