@@ -2,6 +2,8 @@ package model.dataobjects;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
@@ -9,17 +11,24 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 
+import org.imgscalr.Scalr;
+
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity(name="Image")
 public class Image extends SimpleIdDao{
 
+	private static final int thumbSize = 125;
 	
 	public interface ImageSimpleView{};
 	
 	@Column(name="data")
 	@Lob 		
 	private byte[] data;
+	
+	@Column(name="thumb")
+	@Lob
+	private byte[] thumb;
 	
 	@Column(name="main")
 	@JsonView(ImageSimpleView.class)
@@ -50,7 +59,10 @@ public class Image extends SimpleIdDao{
 			InputStream in = new ByteArrayInputStream(data);
 			BufferedImage bimg = ImageIO.read(in);
 			this.setWidth(bimg.getWidth());
-			this.setHeight(bimg.getHeight());			
+			this.setHeight(bimg.getHeight());
+			if (this.getThumb()==null){
+				this.createThumb(bimg);
+			}
 			in.close();	
 		}catch (Exception ex){
 			ex.printStackTrace();
@@ -85,9 +97,46 @@ public class Image extends SimpleIdDao{
 			} else {
 				return this.getData().length > other.getData().length;
 			}
+		}		
+	}
+	
+	public byte[] getThumb() {
+		if (thumb==null && this.getData()!=null) {
+			this.createThumb(this.getData());
+		}		
+		return thumb;
+	}
+
+	private void createThumb(byte[] data) {
+		InputStream in = new ByteArrayInputStream(data);
+		BufferedImage bimg = null;
+		try {
+			bimg = ImageIO.read(in);
+			createThumb(bimg);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+				
+	}
+	
+	private void createThumb(BufferedImage bimg) throws IOException {
+		System.out.println("*******GENERATING THUMBNAIL***********");
+		BufferedImage thumb = Scalr.resize(bimg,  Scalr.Method.BALANCED, thumbSize);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write( thumb, "jpg", baos );
+		baos.flush();
+		byte[] thumbData = baos.toByteArray();
+		baos.close();
+		this.setThumb(thumbData);
 		
 	}
+
+	public void setThumb(byte[] thumb) {
+		this.thumb = thumb;
+	}
+
+	
 	
 	public String toString(){
 		return "{"+id+"}";

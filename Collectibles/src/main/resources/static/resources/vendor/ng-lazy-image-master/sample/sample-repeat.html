@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html ng-app="sample-app" id="ng-app" class="js">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Angular directive: lazy image directive, inspired by TIF - repeat sample</title>
+    <meta name="viewport" content="width=device-width, , initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <!-- look inside this css to see how container and ratios work -->
+    <link rel="stylesheet" type="text/css" href="lazy-image-style.css" />
+    <!-- only for our sample demo app -->
+    <link rel="stylesheet" type="text/css" href="css/app.css" />
+
+</head>
+<body ng-controller="appCtrl" >
+
+<div class="demo-wrapper">
+
+	<h1>Angular lazy image directive</h1>
+    <h2>Test: filtering inside repeat loop</h2>
+    
+    <p>Bug has been reported, but unable to reproduce it. Using a random collection ($scope.collection) where we apply a filter on.</p>
+
+	<p>
+		<select ng-model="searchText">
+			<option value="1">filter 1</option>
+			<option value="2">filter 2</option>
+			<option value="3">none</option>
+		</select>
+		<span ng-bind="filtered.length">0</span> item(s)
+	</p>
+	
+
+	<ul class="demo-repeat-list">
+		<li class="demo-repeat-list--items" ng-repeat="image in filtered =(collection | filter:{'type': searchText})">
+			<span afkl-lazy-image="{{image.srcset}}" class="afkl-lazy-wrapper afkl-img-ratio-3-2"></span>
+		</li>
+	</ul>
+
+    <p><a href="index.html">back</a></p>
+
+</div>
+
+<!-- only dependency is Angular -->
+<script src="vendor/angular.min.js"></script>
+<!-- our ng lazy image module -->
+<script src="lazy-image.js"></script>
+
+<!-- dummy app kickstarting our module -->
+<script src="js/app.js"></script>
+
+</body>
+</html>

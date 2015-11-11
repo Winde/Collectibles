@@ -10,6 +10,7 @@ import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Product;
 import model.dataobjects.Product.ProductListView;
+import model.dataobjects.supporting.ObjectList;
 import model.persistence.HierarchyRepository;
 import model.persistence.ProductRepository;
 import model.persistence.queryParameters.ProductSearch;
@@ -35,13 +36,16 @@ public class SearchController  extends CollectiblesController{
 	@Autowired
 	private HierarchyRepository hierarchyRepository;
 	
+	private final String defaultPaginationSize = "50";
 	
-	private Collection<Product> findProduct(
+	private ObjectList<Product> findProduct(
 			String hierarchy, 
 			String search, 
 			Collection<String> categoryValuesIds, 
 			String withImagesString,
-			String ownedString) throws CollectiblesException {
+			String ownedString,
+			int page,
+			int maxResults) throws CollectiblesException {
 
 			Boolean withImages = null;
 		
@@ -49,7 +53,9 @@ public class SearchController  extends CollectiblesController{
 			ProductSearch searchObject = new ProductSearch();
 			
 			searchObject.setSearchTerm(search);
-			
+			searchObject.setPage(page);
+			searchObject.setMaxResults(maxResults);
+		
 
 			Boolean owned = null;
 			
@@ -102,7 +108,7 @@ public class SearchController  extends CollectiblesController{
 			
 			searchObject.setCategoryValues(categoryValues);
 						
-			Collection<Product> result = null;
+			ObjectList<Product> result = null;
 
 			Collection<String> errors = searchObject.errors();
 			if (errors == null || errors.size()<=0){
@@ -111,8 +117,13 @@ public class SearchController  extends CollectiblesController{
 				throw new IncorrectParameterException(errors);
 			}
 
+			System.out.println("Result: " + result);
+			if (result.getObjects()!=null) {
+				System.out.println("Result objects number: " + result.getObjects().size());
+			}
+			
 			if (result ==null){
-				return new ArrayList<>();
+				return null;
 			} else {				
 				return result;
 			}
@@ -120,23 +131,28 @@ public class SearchController  extends CollectiblesController{
 		
 	@JsonView(ProductListView.class)	
 	@RequestMapping(value="/product/search")
-	public Collection<Product> search(HttpServletRequest request, 			
+	public ObjectList<Product> search(HttpServletRequest request, 			
 			@RequestParam(required=false, name="withImages") String withImagesString,
 			@RequestParam(required=false, name="search") String searchString,
-			@RequestParam(required=false, name="owned" ) String owned) throws CollectiblesException{					
-		return findProduct(null,searchString,null,withImagesString,owned);
-		
+			@RequestParam(required=false, name="owned" ) String owned,
+			@RequestParam(required=true, name="page") int page,
+			@RequestParam(required=false, name="maxResults") int maxResults) throws CollectiblesException{	
+		ObjectList<Product> objects = findProduct(null,searchString,null,withImagesString,owned,page,maxResults);
+		return objects;
 	}
 	
 	@JsonView(ProductListView.class)
 	@RequestMapping(value="/product/search/{hierarchy}/")
-	public Collection<Product> searchCategory(HttpServletRequest request, 
+	public ObjectList<Product> searchCategory(HttpServletRequest request, 
 			@PathVariable String hierarchy, 
 			@RequestParam(required=false, name="search") String searchString,
 			@RequestParam(required=false, name="withImages") String withImagesString,
 			@RequestParam(required=false, name="owned" ) String owned,
-			@RequestParam(required=false, name="categoryValues" ) List<String> categories) throws CollectiblesException{					
-		return findProduct(hierarchy,searchString,categories,withImagesString,owned);
+			@RequestParam(required=false, name="categoryValues" ) List<String> categories,
+			@RequestParam(required=true, name="page") int page,
+			@RequestParam(required=false, name="maxResults", defaultValue=defaultPaginationSize) int maxResults) throws CollectiblesException{					
+		ObjectList<Product> objects = findProduct(hierarchy,searchString,categories,withImagesString,owned,page,maxResults);
+		return objects;
 		
 	}
 }

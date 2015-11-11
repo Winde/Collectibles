@@ -20,6 +20,7 @@ import javax.persistence.JoinColumn;
 
 import model.dataobjects.HierarchyNode.HierarchySimpleView;
 import model.dataobjects.Image.ImageSimpleView;
+import model.dataobjects.supporting.ObjectList.ObjectListView;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -31,7 +32,7 @@ public class Product extends SimpleIdDao{
 	
 	public interface ProductSimpleView  extends SimpleIdDaoView{};
 	public interface ProductComplexView extends ProductSimpleView {};
-	public interface ProductListView extends ProductSimpleView,HierarchySimpleView,ImageSimpleView{};
+	public interface ProductListView extends ObjectListView,ProductSimpleView,HierarchySimpleView,ImageSimpleView{};
 	
 	@ManyToOne
 	@JsonIgnoreProperties({"children"})

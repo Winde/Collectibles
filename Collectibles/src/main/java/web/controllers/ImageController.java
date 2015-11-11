@@ -41,29 +41,47 @@ public class ImageController extends CollectiblesController{
 		}
 	}
 	
+	private ResponseEntity<byte[]> generateImage(byte [] data){
+		final HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.IMAGE_PNG);	    	    
+		if (data!=null){
+			headers.setCacheControl("no-transform,public,max-age=3600,s-maxage=3600");				
+			
+		    return new ResponseEntity<byte[]>(data, headers, HttpStatus.OK);			    
+		}else {
+			return new ResponseEntity<byte[]>(null, headers, HttpStatus.NOT_FOUND);
+		}
+	}
+	
 	@RequestMapping(value="/image/content/{id}", method = RequestMethod.GET)
 	public ResponseEntity<byte[]> getImageContent(@PathVariable String id) throws CollectiblesException{
 		Long imageId = this.getId(id);
 		if (imageId==null){
 			throw new IncorrectParameterException(new String[]{"id"});
 		} else {
-			final HttpHeaders headers = new HttpHeaders();
-		    headers.setContentType(MediaType.IMAGE_PNG);
-		    
-			//byte [] data = imageRepository.obtainBytes(imageId);
 		    byte [] data = null;
 		    Image image = imageRepository.findOne(imageId);
 		    if (image!=null){
 		    	data = image.getData();
 		    }
+		    return generateImage(data);
 		    
-			if (data!=null){
-				headers.setCacheControl("no-transform,public,max-age=3600,s-maxage=3600");				
-				
-			    return new ResponseEntity<byte[]>(data, headers, HttpStatus.OK);			    
-			}else {
-				return new ResponseEntity<byte[]>(null, headers, HttpStatus.NOT_FOUND);
-			}
+		}
+	}
+	
+	@RequestMapping(value="/image/thumb/{id}", method = RequestMethod.GET)
+	public ResponseEntity<byte[]> getImageThumb(@PathVariable String id) throws CollectiblesException{
+		Long imageId = this.getId(id);
+		if (imageId==null){
+			throw new IncorrectParameterException(new String[]{"id"});
+		} else {
+			
+			byte [] data = null;
+		    Image image = imageRepository.findOne(imageId);
+		    if (image!=null){
+		    	data = image.getThumb();
+		    }
+		    return generateImage(data);
 		}
 	}
 	

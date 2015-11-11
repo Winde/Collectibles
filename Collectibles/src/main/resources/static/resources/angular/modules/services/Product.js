@@ -41,38 +41,15 @@
 					progressbar: true
 				});
 			},
-			search: function(hierarchy,searchTerm,withImages,owned){				
+			search: function(searchObject){				
 				var url = "/product/search/";
-												
-				if (
-						hierarchy!=null &&
-						hierarchy!=undefined 	
-				){
-					url = url + hierarchy.id + "/";
+
+				if ( searchObject && searchObject.hierarchy){
+					url = url + searchObject.hierarchy + "/";
 				}
-				
-				var needsQuestionMark = true;
-				
-				if (searchTerm!=null && searchTerm!=undefined && searchTerm!=""){
-					if (needsQuestionMark) { url = url + '?';} else {url = url + '&';}
-					url = url + 'search='+searchTerm;				
-					needsQuestionMark = false;
-				} 				
-				
-				if (withImages!=null){
-					if (needsQuestionMark) { url = url + '?';} else {url = url + '&';}
-					url = url + "withImages=" + withImages;
-					needsQuestionMark = false;
-				}
-				
-				if (owned!=null){
-					if (needsQuestionMark) { url = url + '?';} else {url = url + '&';}
-					url = url + "owned=" + owned;
-					needsQuestionMark = false;
-				}
-				
 				return $http.get(url,{
-					progressbar: true
+					progressbar: true,
+					params: searchObject
 				});
 			},			
 			addImage: function(product,file){

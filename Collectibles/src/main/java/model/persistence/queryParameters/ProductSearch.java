@@ -12,6 +12,9 @@ public class ProductSearch implements SearchObject {
 	private Collection<CategoryValue> categoryValues = null;	
 	private Boolean withImages = null;	
 	private Boolean owned = null;
+	private Integer maxResults = null;
+	private Integer page = null;
+	
 	
 	public ProductSearch(){}
 
@@ -53,6 +56,22 @@ public class ProductSearch implements SearchObject {
 
 	public void setOwned(Boolean owned) {
 		this.owned = owned;
+	}
+
+	public Integer getMaxResults() {
+		return maxResults;
+	}
+
+	public void setMaxResults(Integer maxResults) {
+		this.maxResults = maxResults;
+	}
+
+	public Integer getPage() {
+		return page;
+	}
+
+	public void setPage(Integer page) {
+		this.page = page;
 	}
 
 	@Override

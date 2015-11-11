@@ -12,6 +12,7 @@ import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
+import model.dataobjects.supporting.ObjectList;
 import model.persistence.queryParameters.ProductSearch;
 
 public interface ProductRepositoryCustom {
@@ -28,7 +29,7 @@ public interface ProductRepositoryCustom {
 	
 	public Collection<Product> searchProduct(HierarchyNode node);
 	
-	public Collection<Product> searchProduct(ProductSearch search);
+	public ObjectList<Product> searchProduct(ProductSearch search);
 	
 	@Transactional
 	public void saveWithImages(Collection<Product> products,Collection<Image> images);
@@ -38,5 +39,8 @@ public interface ProductRepositoryCustom {
 	
 	@Transactional
 	public boolean mergeAndSaveProductWithoutImages(Product product, Collection<Image> image);
+
+
+	
 
 }

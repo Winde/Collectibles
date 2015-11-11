@@ -1,0 +1,62 @@
+default:
+  - 'clean'
+  - 'js'
+  - 'cssmin'
+  - 'copy:build'
+
+# FOR NOW EXACTLY SAME AS DEFAULT
+production:
+  - 'default'
+
+js:
+  - 'jshint'
+  - 'ngAnnotate'
+  - 'uglify:app'
+  - 'karma:unit'
+
+# START OUR DEMONSTRATION APP
+sample:
+ - 'connect:open'
+ - 'watch'
+
+# UNIT TESTING
+unit:
+  - 'karma:unit'
+unitBrowser:
+  - 'karma:browser'
+
+# e2e TESTING
+e2e:
+ - 'connect:test'
+ - 'protractor:all'
+sauce:
+ - 'connect:test' # SEE IF NOW WORKS
+ - 'protractor:sauce'
+
+
+# TRAVIS CI BUILD PROCES
+travis:
+ - 'production'
+ - 'coveralls'
+ - 'sauce'
+
+# CREATE A PACKAGE
+package:
+ - 'production'
+ - 'e2e'
+
+install:
+  - 'shell'
+
+# update library dependencies (ng and ng-mock)
+update:
+ - 'bower'
+ - 'copy:update'
+
+# PROCES: DEPLOY APP TO CLOUD THEN DO 2E2 TESTS
+# update gh-pages
+ghpages:
+ - 'copy:pages1'
+ - 'copy:pages2'
+ - 'replace'
+ - 'gh-pages'

@@ -1,0 +1,21 @@
+sudo: false
+
+before_install:
+- npm install -g grunt-cli
+install:
+- npm install -d -q
+- webdriver-manager update
+script:
+- grunt travis
+
+branches:
+  except:
+  - gh-pages
+
+addons:
+  sauce_connect: true
+
+env:
+  global:
+    - secure: GUKsI6FwnRg59f1mDSVzBEnoBn6p9RoA8ijNcp2vgdSRan1ty7TQxGB+xOlo+CHg1OX0h6QFEQ1E/hHlLGyIKJet5RYTQjpUIXBgV47L4acVUbLt2d544216tbZLy+QNgBNdJbOTSi+pyRE3zepWXGEWwBfFbineic+OKV/A1ys=
+    - secure: f6dCoas0QqcTJ3Qoi5pupH0Rz2+yaAhVAj+hr7o8YVD2QEv5aLF3GbJFtFM65tZQxMb2lT1TNEeOfVPzY9BZOTMkoF1O09itb55uA86V+74XMZkxS5R/fI2mwebV6VzYfNyZQFopgQh4wmG9NLzmR9o0nVNnp6uta9QRCetUCzM=

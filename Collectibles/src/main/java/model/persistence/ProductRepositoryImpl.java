@@ -16,6 +16,7 @@ import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
+import model.dataobjects.supporting.ObjectList;
 import model.persistence.queryParameters.ProductSearch;
 
 public class ProductRepositoryImpl implements ProductRepositoryCustom{
@@ -89,7 +90,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 
 
 	@Override
-	public Collection<Product> searchProduct(ProductSearch search) {
+	public ObjectList<Product> searchProduct(ProductSearch search) {
 		String hql = "";
 		
 		hql = hql + "select p from Product p LEFT JOIN FETCH p.images ";
@@ -143,7 +144,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			hql = hql + "GROUP BY p having count(categoryValues)=:sizeCategoryValues "; 			
 		}
 		
-		
+	
 		
 		TypedQuery<Product> query = entityManager.createQuery(hql, Product.class);
 		
@@ -156,9 +157,41 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		if (search.getOwned()!=null) { query.setParameter("owned",search.getOwned()); }
 		
 		
-		Set<Product> result = new HashSet<>();
-		result.addAll(query.getResultList());
-		return result;
+		Set<Product> result = new HashSet<>();	
+		
+		
+		ObjectList<Product> wrapper = new ObjectList<Product>();
+		
+		if (search.getMaxResults()!=null && search.getPage()!=null) {
+			
+			System.out.println("Obtaining results - Max results: " + search.getMaxResults());
+			System.out.println("Obtaining results - Starting in : " + search.getPage()*search.getMaxResults());
+			
+			query.setMaxResults(search.getMaxResults()+1);
+			query.setFirstResult(search.getPage()*search.getMaxResults());
+			
+		} else {
+			System.out.println("Skipping setting paginated results");
+		}
+
+		List<Product> listFromDB = query.getResultList();
+		if (search.getMaxResults() !=null & search.getPage()!=null && (listFromDB.size() == search.getMaxResults()+1)){
+			listFromDB.remove(listFromDB.size()-1);
+			wrapper.setHasNext(true);
+		} else {
+			wrapper.setHasNext(false);
+		}
+		
+		
+		result.addAll(listFromDB);
+		
+		System.out.println("Obtained "+ result.size() + " products");
+		
+		wrapper.setObjects(result);
+		if (search.getMaxResults()!=null && search.getPage()!=null) {
+			wrapper.setMaxResults(search.getMaxResults());	
+		}
+		return wrapper;
 	}
 
 	@Override
@@ -166,7 +199,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		ProductSearch search = new ProductSearch();
 		search.setHierarchy(node);
 		Collection<String> errors = search.errors();
-		return searchProduct(search);		
+		ObjectList<Product> searchResult = searchProduct(search);	
+		return searchResult.getObjects();
 	}
 
 	@Override

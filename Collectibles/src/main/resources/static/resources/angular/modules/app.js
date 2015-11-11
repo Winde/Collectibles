@@ -13,6 +13,7 @@
 	 'ngAnimate',
 	 'projectProgressBar',
 	 'ngFileUpload',
+	 'afkl.lazyImage',
 	 //'ngCookies',	 
 	 'ui.bootstrap',
 	 'login',
