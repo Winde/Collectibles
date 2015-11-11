@@ -184,6 +184,10 @@
 			$scope.page = parseInt($scope.page);
 			$scope.page = parseInt($scope.page) +1;
 			controller.updateSearch();
+			
+			setTimeout(function () {
+		        window.scrollTo(0, $('.productGrid') - 100)
+		    }, 20);
 		}
 		
 		this.previousPage = function(){
@@ -194,6 +198,9 @@
 				$scope.page = parseInt($scope.page) -1;
 				controller.updateSearch();
 			}
+			setTimeout(function () {
+		        window.scrollTo(0, $('.productGrid') - 100)
+		    }, 20);
 		}
 		
 		this.hasNext = function(){
