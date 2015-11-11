@@ -102,12 +102,12 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
        
-    	BCryptPasswordEncoder passWordEncoder = new BCryptPasswordEncoder();
+    	BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     	
     	auth
     	.authenticationProvider(jwtAuthenticationProvider)
     	.userDetailsService(userDetailsService)
-    	.passwordEncoder(passWordEncoder);
+    	.passwordEncoder(passwordEncoder);
     	/*.and()
             .inMemoryAuthentication()
                 .withUser("username").password("password").roles("USER","ADMIN");*/

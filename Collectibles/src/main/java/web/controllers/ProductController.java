@@ -72,23 +72,30 @@ public class ProductController  extends CollectiblesController{
 			throw new IncorrectParameterException(new String[]{"id"});
 		} else {
 			Product product = productRepository.findOne(idLong);
-			try{
-				amazonConnector.updateProductTransaction(product, productRepository, imageRepository);
-			}catch (Exception ex){
-				ex.printStackTrace();
-			}
-						
-			try {
-				goodReadsConnector.updateProductTransaction(product, productRepository, imageRepository);
-			}catch (Exception ex){
-				ex.printStackTrace();
-			}
-			
 			if (product==null){
 				throw new NotFoundException();
-			} else {
-				return product;
 			}
+			
+			System.out.println("Is Amazon Processed? "+ product.getIsAmazonProcessed());
+			if (product.getIsAmazonProcessed()==null || product.getIsAmazonProcessed().equals(Boolean.FALSE)){
+				try{
+					amazonConnector.updateProductTransaction(product, productRepository, imageRepository);
+				}catch (Exception ex){
+					ex.printStackTrace();
+				}
+			}	
+			
+			
+			System.out.println("Is GoodReads Processed? "+product.getIsGoodreadsProcessed());
+			if (product.getIsGoodreadsProcessed()==null || product.getIsGoodreadsProcessed().equals(Boolean.FALSE)){
+				try {
+					goodReadsConnector.updateProductTransaction(product, productRepository, imageRepository);
+				}catch (Exception ex){
+					ex.printStackTrace();
+				}
+			}
+						
+			return product;			
 		}
 	}
 	
@@ -262,7 +269,11 @@ public class ProductController  extends CollectiblesController{
 					product.setHierarchyPlacement(productInDb.getHierarchyPlacement());
 				} 	
 				
-				product.setIsAmazonProcessed(Boolean.FALSE);				
+				if (product.getUniversalReference()!=null && !product.getUniversalReference().equals(productInDb.getUniversalReference())){
+					product.setIsAmazonProcessed(Boolean.FALSE);
+					product.setIsGoodreadsProcessed(Boolean.FALSE);
+				}
+								
 				product.setCategoryValues(productInDb.getCategoryValues());
 				product.setImages(productInDb.getImages());
 				Product result = productRepository.save(product);
