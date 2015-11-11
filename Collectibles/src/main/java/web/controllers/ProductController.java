@@ -11,8 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import model.connection.amazon.AmazonConnector;
-import model.connection.amazon.AmazonBackgroundImageProcessor;
-import model.connection.amazon.TooFastConnectionException;
+import model.connection.goodreads.GoodReadsConnector;
 import model.dataobjects.Category;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
@@ -37,11 +36,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.joestelmach.natty.DateGroup;
-import com.joestelmach.natty.Parser;
-
 import web.supporting.error.exceptions.CollectiblesException;
-import web.supporting.error.exceptions.GenericException;
 import web.supporting.error.exceptions.IncorrectParameterException;
 import web.supporting.error.exceptions.NotFoundException;
 
@@ -65,6 +60,10 @@ public class ProductController  extends CollectiblesController{
 	@Autowired
 	private AmazonConnector amazonConnector;
 	
+	@Autowired
+	private GoodReadsConnector goodReadsConnector;
+	
+	
 	@RequestMapping(value="/product/find/{id}")
 	public Product product(@PathVariable String id) throws CollectiblesException {
 		Long idLong = this.getId(id);
@@ -74,11 +73,17 @@ public class ProductController  extends CollectiblesController{
 		} else {
 			Product product = productRepository.findOne(idLong);
 			try{
-				amazonConnector.updateProductTransaction(product, productRepository);
+				amazonConnector.updateProductTransaction(product, productRepository, imageRepository);
 			}catch (Exception ex){
 				ex.printStackTrace();
 			}
 						
+			try {
+				goodReadsConnector.updateProductTransaction(product, productRepository, imageRepository);
+			}catch (Exception ex){
+				ex.printStackTrace();
+			}
+			
 			if (product==null){
 				throw new NotFoundException();
 			} else {
@@ -123,7 +128,7 @@ public class ProductController  extends CollectiblesController{
 							if (description!=null && !"".equals(description.trim())){ product.setDescription(description); }
 							if (reference!=null && !"".equals(reference.trim())){ product.setReference(reference); }
 							if (owned !=null && owned.trim().equals("true")){product.setOwned(true); }
-							if (ISBN !=null && !"".equals(ISBN.trim())) { product.setAmazonReference(ISBN.replaceAll("-", "")); }
+							if (ISBN !=null && !"".equals(ISBN.trim())) { product.setUniversalReference(ISBN.replaceAll("-", "")); }
 							if (date!=null && !date.trim().equals("")){
 								for (SimpleDateFormat format : formats ){
 									try {
@@ -144,7 +149,9 @@ public class ProductController  extends CollectiblesController{
 						//productRepository.saveWithImages(products,images);
 						productRepository.save(products);
 												
-						amazonConnector.processInBackground(products, productRepository);
+						amazonConnector.processInBackground(products, productRepository, imageRepository);
+						
+						goodReadsConnector.processInBackground(products, productRepository, imageRepository);
 						
 						return products;
 					} catch (IOException e) {

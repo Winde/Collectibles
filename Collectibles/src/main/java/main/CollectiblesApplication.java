@@ -38,6 +38,7 @@ import com.google.common.cache.CacheBuilder;
 @EnableJpaRepositories(basePackages = {"model.persistence"})
 @EntityScan("model.dataobjects")
 @PropertySource("classpath:amazon.properties")
+@PropertySource("classpath:goodreads.properties")
 public class CollectiblesApplication {
 
     public static void main(String[] args) {

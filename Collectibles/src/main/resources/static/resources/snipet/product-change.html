@@ -3,13 +3,33 @@
 	ng-submit="changeProductForm.$valid && productChangeCtrl.changeProduct()" 
 	novalidate>			
 	
+
 	<div class="form-group" ng-if="product.id">
-		<label>Add Image</label>
-		<div class="btn btn-default" 
-			accept="image/*"
-			ngf-pattern="'image/*'"
-			ngf-select="productChangeCtrl.uploadImage($file)" >Upload</span></div>
+				<label>Add Image</label>
+				<div class="btn btn-default" 
+					accept="image/*"
+					ngf-pattern="'image/*'"
+					ngf-select="productChangeCtrl.uploadImage($file)" >Upload</span></div>
 	</div>
+				
+	<div class="form-group" ng-if="product.id">
+		<label>Reset processing for next load</label>	
+						
+		<button type="button" 
+					class="btn btn-default" 
+					ng-model="product.isAmazonProcessed" 
+					uib-btn-checkbox 
+					btn-checkbox-true="true" 
+					btn-checkbox-false="false">Amazon Processed</button>									
+	
+		<button type="button" 
+					class="btn btn-default" 
+					ng-model="product.isGoodreadsProcessed" 
+					uib-btn-checkbox 
+					btn-checkbox-true="true" 
+					btn-checkbox-false="false">Goodreads Processed</button>					
+	</div>
+	
 	
 	<div class="form-group">	
 		<label>Hierarchy</label>	<!-- selectpicker  -->	
@@ -44,7 +64,7 @@
 	<div class="form-group">
 		<label>Amazon Reference</label>
 		<input class="form-control"
-			ng-model="product.amazonReference"/>
+			ng-model="product.universalReference"/>
 	</div>	
 	
 	<div class="form-group">

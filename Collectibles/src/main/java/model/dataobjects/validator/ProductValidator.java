@@ -17,7 +17,7 @@ public class ProductValidator extends DaoValidator<Product>{
 			result.add("product.name");
 		}
 		
-		if (e.getAmazonReference()!=null && "".equals(e.getAmazonReference().trim())){
+		if (e.getUniversalReference()!=null && "".equals(e.getUniversalReference().trim())){
 			result.add("product.amazonReference");
 		}
 		return result;

@@ -5,8 +5,8 @@
 		var factory = this;
 		
 		this.cleanUpProduct = function cleanUpProduct(product){
-			if (product.amazonReference == ""){
-				product.amazonReference = null;
+			if (product.universalReference == ""){
+				product.universalReference = null;
 			}
 		}
 		

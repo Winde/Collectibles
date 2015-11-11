@@ -47,6 +47,16 @@
 						$scope.product.selectedImage =data.images[0]; 
 					}										
 				}
+				
+				if (data.hierarchyPlacement) {
+					$scope.product.hierarchyPath = [];
+					var current = data.hierarchyPlacement; 										
+					while (current.father){
+						$scope.product.hierarchyPath.unshift(current);
+						current = current.father;
+					}
+					
+				}
 			})
 			.catch(function(){	
 				Message.alert("There was an error");

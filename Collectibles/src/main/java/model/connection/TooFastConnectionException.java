@@ -1,4 +1,4 @@
-package model.connection.amazon;
+package model.connection;
 
 public class TooFastConnectionException extends Exception {
 

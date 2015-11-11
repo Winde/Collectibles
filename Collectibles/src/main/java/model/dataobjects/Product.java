@@ -8,12 +8,15 @@ import java.util.TreeSet;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
 
 import model.dataobjects.HierarchyNode.HierarchySimpleView;
 import model.dataobjects.Image.ImageSimpleView;
@@ -24,12 +27,14 @@ import com.fasterxml.jackson.annotation.JsonView;
 @Entity(name="Product")
 public class Product extends SimpleIdDao{
 
+	private static final long MINIMUM_LENGTH_DESCRIPTION = 100;
+	
 	public interface ProductSimpleView  extends SimpleIdDaoView{};
 	public interface ProductComplexView extends ProductSimpleView {};
 	public interface ProductListView extends ProductSimpleView,HierarchySimpleView,ImageSimpleView{};
 	
 	@ManyToOne
-	@JsonIgnoreProperties({ "father", "children"})
+	@JsonIgnoreProperties({"children"})
 	@JsonView(ProductSimpleView.class)
 	private HierarchyNode hierarchyPlacement;
 	
@@ -63,17 +68,30 @@ public class Product extends SimpleIdDao{
 	@JsonView(ProductSimpleView.class)
 	private Date releaseDate = null;
 			
-	@Column(name="amazon_reference")
+	@Column(name="universal_reference")
 	@JsonView(ProductSimpleView.class)
-	private String amazonReference = null;
+	private String universalReference = null;
 	
 	
 	@Column(name="amazon_url")
+	@JsonView(ProductComplexView.class)
 	private String amazonUrl = null;
 	
 	@Column(name="is_amazon_processed")
 	private Boolean isAmazonProcessed = null;
 	
+	@Column(name="is_goodreads_processed")
+	private Boolean isGoodreadsProcessed = null;		
+	
+	@ElementCollection(fetch = FetchType.LAZY)
+	@CollectionTable(name="authors", joinColumns=@JoinColumn(name="id"))
+	@Column(name="authors")
+	@JsonView(ProductComplexView.class)
+	private List<String> authors;
+	
+	@Column(name="goodreads_related_link")
+	@JsonView(ProductComplexView.class)
+	private String goodreadsRelatedLink;
 	
 	public Product(){}
 
@@ -194,15 +212,15 @@ public class Product extends SimpleIdDao{
 		this.isAmazonProcessed = isAmazonProcessed;
 	}
 
-	public String getAmazonReference() {
-		return amazonReference;
+	public String getUniversalReference() {
+		return universalReference;
 	}
 
-	public void setAmazonReference(String amazonReference) {
-		if (this.getAmazonReference()!=null && !this.getAmazonReference().equals(amazonReference)){
+	public void setUniversalReference(String universalReference) {
+		if (this.getUniversalReference()!=null && !this.getUniversalReference().equals(universalReference)){
 			this.setIsAmazonProcessed(isAmazonProcessed);
 		}
-		this.amazonReference = amazonReference;
+		this.universalReference = universalReference;
 	}
 
 	public String getAmazonUrl() {
@@ -213,10 +231,42 @@ public class Product extends SimpleIdDao{
 		this.amazonUrl = amazonUrl;
 	}
 	
-	
+	public List<String> getAuthors() {
+		return authors;
+	}
+
+	public void setAuthors(List<String> authors) {
+		this.authors = authors;
+	}
+
+	public String getGoodreadsRelatedLink() {
+		return goodreadsRelatedLink;
+	}
+
+	public void setGoodreadsRelatedLink(String goodreadsRelatedLink) {
+		this.goodreadsRelatedLink = goodreadsRelatedLink;
+	}
+
+	public Boolean getIsGoodreadsProcessed() {
+		return isGoodreadsProcessed;
+	}
+
+	public void setIsGoodreadsProcessed(Boolean isGoodreadsProcessed) {
+		this.isGoodreadsProcessed = isGoodreadsProcessed;
+	}
 
 	public String toString(){
 		return "{" + this.getId() + " - " + this.getName() + " - " + this.getDescription() +"}";		
+	}
+	
+	public boolean isLengthyDescription() {
+		if (this.getDescription()==null){
+			return false;
+		}else if(this.getDescription().length()<MINIMUM_LENGTH_DESCRIPTION){
+			return false;
+		} else {
+			return true;
+		}
 	}
 	
 }

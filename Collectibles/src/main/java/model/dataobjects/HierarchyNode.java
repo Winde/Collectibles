@@ -29,12 +29,12 @@ public class HierarchyNode extends SimpleIdDao{
 	private String name;
 	
 	@OneToMany	
-	@JsonIgnoreProperties({"categories"})	
+	@JsonIgnoreProperties({"father","categories"})	
 	@JsonView(HierarchyTreeView.class)
 	private Set<HierarchyNode> children;
 	
 	@ManyToOne
-	@JsonIgnoreProperties({ "father", "children", "categories"})
+	@JsonIgnoreProperties({"children", "categories"})
 	@JsonView(HierarchyComplexView.class)
 	private HierarchyNode father;
 		

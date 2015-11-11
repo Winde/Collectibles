@@ -5,30 +5,45 @@
 		<button class="btn" ng-click="productCtrl.setEditable(false)" ng-show="productCtrl.isEditable()">STOP EDITING</button>
 	</div>
 
-	<h1>{{product.hierarchyPlacement.name}}</h1>
-	
+	<h3 ng-if="product.hierarchyPath">
+		<span ng-repeat="node in product.hierarchyPath">{{$first ? '' : $last ? ' &gt; ' : ' &gt; '}} 
+		<a ng-href="#{{'/products/?hierarchy='+node.id}}">{{node.name}}</a>  
+	</span>
+	</h3>
+
 	<h2>{{product.name}}</h2>
 	
 	<div class="row">
 	
-		<div class="col-xs-8">
+		<div class="col-lg-8 col-sm-8 col-xs-12">
 			<div class="row">
 				<div class="col-xs-12">
 					<div class="productDescription">
 						<div ng-bind-html="product.description"></div>
+					</div>
+					<div class="authorsBlock" ng-if="product.authors && product.authors.length>0">
+						<b>Authors:</b>
 					</div> 	
+					<div>
+						<span ng-repeat="author in product.authors">{{$first ? '' : $last ? ' and ' : ', '}}{{author}}</span> 
+					</div>
 				</div>
 			</div>
-			<div class="row amazonBlock">
-				<div class="col-md-4 col-sm-6 col-xs-12">
+			<div class="row providerLinksBlock">
+				<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.amazonUrl">
 					<a ng-if="product.amazonUrl" class="btn btn-block btn-lg btn-amazon" ng-href="{{product.amazonUrl}}">
 						<i class="fa fa-amazon"></i> amazon
+					</a>
+				</div>
+				<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.goodreadsRelatedLink">
+					<a ng-if="product.goodreadsRelatedLink" class="btn btn-block btn-lg btn-android" ng-href="{{product.goodreadsRelatedLink}}">
+						Goodreads series
 					</a>
 				</div>
 			</div>
 		</div>
 	
-		<div class="col-md-4">
+		<div class="col-lg-4 col-sm-4 col-xs-12">
 			<div class="images">	
 				<div ng-if="product.selectedImage" > 		
 					<a href ng-if="productCtrl.isEditable() && isAuthenticated()" ng-click="productCtrl.removeImage(product.selectedImage)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>

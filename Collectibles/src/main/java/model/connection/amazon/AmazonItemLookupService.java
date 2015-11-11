@@ -21,25 +21,23 @@
 
 package model.connection.amazon;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import model.connection.ProductInfoLookupServiceXML;
+import model.connection.TooFastConnectionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 @Service
-public class AmazonItemLookupService {
+public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 
     private String AWS_ACCESS_KEY_ID = null;
     private String AWS_SECRET_KEY = null;
@@ -52,24 +50,7 @@ public class AmazonItemLookupService {
     		@Value("${AWS_SECRET_KEY}")String AWS_SECRET_KEY,
     		@Value("${ENDPOINT}") String ENDPOINT,
     		@Value("${ASSOCIATE_TAG}")String ASSOCIATE_TAG){
-    	/*
-    	Properties prop = new Properties();
-    	String propFileName = "amazon.properties";
-    	InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(propFileName);
-    	if (resourceAsStream!=null){
-    		try {
-				prop.load(resourceAsStream);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		
-    		AWS_SECRET_KEY = prop.getProperty("AWS_SECRET_KEY");
-    		AWS_ACCESS_KEY_ID = prop.getProperty("AWS_ACCESS_KEY_ID");    	    
-    	    ENDPOINT = prop.getProperty("ENDPOINT");
-    	    ASSOCIATE_TAG = prop.getProperty("ASSOCIATE_TAG");
-    	}
-    	*/
+
     	this.AWS_SECRET_KEY = AWS_SECRET_KEY;
     	this.AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID;    	    
     	this.ENDPOINT = ENDPOINT;
@@ -110,57 +91,12 @@ public class AmazonItemLookupService {
     
     public String getMultipleUseUrl(String id) throws TooFastConnectionException {
     	String url = getUrl("AWSECommerceService","ItemLookup","Large",id);
+    	System.out.println("Amazon url for fetch data: " + url);
     	return url;
     }
-    
-    public String getDescription(String id) throws TooFastConnectionException {
-    	String url = getUrl("AWSECommerceService","ItemLookup","Large",id);
-    	System.out.println("Fecthing url: " + url);
-    	return parseDescription(url);
-    }
-    
-    public String getImage(String id) throws TooFastConnectionException {        
-    	String url = getUrl("AWSECommerceService","ItemLookup","Images",id);
-    	System.out.println("Fecthing url: " + url);
-        return parseImage(url);
-    }
-    
-	public String getAmazonUrl(String id) throws TooFastConnectionException {
-		String url = getUrl("AWSECommerceService","ItemLookup","Large",id);
-		System.out.println("Fecthing url: " + url);
-		return parseAmazonUrl(url);
-	}
 
-
-	private Document fetchDoc(String requestUrl) throws TooFastConnectionException{
-    	
-    	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = null;
-		try {
-			db = dbf.newDocumentBuilder();
-		} catch (ParserConfigurationException e1) {
-			e1.printStackTrace();
-			return null;
-		}
-        Document doc = null;
-        try {
-        	doc = db.parse(requestUrl);
-        } catch (IOException ioe) {
-    		ioe.printStackTrace();
-    		if (ioe.getMessage()!=null && ioe.getMessage().contains("HTTP response code: 503")){    			
-    			throw new TooFastConnectionException();    				
-    		}    		
-        	return null;
-        } catch (SAXException saxe) {
-        	saxe.printStackTrace();
-			return null;
-		}
-        return doc;
-    }
-	
-    public String parseAmazonUrl(String requestUrl) throws TooFastConnectionException {
+    public String getAmazonUrl(Document doc) throws TooFastConnectionException {
     	String amazonUrl = null;
-    	Document doc = fetchDoc(requestUrl);
     	if (doc!=null){
     		NodeList nodes = doc.getElementsByTagName("DetailPageURL");
     		if (nodes!=null && nodes.getLength()>0){
@@ -169,11 +105,9 @@ public class AmazonItemLookupService {
     	}
     	return amazonUrl;
 	}
-
     
-    public String parseDescription(String requestUrl) throws TooFastConnectionException{
+    public String getDescription(Document doc ) throws TooFastConnectionException{
     	String description = null;
-    	Document doc = fetchDoc(requestUrl);
     	if (doc!=null){
     		NodeList nodes = doc.getElementsByTagName("EditorialReviews");
     		if (nodes!=null && nodes.getLength()>0){
@@ -187,10 +121,9 @@ public class AmazonItemLookupService {
     	return description;    	
     }
     
-    public String parseImage(String requestUrl) throws TooFastConnectionException{
+    private String parseImageUrl(Document doc) throws TooFastConnectionException{
         String image = null;
-        Document doc = fetchDoc(requestUrl);
-        if (doc!=null){
+    	if (doc!=null){
 	        NodeList nodes = doc.getElementsByTagName("LargeImage");
 	        if (nodes!=null && nodes.getLength()>0){
 	        	Element element = ((Element) nodes.item(0));
@@ -203,7 +136,37 @@ public class AmazonItemLookupService {
         }
         return image;
     }
+    
+    public byte[] getImageData(Document doc) throws TooFastConnectionException{
+    	byte [] data = null;
+    	String url = parseImageUrl(doc);
+    	if (url!=null){
+    		data = fetchImage(url);
+    	}
+    	return data;
+    }
+
+	@Override
+	public Document fetchDocFromId(String id) throws TooFastConnectionException, FileNotFoundException {
+		String url = this.getMultipleUseUrl(id);
+		return this.fetchDocFromUrl(url);
+	}
 
 
+	@Override
+	public Integer getPublicationYear(Document doc)
+			throws TooFastConnectionException {
+		return null;
+	}
 
+	@Override
+	public List<String> getAuthors(Document doc)
+			throws TooFastConnectionException {
+		return null;
+	}
+
+	@Override
+	public String getSeriesUrl(Document doc) throws TooFastConnectionException {
+		return null;
+	}
 }

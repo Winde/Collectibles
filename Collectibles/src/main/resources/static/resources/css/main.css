@@ -6,9 +6,12 @@
 	padding: 1px;	
 }
 
-.amazonBlock {
-	margin-top: 15px;	
-	margin-bottom: 15px;
+.providerLinksBlock {
+	margin-bottom: 25px;
+}
+
+.providerLinksBlock .btn {
+	margin-top: 25px;	
 }
 
 .productGrid {
@@ -39,6 +42,12 @@
 	border-top-left-radius: 10px; 
 	border-top-right-radius: 10px;
 }
+
+.product .authorsBlock{
+	margin-top: 15px;
+}
+
+
 .bootstrap-select .root {
 	padding-left: 20px;
 }
