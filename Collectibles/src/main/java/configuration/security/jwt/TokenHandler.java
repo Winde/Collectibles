@@ -17,7 +17,7 @@ import org.apache.commons.codec.binary.Base64;
 
 public class TokenHandler {
 
-	private static final String CIPHER_NAME = "AES/CBC/NoPadding";
+	private static final String CIPHER_NAME = "AES/ECB/PKCS5Padding";
 	private static final String KEY_CIPHER = "AES";
 	private static final String HMAC_ALGO = "HmacSHA256";
 	private static final String SEPARATOR = ".";
