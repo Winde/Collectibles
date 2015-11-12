@@ -42,6 +42,12 @@
 		}
 		
 		return {
+			setStoredSession : function(session){
+				factory.setStoredSession(session);
+			},
+			getHeaderResponseParameter: function(){
+				return factory.headerWithSessionResponse;
+			},
 			getHeaderRequestParameter: function(){
 				return factory.headerWithSessionRequest;
 			},			

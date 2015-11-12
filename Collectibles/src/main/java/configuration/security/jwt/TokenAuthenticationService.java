@@ -1,5 +1,6 @@
 package configuration.security.jwt;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,11 +20,16 @@ public class TokenAuthenticationService {
 	private static final long TWO_HOURS = 1000 * 60 * 60 * 2;
 	private static final long THIRTY_MINUTES = 1000 * 60 * 30;
  
-	private final TokenHandler tokenHandler;
+	private TokenHandler tokenHandler = null;
  
 	@Autowired
-	public TokenAuthenticationService(@Value("${token.secret}") String secret) {
-		tokenHandler = new TokenHandler(DatatypeConverter.parseBase64Binary(secret));
+	public TokenAuthenticationService(@Value("${token.secret}") String secret, @Value("${token.crypt.key}")String cryptKey) {
+		System.out.println("CRYPTKEY: " + cryptKey + " length: (" + cryptKey.getBytes().length + ")");		
+		try {
+			tokenHandler = new TokenHandler(DatatypeConverter.parseBase64Binary(secret),cryptKey.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {			
+			e.printStackTrace();
+		}
 	}
  
 	public void addAuthentication(HttpServletResponse response, UserAuthentication authentication) {

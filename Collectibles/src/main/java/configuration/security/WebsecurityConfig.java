@@ -1,6 +1,11 @@
 package configuration.security;
 
+import javax.servlet.Filter;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.embedded.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
@@ -12,7 +17,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 
+import configuration.security.jwt.JwtAuthenticationOnSuccess;
 import configuration.security.jwt.JwtAuthenticationProvider;
 import configuration.security.jwt.StatelessAuthenticationFilter;
 import configuration.security.jwt.StatelessLoginFilter;
@@ -45,6 +52,16 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	private JwtAuthenticationProvider jwtAuthenticationProvider;
+	
+    
+    @Bean
+    public FilterRegistrationBean insertRegistrationAfter() {
+        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+        JwtAuthenticationOnSuccess userFilter = new JwtAuthenticationOnSuccess(tokenAuthenticationService);
+        registrationBean.setFilter(userFilter);
+        registrationBean.setOrder(Integer.MAX_VALUE);
+        return registrationBean;
+    }
 	
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -96,8 +113,10 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
  
 	// custom Token based authentication based on 
 	// the header previously given to the client
-	.addFilterBefore(new StatelessAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);	        
+	.addFilterBefore(new StatelessAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);	
+    
     }
+       
     
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {

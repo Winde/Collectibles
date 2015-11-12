@@ -6,23 +6,31 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 
 public class TokenHandler {
 
+	private static final String CIPHER_NAME = "AES/CBC/NoPadding";
+	private static final String KEY_CIPHER = "AES";
 	private static final String HMAC_ALGO = "HmacSHA256";
 	private static final String SEPARATOR = ".";
 	private static final String SEPARATOR_SPLITTER = "\\."; 
 	
 	private final Mac hmac;
+	private SecretKeySpec encryptKey = null;
 	
-	public TokenHandler(byte[] secretKey) {
+	public TokenHandler(byte[] secretKey, byte[] encryptKey) {
 		try {
 			hmac = Mac.getInstance(HMAC_ALGO);
 			hmac.init(new SecretKeySpec(secretKey, HMAC_ALGO));
+			this.encryptKey =  new SecretKeySpec(encryptKey, KEY_CIPHER);
 		} catch (NoSuchAlgorithmException | InvalidKeyException e) {
 			throw new IllegalStateException(
 				"failed to initialize HMAC: " + e.getMessage(), e);
@@ -42,7 +50,37 @@ public class TokenHandler {
 		return Base64.decodeBase64(base64String);
 	}
 	
+	private String cipher(String toProcess, int cryptMode){
+		String result = null;
+		byte [] resultBytes = null;
+		Cipher cipher = null;
+		try {
+			cipher = Cipher.getInstance(CIPHER_NAME);
+			cipher.init(cryptMode, encryptKey);
+			resultBytes = cipher.doFinal(toProcess.getBytes());
+			if (resultBytes != null){
+				result = new String(resultBytes, "UTF-8");
+			}
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	private String encrypt(String toBeEncrypted){
+		//return cipher(toBeEncrypted,Cipher.ENCRYPT_MODE);
+		return toBeEncrypted;
+	}
 
+	private String decrypt(String toBeDecrypted){
+		//return cipher(toBeDecrypted,Cipher.DECRYPT_MODE);
+		return toBeDecrypted;
+	}
+	
 	public String createTokenForUser(UserDetailsImpl user) {
 		byte[] userBytes = UserDetailsImpl.toJSON(user);
 		byte[] hash = createHmac(userBytes);
@@ -50,14 +88,19 @@ public class TokenHandler {
 		sb.append(toBase64(userBytes));
 		sb.append(SEPARATOR);
 		sb.append(toBase64(hash));		
-		return sb.toString();
+		return this.encrypt(sb.toString());
 	}
 
 
 	public UserDetailsImpl parseUserFromToken(String token) {
-		
-		
-		final String[] parts = token.split(SEPARATOR_SPLITTER);
+		String tokenDecrypted = null;
+		if (token!=null){
+			tokenDecrypted = this.decrypt(token); 
+		}
+		if (tokenDecrypted==null){
+			return null;
+		}
+		final String[] parts = tokenDecrypted.split(SEPARATOR_SPLITTER);
 
 		if (parts.length == 2 && parts[0].length() > 0 && parts[1].length() > 0) {
 			try {

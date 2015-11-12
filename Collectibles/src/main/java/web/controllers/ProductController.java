@@ -275,6 +275,7 @@ public class ProductController  extends CollectiblesController{
 				if (product.getUniversalReference()!=null && !product.getUniversalReference().equals(productInDb.getUniversalReference())){
 					product.setIsAmazonProcessed(Boolean.FALSE);
 					product.setIsGoodreadsProcessed(Boolean.FALSE);
+					product.setAuthors(productInDb.getAuthors());
 				}
 								
 				product.setCategoryValues(productInDb.getCategoryValues());

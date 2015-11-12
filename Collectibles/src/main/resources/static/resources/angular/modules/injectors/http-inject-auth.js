@@ -2,8 +2,8 @@
 	
 
 	angular.module('login')
-	.factory('httpInjectAuth',['$q', 'Auth','$location',
-			 function httpInjectAuth($q, Auth,$location) {
+	.factory('httpInjectAuth',['$q', 'Auth','Base64','$location',
+			 function httpInjectAuth($q, Auth, Base64, $location) {
 			
 		    return {		    	
 		    	'request': function(request){		    		
@@ -20,6 +20,13 @@
 		    		}		    		
 		    		return request;
 		    	},	
+		    	'response': function(response){		    				    	
+		    		if (response.headers && response.headers(Auth.getHeaderResponseParameter())){
+		    			Auth.setStoredSession(response.headers(Auth.getHeaderResponseParameter()))		    			
+		    		}
+		    		
+		    		return response;
+		    	},
 		        'responseError': function(responseError) {		        	
 		        	if (responseError && responseError.config && responseError.config.nointercept) {		        		
 		        		//return $q.reject(responseError);

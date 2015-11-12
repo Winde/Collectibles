@@ -1,8 +1,10 @@
 package main;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -24,6 +26,9 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import com.google.common.cache.CacheBuilder;
 
+import configuration.security.jwt.JwtAuthenticationOnSuccess;
+import configuration.security.jwt.TokenAuthenticationService;
+
 
 @SpringBootApplication
 @Configuration
@@ -41,6 +46,10 @@ import com.google.common.cache.CacheBuilder;
 @PropertySource("classpath:goodreads.properties")
 public class CollectiblesApplication {
 
+	@Autowired
+	private TokenAuthenticationService tokenAuthenticationService;
+	
+	
     public static void main(String[] args) {
         SpringApplication.run(CollectiblesApplication.class, args);
     }
@@ -73,4 +82,6 @@ public class CollectiblesApplication {
         commonsMultipartResolver.setMaxUploadSize(-1);
         return commonsMultipartResolver;
     }
+    
+
 }
