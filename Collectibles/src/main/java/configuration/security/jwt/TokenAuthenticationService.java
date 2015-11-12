@@ -23,8 +23,7 @@ public class TokenAuthenticationService {
 	private TokenHandler tokenHandler = null;
  
 	@Autowired
-	public TokenAuthenticationService(@Value("${token.secret}") String secret, @Value("${token.crypt.key}")String cryptKey) {
-		System.out.println("CRYPTKEY: " + cryptKey + " length: (" + cryptKey.getBytes().length + ")");		
+	public TokenAuthenticationService(@Value("${token.secret}") String secret, @Value("${token.crypt.key}")String cryptKey) {			
 		try {
 			tokenHandler = new TokenHandler(DatatypeConverter.parseBase64Binary(secret),cryptKey.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {			

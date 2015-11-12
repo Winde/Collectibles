@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 
@@ -53,7 +54,14 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private JwtAuthenticationProvider jwtAuthenticationProvider;
 	
+	@Autowired
+    private PasswordEncoder passwordEncoder;
     
+	@Bean 
+	public PasswordEncoder bCryptPasswordEncoder(){
+	    return new BCryptPasswordEncoder();
+	}
+	
     @Bean
     public FilterRegistrationBean insertRegistrationAfter() {
         FilterRegistrationBean registrationBean = new FilterRegistrationBean();
@@ -65,77 +73,40 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
 	
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-    
     	
-	
-    /*
-    http    	        	
-      	.csrf().disable()      	
-      	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-    .and()
-    	.httpBasic()
-    .and()
-    	.authorizeRequests()
-    	.antMatchers("/app/**").permitAll()		
-	.and()
-		.exceptionHandling()
-			//.authenticationEntryPoint(entryPoint)
-	    	.accessDeniedHandler(accessDeniedhandler)
-	.and()
-	    .logout()
-		    .logoutUrl("/logout")
-		    .logoutSuccessHandler(logoutHandler)
-		    .deleteCookies("JSESSIONID")
-     .and()
-     	.headers()     	
-     	//.antMatchers("/image/content/**")     		
-     			.cacheControl()
-     				.disable();
-	*/
-    http    
-    	.csrf().disable()  
-    	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
-    .and()
-    	.authorizeRequests()
-    	.antMatchers("/app/**").permitAll()		
-	.and()	     
-     	.headers()     	
-     	//.antMatchers("/image/content/**")     		
-     			.cacheControl()
-     				.disable()
-    .and()
-    
-	// custom JSON based authentication by POST of 
-	// {"username":"<name>","password":"<password>"} 
-	// which sets the token header upon authentication
-	.addFilterBefore(new StatelessLoginFilter("/login",tokenAuthenticationService,
-            userDetailsService,authenticationManagerBuilder.getOrBuild()), UsernamePasswordAuthenticationFilter.class)
- 
-	// custom Token based authentication based on 
-	// the header previously given to the client
-	.addFilterBefore(new StatelessAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);	
-    
+	    http    
+	    	.csrf().disable()  
+	    	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
+	    .and()
+	    	.authorizeRequests()
+	    	.antMatchers("/app/**").permitAll()		
+		.and()	     
+	     	.headers()     	 		
+	     		.cacheControl()
+	     			.disable()
+	    .and()
+	    
+		// custom JSON based authentication by POST of 
+		// {"username":"<name>","password":"<password>"} 
+		// which sets the token header upon authentication
+		.addFilterBefore(new StatelessLoginFilter("/login",tokenAuthenticationService,
+	            userDetailsService,authenticationManagerBuilder.getOrBuild()), UsernamePasswordAuthenticationFilter.class)
+	 
+		// custom Token based authentication based on 
+		// the header previously given to the client
+		.addFilterBefore(new StatelessAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);	
+	    
     }
        
     
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-       
-    	BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    	
+
     	auth
-    	.authenticationProvider(jwtAuthenticationProvider)
-    	.userDetailsService(userDetailsService)
-    	.passwordEncoder(passwordEncoder);
-    	/*.and()
-            .inMemoryAuthentication()
-                .withUser("username").password("password").roles("USER","ADMIN");*/
-       
-    	/*
-    	auth
-        	.userDetailsService(userDetailsService)
-        	.passwordEncoder(new ShaPasswordEncoder(256));
-       */
+    		.authenticationProvider(jwtAuthenticationProvider)
+    			.userDetailsService(userDetailsService)
+    				.passwordEncoder(passwordEncoder);
+
         
     }
 

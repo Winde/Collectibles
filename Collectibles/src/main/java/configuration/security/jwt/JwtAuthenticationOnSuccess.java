@@ -33,8 +33,7 @@ public class JwtAuthenticationOnSuccess implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
-		
-		System.out.println("Filter is last?");		
+	
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication instanceof UserAuthentication) {
 			UserAuthentication userAuth = (UserAuthentication) authentication;
