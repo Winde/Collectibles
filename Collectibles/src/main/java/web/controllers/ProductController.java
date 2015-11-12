@@ -17,6 +17,7 @@ import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
+import model.persistence.AuthorRepository;
 import model.persistence.CategoryValueRepository;
 import model.persistence.HierarchyRepository;
 import model.persistence.ImageRepository;
@@ -50,6 +51,8 @@ public class ProductController  extends CollectiblesController{
 	@Autowired
 	private ImageRepository imageRepository;
 
+	@Autowired
+	private AuthorRepository authorRepository;
 	
 	@Autowired
 	private CategoryValueRepository categoryValueRepository;
@@ -79,7 +82,7 @@ public class ProductController  extends CollectiblesController{
 			System.out.println("Is Amazon Processed? "+ product.getIsAmazonProcessed());
 			if (product.getIsAmazonProcessed()==null || product.getIsAmazonProcessed().equals(Boolean.FALSE)){
 				try{
-					amazonConnector.updateProductTransaction(product, productRepository, imageRepository);
+					amazonConnector.updateProductTransaction(product, productRepository, imageRepository,authorRepository);
 				}catch (Exception ex){
 					ex.printStackTrace();
 				}
@@ -89,7 +92,7 @@ public class ProductController  extends CollectiblesController{
 			System.out.println("Is GoodReads Processed? "+product.getIsGoodreadsProcessed());
 			if (product.getIsGoodreadsProcessed()==null || product.getIsGoodreadsProcessed().equals(Boolean.FALSE)){
 				try {
-					goodReadsConnector.updateProductTransaction(product, productRepository, imageRepository);
+					goodReadsConnector.updateProductTransaction(product, productRepository, imageRepository,authorRepository);
 				}catch (Exception ex){
 					ex.printStackTrace();
 				}
@@ -156,9 +159,9 @@ public class ProductController  extends CollectiblesController{
 						//productRepository.saveWithImages(products,images);
 						productRepository.save(products);
 												
-						amazonConnector.processInBackground(products, productRepository, imageRepository);
+						amazonConnector.processInBackground(products, productRepository, imageRepository,authorRepository);
 						
-						goodReadsConnector.processInBackground(products, productRepository, imageRepository);
+						goodReadsConnector.processInBackground(products, productRepository, imageRepository,authorRepository);
 						
 						return products;
 					} catch (IOException e) {

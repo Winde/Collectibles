@@ -1,6 +1,7 @@
 package model.dataobjects;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -14,14 +15,17 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.JoinColumn;
 
+import model.dataobjects.Author.AuthorView;
 import model.dataobjects.HierarchyNode.HierarchySimpleView;
 import model.dataobjects.Image.ImageSimpleView;
 import model.dataobjects.supporting.ObjectList.ObjectListView;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -31,7 +35,7 @@ public class Product extends SimpleIdDao{
 	private static final long MINIMUM_LENGTH_DESCRIPTION = 100;
 	
 	public interface ProductSimpleView  extends SimpleIdDaoView{};
-	public interface ProductComplexView extends ProductSimpleView {};
+	public interface ProductComplexView extends ProductSimpleView,AuthorView {};
 	public interface ProductListView extends ObjectListView,ProductSimpleView,HierarchySimpleView,ImageSimpleView{};
 	
 	@ManyToOne
@@ -40,7 +44,8 @@ public class Product extends SimpleIdDao{
 	private HierarchyNode hierarchyPlacement;
 	
 	@OneToMany(fetch=FetchType.LAZY)
-	@JsonView(ProductComplexView.class)
+	//@JsonView(ProductComplexView.class)
+	@JsonIgnore
 	private Set<CategoryValue> categoryValues;
 	
 	@Column(name="reference",unique=true )
@@ -56,7 +61,7 @@ public class Product extends SimpleIdDao{
 	@JsonView(ProductSimpleView.class)
 	private String name = null;
 
-	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.REMOVE})
+	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.MERGE,CascadeType.REMOVE})
 	@JsonIgnoreProperties({ "data" })
 	@JsonView(ProductSimpleView.class)
 	private List<Image> images = null;
@@ -89,15 +94,19 @@ public class Product extends SimpleIdDao{
 	@Column(name="is_goodreads_processed")
 	private Boolean isGoodreadsProcessed = null;		
 	
-	@ElementCollection(fetch = FetchType.LAZY)
-	@CollectionTable(name="authors", joinColumns=@JoinColumn(name="id"))
-	@Column(name="authors")
+	@ManyToMany(fetch=FetchType.LAZY,cascade = {CascadeType.MERGE})	
 	@JsonView(ProductComplexView.class)
-	private List<String> authors;
+	private Collection<Author> authors;
 	
 	@Column(name="goodreads_related_link")
 	@JsonView(ProductComplexView.class)
 	private String goodreadsRelatedLink;
+	
+	@Column(name="publisher")
+	@JsonView(ProductSimpleView.class)
+	private String publisher;
+	
+	
 	
 	public Product(){}
 
@@ -129,11 +138,7 @@ public class Product extends SimpleIdDao{
 	}
 
 	public Set<CategoryValue> getCategoryValues() {
-		if (categoryValues == null){
-			return null;
-		} else {
-			return new TreeSet<>(categoryValues);
-		}
+		return categoryValues;		
 	}
 
 	public void setCategoryValues(Set<CategoryValue> categoryValue) {
@@ -237,11 +242,11 @@ public class Product extends SimpleIdDao{
 		this.amazonUrl = amazonUrl;
 	}
 	
-	public List<String> getAuthors() {
+	public Collection<Author> getAuthors() {
 		return authors;
 	}
 
-	public void setAuthors(List<String> authors) {
+	public void setAuthors(Collection<Author> authors) {
 		this.authors = authors;
 	}
 
@@ -272,7 +277,15 @@ public class Product extends SimpleIdDao{
 	public String toString(){
 		return "{" + this.getId() + " - " + this.getName() + " - " + this.getDescription() +"}";		
 	}
-	
+
+	public String getPublisher() {
+		return publisher;
+	}
+
+	public void setPublisher(String publisher) {
+		this.publisher = publisher;
+	}
+
 	public boolean isLengthyDescription() {
 		if (this.getDescription()==null){
 			return false;

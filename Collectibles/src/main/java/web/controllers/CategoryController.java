@@ -51,6 +51,7 @@ public class CategoryController extends CollectiblesController{
 	
 	@RequestMapping("/category/by/hierarchy/{hierarchy}")
 	public Collection<Category> categories(@PathVariable String hierarchy) throws CollectiblesException{
+		
 		Long hierarchyId = this.getId(hierarchy);
 		
 		if (hierarchyId==null){

@@ -21,12 +21,24 @@
 					<div class="productDescription">
 						<div ng-bind-html="product.description"></div>
 					</div>
-					<div class="authorsBlock" ng-if="product.authors && product.authors.length>0">
-						<b>Authors:</b>
-					</div> 	
-					<div>
-						<span ng-repeat="author in product.authors">{{$first ? '' : $last ? ' and ' : ', '}}{{author}}</span> 
-					</div>
+					<div class="authorsBlock" ng-if="product.authors && product.authors.length>0">										
+						<p><b>Publisher:</b> <span>{{product.publisher}}</span></p>
+						
+						<!-- <p><b>Authors:</b> <span >{{$first ? '' : $last ? ' and ' : ', '}}{{author}}</span></p> -->
+						<div ng-if="product.authors && product.authors.length && product.authors.length>0">
+							<p><b>Authors:</b></p>
+							<div class="row">
+								<div class="col-md-2 col-sm-4 col-xs-6" ng-repeat="author in product.authors">															
+										<a href="{{author.goodreadsAuthorLink}}">																		
+											<img class="img-responsive img-thumbnail" ng-if="author.imageUrl" ng-src="{{author.imageUrl}}" />
+											<img class="img-responsive img-thumbnail" ng-if="!author.imageUrl" src="https://s.gr-assets.com/assets/nophoto/user/u_200x266-e183445fd1a1b5cc7075bb1cf7043306.png" />
+											<span>{{author.name}}</span>
+										</a>
+									
+								</div>
+							</div>
+						</div>
+					</div> 						
 				</div>
 			</div>
 			<div class="row providerLinksBlock">

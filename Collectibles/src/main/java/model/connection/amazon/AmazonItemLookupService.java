@@ -22,12 +22,14 @@
 package model.connection.amazon;
 
 import java.io.FileNotFoundException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import model.connection.ProductInfoLookupServiceXML;
 import model.connection.TooFastConnectionException;
+import model.dataobjects.Author;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -107,6 +109,11 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
     	return this.getField(doc, "/ItemLookupResponse/Items/Item/LargeImage/URL");       
     }        
     
+	@Override
+	public String getPublisher(Document doc) throws TooFastConnectionException {
+		return this.getField(doc, "/ItemLookupResponse/Items/Item/ItemAttributes/Publisher");
+	}
+    
     public byte[] getImageData(Document doc) throws TooFastConnectionException{
     	byte [] data = null;
     	String url = parseImageUrl(doc);
@@ -130,7 +137,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	}
 
 	@Override
-	public List<String> getAuthors(Document doc)
+	public Collection<Author> getAuthors(Document doc)
 			throws TooFastConnectionException {
 		return null;
 	}
@@ -145,4 +152,6 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 			throws TooFastConnectionException {
 		return null;
 	}
+
+
 }

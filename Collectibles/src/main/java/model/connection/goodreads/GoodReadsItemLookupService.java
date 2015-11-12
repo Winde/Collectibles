@@ -1,15 +1,21 @@
 package model.connection.goodreads;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import model.connection.ProductInfoLookupServiceXML;
 import model.connection.TooFastConnectionException;
+import model.dataobjects.Author;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 @Service
 public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
@@ -60,8 +66,34 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 		return this.getField(doc, "/GoodreadsResponse/book/url");
 	}
 	
-	public List<String> getAuthors(Document doc){
-		return this.getFields(doc, "/GoodreadsResponse/book/authors/author/name");		
+	public Collection<Author> getAuthors(Document doc){
+		List<Author> authors = new ArrayList<>();
+		NodeList authorNodes = this.getNodes(doc, "/GoodreadsResponse/book/authors/author");
+		if (authorNodes!=null && authorNodes.getLength()>0){
+			for (int i=0;i<authorNodes.getLength();i++){
+				Node node = authorNodes.item(i);
+				Element element = (Element) node;
+				String id =  (element.getElementsByTagName("id").getLength()>0 ? element.getElementsByTagName("id").item(0).getTextContent() : null);
+				String name = (element.getElementsByTagName("name").getLength()>0 ? element.getElementsByTagName("name").item(0).getTextContent() : null);
+				String imageUrl = (element.getElementsByTagName("image_url").getLength()>0 ? element.getElementsByTagName("image_url").item(0).getTextContent() : null);
+				String link = (element.getElementsByTagName("link").getLength()>0 ? element.getElementsByTagName("link").item(0).getTextContent() : null);
+				imageUrl = imageUrl.replaceAll("\\n", "");
+				link = link.replaceAll("\\n", "");
+				if (id!=null){					
+					Author author = new Author();
+					author.setId(id);
+					author.setName(name);
+					author.setImageUrl(imageUrl);
+					author.setGoodreadsAuthorLink(link);
+					authors.add(author);
+				}				
+			}
+		}
+		if (authors.size()>0){
+			return authors;
+		} else {
+			return null;
+		}
 	}
 	
 	public String getSeriesUrl(Document doc){
@@ -72,6 +104,11 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 			url = baseUrl + series;
 		}
 		return url;		
+	}
+	
+	@Override
+	public String getPublisher(Document doc) throws TooFastConnectionException {
+		return this.getField(doc, "/GoodreadsResponse/book/publisher");
 	}
 
 	@Override
@@ -91,6 +128,8 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	public String getAmazonUrl(Document doc) throws TooFastConnectionException {
 		return null;
 	}
+
+
 
 
 	

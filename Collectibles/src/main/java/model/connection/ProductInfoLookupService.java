@@ -1,7 +1,10 @@
 package model.connection;
 
 import java.io.FileNotFoundException;
+import java.util.Collection;
 import java.util.List;
+
+import model.dataobjects.Author;
 
 import org.w3c.dom.Document;
 
@@ -15,7 +18,7 @@ public interface ProductInfoLookupService<E> {
 	
 	public Integer getPublicationYear(E doc) throws TooFastConnectionException;
 	
-	public List<String> getAuthors(E doc) throws TooFastConnectionException;
+	public Collection<Author> getAuthors(E doc) throws TooFastConnectionException;
 	
 	public String getSeriesUrl(E doc) throws TooFastConnectionException;
 
@@ -24,4 +27,6 @@ public interface ProductInfoLookupService<E> {
     public String getDescription(Document doc ) throws TooFastConnectionException;
      
     public String getGoodReadsUrl(E doc) throws TooFastConnectionException;
+    
+    public String getPublisher(E doc)  throws TooFastConnectionException;
 }

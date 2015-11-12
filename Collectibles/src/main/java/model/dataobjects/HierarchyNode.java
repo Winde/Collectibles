@@ -12,6 +12,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -37,12 +38,13 @@ public class HierarchyNode extends SimpleIdDao{
 	@JsonIgnoreProperties({"children", "categories"})
 	@JsonView(HierarchyComplexView.class)
 	private HierarchyNode father;
-		
+
 	@ManyToMany(fetch=FetchType.LAZY)	
-	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-	@JsonView(HierarchyComplexView.class)
+	//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	//@JsonView(HierarchyComplexView.class)
+	@JsonIgnore
 	private Set<Category> categories; 
-	
+
 	@Column(name="lineage")
 	@JsonView(HierarchySimpleView.class)
 	private String lineage;
@@ -53,7 +55,7 @@ public class HierarchyNode extends SimpleIdDao{
 	
 	public HierarchyNode(){
 		children = new TreeSet<>();
-		categories = new TreeSet<>();
+		//categories = new TreeSet<>();
 	}	
 	
 	public String getName() {
@@ -100,13 +102,9 @@ public class HierarchyNode extends SimpleIdDao{
 	public void setFather(HierarchyNode father) {
 		this.father = father;
 	}
-	
+
 	public Collection<Category> getCategories(){
-		if (categories==null){
-			return null;
-		} else {
-			return new ArrayList<>(categories);
-		}
+		return categories;
 	}
 	
 	public boolean addCategory(Category category){

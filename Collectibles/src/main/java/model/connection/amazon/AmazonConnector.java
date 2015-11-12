@@ -8,6 +8,7 @@ import model.connection.BackgroundProcessor;
 import model.connection.ProductInfoLookupService;
 import model.connection.TooFastConnectionException;
 import model.dataobjects.Product;
+import model.persistence.AuthorRepository;
 import model.persistence.ImageRepository;
 import model.persistence.ProductRepository;
 
@@ -28,11 +29,11 @@ public class AmazonConnector extends AbstractProductInfoConnector {
 
 
 	@Override
-	public void processInBackground(Collection<Product> products, ProductRepository productRepository, ImageRepository imageRepository){
+	public void processInBackground(Collection<Product> products, ProductRepository productRepository, ImageRepository imageRepository, AuthorRepository authorRepository){
 		
 		Collection<Product> clonedProducts = new ArrayList<Product>();		
 		clonedProducts.addAll(products);
-		BackgroundProcessor thread = new BackgroundProcessor(clonedProducts, productRepository, imageRepository, this);
+		BackgroundProcessor thread = new BackgroundProcessor(clonedProducts, productRepository, imageRepository, authorRepository, this);
 		thread.start();
 	}
 

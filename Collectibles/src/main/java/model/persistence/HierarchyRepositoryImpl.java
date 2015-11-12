@@ -39,14 +39,14 @@ public class HierarchyRepositoryImpl implements HierarchyRepositoryCustom{
 	public HierarchyNode addCategory(HierarchyNode hierarchyNode,Category category){
 		category.addHierarchy(hierarchyNode);
 		categoryRepository.save(category);
-		hierarchyNode.addCategory(category);
+		//hierarchyNode.addCategory(category);
 		this.save(hierarchyNode);		
 		return hierarchyNode;
 	}
 	
 	public boolean removeCategory(HierarchyNode hierarchyNode,Category category){
 		boolean result = true;
-		result = result && hierarchyNode.removeCategory(category);
+		//result = result && hierarchyNode.removeCategory(category);
 		result = result && category.removeHierarchy(hierarchyNode);
 		this.save(hierarchyNode);
 		categoryRepository.save(category);

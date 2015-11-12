@@ -8,8 +8,10 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import model.dataobjects.Author;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
+import model.persistence.AuthorRepository;
 import model.persistence.ImageRepository;
 import model.persistence.ProductRepository;
 
@@ -18,18 +20,22 @@ import org.w3c.dom.Document;
 public abstract class AbstractProductInfoConnector implements ProductInfoConnector{
 
 	@Override
-	public boolean updateProductTransaction(Product product,ProductRepository productRepository, ImageRepository imageRepository) throws TooFastConnectionException{		
+	public boolean updateProductTransaction(Product product,ProductRepository productRepository, ImageRepository imageRepository, AuthorRepository authorRepository) throws TooFastConnectionException{		
 		System.out.println("Starting access to provider : " + this.getClass());
 		boolean updated = false;
 		try {
 			Collection<Image> imagesAdd = new ArrayList<>();
 			Collection<Image> imagesRemove = new ArrayList<>();
+			Collection<Author> authorsAdd = new ArrayList<>();
 			
 			productRepository.findOne(product.getId());				
-			updated = this.updateProductDo(product, imagesAdd, imagesRemove);
-			if (updated){
-				productRepository.saveWithImages(product, imagesAdd);
-				imageRepository.delete(imagesRemove);			
+			updated = this.updateProductDo(product, imagesAdd, imagesRemove,authorsAdd);
+			if (updated){	
+				//System.out.println("Removing images");
+				//System.out.println(imagesRemove);
+				//imageRepository.delete(imagesRemove);
+				System.out.println("Saving product");
+				productRepository.save(product);
 				this.storeAfterSuccess(product,productRepository);
 			}
 		}catch (Exception ex){
@@ -49,7 +55,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	protected abstract void storeAfterSuccess(Product product, ProductRepository productRepository); 
 	
 	
-	protected boolean updateProductDo(Product product, Collection<Image> imagesAdd, Collection<Image> imagesRemove) throws TooFastConnectionException, FileNotFoundException{
+	protected boolean updateProductDo(Product product, Collection<Image> imagesAdd, Collection<Image> imagesRemove, Collection<Author> authorsAdd) throws TooFastConnectionException, FileNotFoundException{
 		boolean processed = false;
 		ProductInfoLookupService itemLookup = this.getImageLookupService();
 		List<Image> removeImages = new ArrayList<>();
@@ -111,6 +117,17 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						}
 					}
 					
+					if (product.getPublisher()==null){
+						String publisher = null;
+						
+						publisher = itemLookup.getPublisher(doc);
+						System.out.println("Obtained publisher: " + publisher);
+							
+						if (publisher!=null && !"".equals(publisher.trim())){
+							product.setPublisher(publisher);
+						}
+					}
+					
 					byte [] imageData = null;
 					if (doc!=null){
 						imageData = itemLookup.getImageData(doc);
@@ -169,12 +186,15 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					}
 					
 					if (product.getAuthors()==null || product.getAuthors().size()==0){
-						List<String> authors = null;
+						Collection<Author> authors = null;
 						authors = itemLookup.getAuthors(doc);
 						System.out.println("Obtained authors :" + authors);
 						if (authors!=null && authors.size()>0){
+							System.out.println("Obtained " + authors.size() + " authors");
 							product.setAuthors(authors);
+							authorsAdd.addAll(authors);
 						}
+						
 					}					
 				}
 				processed = true;

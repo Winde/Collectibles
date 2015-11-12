@@ -106,6 +106,22 @@ public abstract class ProductInfoLookupServiceXML implements ProductInfoLookupSe
 		return field;
 	}
 	
+	protected NodeList getNodes(Document doc,String xpath){
+		NodeList nodes = null;
+		XPath xPath = XPathFactory.newInstance().newXPath();	
+		try {
+			nodes = (NodeList)xPath.evaluate(xpath, doc.getDocumentElement(),XPathConstants.NODESET);
+			
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception ex){
+			ex.printStackTrace();
+		}
+		
+		return nodes;
+	}
+	
 	protected List<String> getFields(Document doc,String xpath){
 		List<String> fields = null;
 		XPath xPath = XPathFactory.newInstance().newXPath();	
