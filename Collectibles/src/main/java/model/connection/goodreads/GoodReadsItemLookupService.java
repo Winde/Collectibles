@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -82,15 +83,43 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 				Element element = (Element) node;
 				String id =  (element.getElementsByTagName("id").getLength()>0 ? element.getElementsByTagName("id").item(0).getTextContent() : null);
 				String name = (element.getElementsByTagName("name").getLength()>0 ? element.getElementsByTagName("name").item(0).getTextContent() : null);
-				String imageUrl = (element.getElementsByTagName("image_url").getLength()>0 ? element.getElementsByTagName("image_url").item(0).getTextContent() : null);
+				String imageUrl = null;
+				Node imageElement = null; 
+				if (element.getElementsByTagName("image_url").getLength()>0 ){
+					boolean validImage = true;
+					imageElement = element.getElementsByTagName("image_url").item(0);
+					NamedNodeMap attributes = imageElement.getAttributes();
+					if (attributes!=null && attributes.getLength()>0){
+						for (int j=0;j<attributes.getLength();j++){
+							Node attribute = attributes.item(j);
+							if ("nophoto".equals(attribute.getNodeName()) && "true".equals(attribute.getNodeValue())){
+								validImage = false;
+							}							
+						}
+					}
+					if (validImage){
+						imageUrl = imageElement.getTextContent();
+					}
+				}
 				String link = (element.getElementsByTagName("link").getLength()>0 ? element.getElementsByTagName("link").item(0).getTextContent() : null);
-				imageUrl = imageUrl.replaceAll("\\n", "");
+				byte [] byteImage = null;
+				if (imageUrl!=null){
+					try {
+						byteImage = fetchImage(imageUrl);
+					} catch (TooFastConnectionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				if (imageUrl!=null){
+					imageUrl = imageUrl.replaceAll("\\n", "");
+				}
 				link = link.replaceAll("\\n", "");
 				if (id!=null){					
 					Author author = new Author();
 					author.setId(id);
 					author.setName(name);
-					author.setImageUrl(imageUrl);
+					author.setImageData(byteImage);
 					author.setGoodreadsAuthorLink(link);
 					authors.add(author);
 				}				

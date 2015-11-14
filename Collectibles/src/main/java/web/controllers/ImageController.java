@@ -3,7 +3,9 @@ package web.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.dataobjects.Author;
 import model.dataobjects.Image;
+import model.persistence.AuthorRepository;
 import model.persistence.ImageRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,10 @@ public class ImageController extends CollectiblesController{
 	@Autowired
 	private ImageRepository imageRepository;
 	
+	@Autowired
+	private AuthorRepository authorRepository;
+	
+	
 	@RequestMapping(value="/image/{id}", method = RequestMethod.GET)
 	public Image getImage(@PathVariable String id) throws CollectiblesException{
 		Long imageId = this.getId(id);
@@ -40,6 +46,8 @@ public class ImageController extends CollectiblesController{
 			}
 		}
 	}
+	
+
 	
 	private ResponseEntity<byte[]> generateImage(byte [] data){
 		final HttpHeaders headers = new HttpHeaders();
@@ -83,6 +91,18 @@ public class ImageController extends CollectiblesController{
 		    }
 		    return generateImage(data);
 		}
+	}
+	
+	@RequestMapping(value="/image/author/{id}", method = RequestMethod.GET)
+	public ResponseEntity<byte[]> getAuthorImage(@PathVariable String id) throws CollectiblesException{
+		
+		Author author = authorRepository.findOne(id);
+		if (author==null){
+			throw new NotFoundException();
+		} else {
+			return generateImage(author.getImageData());
+		}
+		
 	}
 	
 	@RequestMapping(value="/images/{ids}", method = RequestMethod.GET)

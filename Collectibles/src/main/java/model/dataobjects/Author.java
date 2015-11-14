@@ -3,7 +3,9 @@ package model.dataobjects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
@@ -20,9 +22,10 @@ public class Author implements Comparable<Author>{
 	@JsonView(AuthorView.class)
 	private String name;
 	
-	@Column(name="image_url")
-	@JsonView(AuthorView.class)
-	private String imageUrl;
+	@Column(name="image_data")
+	@Lob
+	@JsonIgnore
+	private byte[] imageData;
 	
 	@Column(name="goodreads_author_link")
 	@JsonView(AuthorView.class)
@@ -42,17 +45,22 @@ public class Author implements Comparable<Author>{
 		this.name = name;
 	}
 
-	public String getImageUrl() {
-		return imageUrl;
+	public byte[] getImageData() {
+		return imageData;
 	}
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
+	public void setImageData(byte[] imageData) {
+		this.imageData = imageData;
 	}
 	public String getGoodreadsAuthorLink() {
 		return goodreadsAuthorLink;
 	}
 	public void setGoodreadsAuthorLink(String goodreadsAuthorLink) {
 		this.goodreadsAuthorLink = goodreadsAuthorLink;
+	}
+	
+	@JsonView(AuthorView.class)
+	public boolean getHasImage(){
+		return this.getImageData()!=null;
 	}
 	
 	@Override
@@ -91,7 +99,7 @@ public class Author implements Comparable<Author>{
 	}
 
 	public String toString(){
-		return "{ id: "+this.getId() + ", name: " +this.getName() + ", image: " +this.getImageUrl()+ ", url: " +this.getGoodreadsAuthorLink() +" }";
+		return "{ id: "+this.getId() + ", name: " +this.getName() + ", url: " +this.getGoodreadsAuthorLink() +" }";
 		
 	}
 }
