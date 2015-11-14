@@ -1,4 +1,4 @@
-<div ng-if="isAuthenticated()">
+<div ng-if="isAdmin()">
 		<button class="btn" ng-click="productListCtrl.toggleEditMode()" ng-show="!editMode">EDIT</button>
 		<button class="btn" ng-click="productListCtrl.toggleEditMode()" ng-show="editMode">STOP EDITING</button>
 </div>

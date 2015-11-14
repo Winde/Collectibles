@@ -22,19 +22,23 @@
 		
 		this.removeStoredSession = function(){			
 			localStorage.removeItem(localStorageKeyForSession);
-			/*
-		    $injector.invoke(function($http){
-			    $http({
-					url: '/logout', 
-					method: 'POST', 
-					nointercept: true, 
-					headers: {
-						'JSESSIONID' : factory.getStoredSession(),
-						'X-Requested-With': 'XMLHttpRequest'
-					}						
-				});
-		    });
-		    */		    
+		}
+		
+		
+		this.setRoles = function(roles){
+			localStorage.setItem("roles",roles);
+		}
+		
+		this.getRoles = function(){
+			var roles = localStorage.getItem("roles");
+			if (roles!=null && roles!=undefined){
+				return JSON.parse(roles);
+			}
+			return null;
+		}
+		
+		this.removeRoles = function(){
+			localStorage.removeItem("roles");
 		}
 		
 		if (this.getStoredSession()!=null){
@@ -42,6 +46,15 @@
 		}
 		
 		return {
+			getRoles: function(){
+				return factory.getRoles();
+			},
+			setRoles: function(roles){
+				factory.setRoles(roles);
+			},
+			removeRoles: function(roles){
+				factory.removeRoles(roles);
+			},
 			setStoredSession : function(session){
 				factory.setStoredSession(session);
 			},
@@ -91,6 +104,9 @@
 					})
 					.success(function(data ,status,headers){												
 						factory.setStoredSession(headers(factory.headerWithSessionResponse));
+						if (data!=null && data!=undefined){
+							factory.setRoles(JSON.stringify(data));
+						}
 						factory.authenticated = true;						
 						$location.path("/products/").replace();						
 					})
@@ -114,9 +130,19 @@
 			logout: function(){				
 				factory.authenticated = false;
 				factory.removeStoredSession();
+				factory.removeRoles();
 			},
 			isloggedIn: function(){
 				return factory.authenticated;
+			},
+			isAdmin: function(){
+				if (factory.authenticated){
+					var roles = factory.getRoles();
+					if (roles!=null && roles!=undefined){
+						return (roles.indexOf("ROLE_ADMIN")>=0)
+					}					
+				}
+				return false;
 			}
 		};
 		

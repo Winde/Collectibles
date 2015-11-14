@@ -5,7 +5,6 @@ import java.util.Collection;
 import model.dataobjects.Category;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
-import model.dataobjects.Product;
 import model.persistence.CategoryRepository;
 import model.persistence.HierarchyRepository;
 
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import web.supporting.error.exceptions.CollectiblesException;
-import web.supporting.error.exceptions.GenericException;
 import web.supporting.error.exceptions.IncorrectParameterException;
 import web.supporting.error.exceptions.NotFoundException;
 

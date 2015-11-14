@@ -9,7 +9,8 @@
 				product: "=",
 				editable: "=",
 				forbidedit: "=",
-				isAuthenticated: "&"				
+				isAuthenticated: "&",
+				isAdmin: "&"
 			},
 			link: function(scope,element,attrs){
 			},

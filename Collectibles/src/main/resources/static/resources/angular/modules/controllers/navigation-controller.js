@@ -28,6 +28,10 @@
 			return Auth.isloggedIn();
 		} 
 		
+		$scope.isAdmin = function(){
+			return Auth.isAdmin();
+		}
+		
 	
 		$scope.isActive = function (viewLocation) { 
 	        return viewLocation === $location.path();

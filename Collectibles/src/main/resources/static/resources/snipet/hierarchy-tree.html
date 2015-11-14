@@ -12,7 +12,7 @@
 					'depth7': hierarchy.depth == 7,
 					element: isElement == true				
 				}">
-			<a href ng-if="isAuthenticated()" ng-click="hierarchyCtrl.remove(hierarchy)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>{{hierarchy.name}}
+			<a href ng-if="isAdmin()" ng-click="hierarchyCtrl.remove(hierarchy)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>{{hierarchy.name}}
 		</div>
 	</div>
 </div>

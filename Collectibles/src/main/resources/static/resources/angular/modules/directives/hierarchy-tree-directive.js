@@ -6,7 +6,8 @@
 			restrict: 'E',
 			scope: {
 				hierarchies: "=",
-				isAuthenticated: "&"
+				isAuthenticated: "&",
+				isAdmin: "&"
 			},
 			templateUrl: '/app/snipet/hierarchy-tree.html',
 			controllerAs: 'hierarchyCtrl',

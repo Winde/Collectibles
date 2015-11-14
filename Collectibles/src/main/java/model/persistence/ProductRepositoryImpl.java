@@ -93,7 +93,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 	public ObjectList<Product> searchProduct(ProductSearch search) {
 		String hql = "";
 		
-		hql = hql + "select p from Product p LEFT JOIN FETCH p.images ";
+		hql = hql + "select p from Product p LEFT JOIN FETCH p.images LEFT JOIN FETCH p.owners";
 		
 		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
 			hql = hql + " INNER JOIN p.categoryValues categoryValues ";

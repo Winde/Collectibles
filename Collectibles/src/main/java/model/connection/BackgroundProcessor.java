@@ -8,7 +8,7 @@ import model.persistence.AuthorRepository;
 import model.persistence.ImageRepository;
 import model.persistence.ProductRepository;
 
-public class BackgroundProcessor extends Thread {
+public class BackgroundProcessor extends Thread{
 
 	private ProductRepository productRepository = null;
 	private ImageRepository imageRepository = null;
@@ -42,7 +42,8 @@ public class BackgroundProcessor extends Thread {
 	}
 		
 	protected void doOne(Product product) throws TooFastConnectionException{
-		getConnector().updateProductTransaction(product, getProductRepository(), getImageRepository(), getAuthorRepository());				
+		product.updateWithConnector(getConnector());
+		//getConnector().updateProductTransaction(product, getProductRepository(), getImageRepository(), getAuthorRepository());				
 	}
 	
 	
@@ -50,7 +51,6 @@ public class BackgroundProcessor extends Thread {
 	private AuthorRepository getAuthorRepository() {
 		return this.authorRepository;
 	}
-
 
 	public void run(){
 				

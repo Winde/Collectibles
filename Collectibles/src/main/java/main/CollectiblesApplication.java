@@ -1,5 +1,9 @@
 package main;
 
+import javax.persistence.PersistenceContextType;
+import javax.persistence.PersistenceContext;
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -18,6 +22,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
@@ -44,13 +51,16 @@ import configuration.security.jwt.TokenAuthenticationService;
 @EntityScan("model.dataobjects")
 @PropertySource("classpath:amazon.properties")
 @PropertySource("classpath:goodreads.properties")
+@EnableTransactionManagement
 public class CollectiblesApplication {
 
 	@Autowired
 	private TokenAuthenticationService tokenAuthenticationService;
 	
+	@Autowired
+	private DataSource datasource;
 	
-    public static void main(String[] args) {
+	public static void main(String[] args) {
         SpringApplication.run(CollectiblesApplication.class, args);
     }
     

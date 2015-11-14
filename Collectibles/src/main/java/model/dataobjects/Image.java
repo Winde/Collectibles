@@ -9,10 +9,14 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.imgscalr.Scalr;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity(name="Image")
@@ -40,7 +44,9 @@ public class Image extends SimpleIdDao{
 	@Column(name="height")
 	private Integer height;
 	
-	
+	@OneToOne(fetch=FetchType.LAZY)
+	@JsonIgnore
+	private Product product;
 	
 	public boolean isMain() {
 		return main;
@@ -136,8 +142,14 @@ public class Image extends SimpleIdDao{
 		this.thumb = thumb;
 	}
 
-	
-	
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+
 	public String toString(){
 		return "{"+id+"}";
 	}

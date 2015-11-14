@@ -21,14 +21,21 @@ import org.w3c.dom.NodeList;
 public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 
 	private String key = null;
+	private String entryPointQueryOne = null;
+	private String baseUrlSeries = null;
 	
 	@Autowired
-	public GoodReadsItemLookupService(@Value("${goodreads.public.key}") String key) {
+	public GoodReadsItemLookupService(
+			@Value("${goodreads.public.key}") String key,
+			@Value("${goodreads.entryPoint.query.isbn}") String entryPointQueryOne,
+			@Value("${goodreads.url.series}") String baseUrlSeries) {
 		this.key = key;
+		this.entryPointQueryOne = entryPointQueryOne;
+		this.baseUrlSeries  = baseUrlSeries;
 	}
 	
 	public String getLookupUrl(String id){
-		String url = "https://www.goodreads.com/book/isbn?isbn="+id+"&key="+key;
+		String url = entryPointQueryOne + "?isbn="+id+"&key="+key;
 		System.out.println("Goodreads url for fetch data: " + url);
 		return url;
 	}
@@ -97,11 +104,10 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	}
 	
 	public String getSeriesUrl(Document doc){
-		String url = null;
-		String baseUrl = "https://www.goodreads.com/series/";
+		String url = null;		
 		String series = this.getField(doc, "/GoodreadsResponse/book/series_works/series_work/series/id");
 		if (series !=null) {
-			url = baseUrl + series;
+			url = baseUrlSeries + series;
 		}
 		return url;		
 	}

@@ -25,18 +25,6 @@ public class AmazonConnector extends AbstractProductInfoConnector {
 		return itemLookup;
 	}
 	
-	
-
-
-	@Override
-	public void processInBackground(Collection<Product> products, ProductRepository productRepository, ImageRepository imageRepository, AuthorRepository authorRepository){
-		
-		Collection<Product> clonedProducts = new ArrayList<Product>();		
-		clonedProducts.addAll(products);
-		BackgroundProcessor thread = new BackgroundProcessor(clonedProducts, productRepository, imageRepository, authorRepository, this);
-		thread.start();
-	}
-
 	@Override
 	protected boolean checkIfWeProcess(Product product) {
 		return product!=null && (product.getIsAmazonProcessed()==null || !product.getIsAmazonProcessed());

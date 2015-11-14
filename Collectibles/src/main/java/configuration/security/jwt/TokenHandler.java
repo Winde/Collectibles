@@ -116,9 +116,13 @@ public class TokenHandler {
 										
 					final UserDetailsImpl user = UserDetailsImpl.fromJSON(json);
 					
-					if (user!=null && new Date().getTime() < user.getExpires()) {											
+					if (user!=null && new Date().getTime() < user.getExpires()) {
+						System.out.println("User is valid, still valid for " + ((user.getExpires() -new Date().getTime() )/1000) + " seconds");						
 						return user;
 					} else {
+						System.out.println("User is null?: " + user==null );
+						System.out.println("CurrentTime: " + new Date().getTime() );
+						System.out.println("ExpirationTime: " +  user.getExpires());
 						System.out.println("User is expired");
 					}
 				} else{

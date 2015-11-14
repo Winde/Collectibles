@@ -104,8 +104,8 @@
 							<ul class="nav navbar-nav">							
 								<li ng-show="!isAuthenticated()" ng-class="{ active: isActive('/login/')}"><a href="#/login/" ng-click="isCollapsed = true">Login</a></li>
 								<li ng-class="{ active: isActive('/products/')}"><a href="#/products/" ng-click="isCollapsed = true">Products</a></li>																											
-								<li ng-show="isAuthenticated()" ng-class="{ active: isActive('/products/create/')}"><a href="#/products/create/" ng-click="isCollapsed = true">Add Products</a></li>
-								<li ng-show="isAuthenticated()" ng-class="{ active: isActive('/hierarchy/create/')}"><a href="#/hierarchy/create/"ng-click="isCollapsed = true">Manage Hierarchies</a></li>
+								<li ng-show="isAdmin()" ng-class="{ active: isActive('/products/create/')}"><a href="#/products/create/" ng-click="isCollapsed = true">Add Products</a></li>
+								<li ng-show="isAdmin()" ng-class="{ active: isActive('/hierarchy/create/')}"><a href="#/hierarchy/create/"ng-click="isCollapsed = true">Manage Hierarchies</a></li>
 								<li ng-show="isAuthenticated()" ng-class="{ active: isActive('/logout/')}"><a href="" ng-click="logout()" ng-click="isCollapsed = true">Logout</a></li>
 							</ul>
 						</div>

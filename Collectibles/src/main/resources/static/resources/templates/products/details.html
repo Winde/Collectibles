@@ -5,12 +5,14 @@
 			product="product" 
 			editable="editable" 
 			is-authenticated="isAuthenticated()"		
+			is-admin="isAdmin()"
 			forbidedit="forbidedit"></product-page>
 		
 		<product-change 
 			ng-show="editable && isAuthenticated()" 
 			product="product" 	
-			is-authenticated="isAuthenticated()"	
+			is-authenticated="isAuthenticated()"
+			is-admin="isAdmin()"	
 			createnew="editable"></product-change>
 			
 	</div>

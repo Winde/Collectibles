@@ -6,8 +6,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import model.dataobjects.Author;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
@@ -15,36 +13,65 @@ import model.persistence.AuthorRepository;
 import model.persistence.ImageRepository;
 import model.persistence.ProductRepository;
 
-import org.w3c.dom.Document;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 public abstract class AbstractProductInfoConnector implements ProductInfoConnector{
 
-	@Override
-	public boolean updateProductTransaction(Product product,ProductRepository productRepository, ImageRepository imageRepository, AuthorRepository authorRepository) throws TooFastConnectionException{		
-		System.out.println("Starting access to provider : " + this.getClass());
-		boolean updated = false;
-		try {
-			Collection<Image> imagesAdd = new ArrayList<>();
-			Collection<Image> imagesRemove = new ArrayList<>();
-			Collection<Author> authorsAdd = new ArrayList<>();
-			
-			productRepository.findOne(product.getId());				
-			updated = this.updateProductDo(product, imagesAdd, imagesRemove,authorsAdd);
-			if (updated){	
-				//System.out.println("Removing images");
-				//System.out.println(imagesRemove);
-				//imageRepository.delete(imagesRemove);
-				System.out.println("Saving product");
-				productRepository.save(product);
-				this.storeAfterSuccess(product,productRepository);
-			}
-		}catch (Exception ex){
-			ex.printStackTrace();
-			updated = false;			
-		}
+	@Autowired
+	PlatformTransactionManager transactionManager;
+	
+	@Autowired
+	private ProductRepository productRepository;
+	
+	@Autowired
+	private ImageRepository imageRepository;
+	
+	@Autowired
+	private AuthorRepository authorRepository;
+	
+	
+	@Override	
+	public boolean updateProductTransaction(Product product) throws TooFastConnectionException{
+		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 		
-		System.out.println("Finishing access to provider "+this.getClass()+", was updated?  : " + updated );
-		return updated;
+		boolean result = true; 		
+		result = transactionTemplate.execute(new TransactionCallback<Boolean>(){
+
+			@Override
+			public Boolean doInTransaction(TransactionStatus status) {
+				System.out.println("Starting access to provider : " + this.getClass());
+				boolean updated = false;
+				try {
+					Collection<Image> imagesAdd = new ArrayList<>();
+					Collection<Image> imagesRemove = new ArrayList<>();
+					Collection<Author> authorsAdd = new ArrayList<>();
+					
+					Product productInDb = productRepository.findOne(product.getId());				
+					updated = updateProductDo(productInDb, imagesAdd, imagesRemove,authorsAdd);
+					if (updated){	
+						//System.out.println("Removing images");
+						//System.out.println(imagesRemove);				
+						System.out.println("Saving product");
+						productRepository.save(productInDb);
+						imageRepository.delete(imagesRemove);
+						storeAfterSuccess(productInDb,productRepository);
+					}
+				}catch (Exception ex){
+					ex.printStackTrace();
+					updated = false;			
+				}
+				
+				System.out.println("Finishing access to provider "+this.getClass()+", was updated?  : " + updated );
+				return updated;
+			}
+			
+		});
+		
+		return result;
 	}
 
 	
@@ -57,8 +84,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	
 	protected boolean updateProductDo(Product product, Collection<Image> imagesAdd, Collection<Image> imagesRemove, Collection<Author> authorsAdd) throws TooFastConnectionException, FileNotFoundException{
 		boolean processed = false;
-		ProductInfoLookupService itemLookup = this.getImageLookupService();
-		List<Image> removeImages = new ArrayList<>();
+		ProductInfoLookupService itemLookup = this.getImageLookupService();		
 		
 		System.out.println("Checking if we have product universal reference");
 		
@@ -148,14 +174,14 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						
 						if (executeChange){
 							if (product.getImages()!=null && product.getImages().size()>0){
-								removeImages.addAll(product.getImages());
+								System.out.println("Substituting images: " + product.getImages());
+								imagesRemove.addAll(product.getImages());
 							}						
-							
-							imagesAdd.add(newImage);
-							
+														
 							System.out.println("Obtained image from: " + this.getClass() );
 							List<Image> images = new ArrayList<>();
-							images.add(newImage);							
+							images.add(newImage);
+							imagesAdd.add(newImage);
 							product.setImages(images);
 						}
 					}
@@ -209,4 +235,12 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		return processed;
 	}
 	
+	@Override
+	public void processInBackground(Collection<Product> products){
+		
+		Collection<Product> clonedProducts = new ArrayList<Product>();		
+		clonedProducts.addAll(products);
+		BackgroundProcessor thread = new BackgroundProcessor(clonedProducts, productRepository, imageRepository,authorRepository,  this);
+		thread.start();
+	}
 }

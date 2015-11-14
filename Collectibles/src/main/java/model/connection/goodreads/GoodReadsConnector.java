@@ -30,14 +30,7 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 		return lookUpService;
 	}
 
-	@Override
-	public void processInBackground(Collection<Product> products, ProductRepository productRepository, ImageRepository imageRepository, AuthorRepository authorRepository){
-		
-		Collection<Product> clonedProducts = new ArrayList<Product>();		
-		clonedProducts.addAll(products);
-		BackgroundProcessor thread = new BackgroundProcessor(clonedProducts, productRepository, imageRepository,authorRepository,  this);
-		thread.start();
-	}
+
 
 	@Override
 	protected boolean updateProductDo(Product product, Collection<Image> imagesAdd, Collection<Image> imagesRemove, Collection<Author> authorsAdd) throws TooFastConnectionException, FileNotFoundException{

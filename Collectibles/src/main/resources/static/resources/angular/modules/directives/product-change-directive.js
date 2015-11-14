@@ -8,7 +8,8 @@
 			scope: {
 				product: "=",
 				createnew: "@",
-				isAuthenticated: "&"
+				isAuthenticated: "&",
+				isAdmin: "&"
 			},
 			link: function(scope,element,attrs){
 			},

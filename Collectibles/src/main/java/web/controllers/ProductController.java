@@ -17,11 +17,14 @@ import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
+import model.dataobjects.User;
+import model.dataobjects.serializable.SerializableProduct;
 import model.persistence.AuthorRepository;
 import model.persistence.CategoryValueRepository;
 import model.persistence.HierarchyRepository;
 import model.persistence.ImageRepository;
 import model.persistence.ProductRepository;
+import model.persistence.UserRepository;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -29,6 +32,8 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,14 +66,18 @@ public class ProductController  extends CollectiblesController{
 	private HierarchyRepository hierarchyRepository;
 
 	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
 	private AmazonConnector amazonConnector;
 	
 	@Autowired
 	private GoodReadsConnector goodReadsConnector;
 	
 	
+	
 	@RequestMapping(value="/product/find/{id}")
-	public Product product(@PathVariable String id) throws CollectiblesException {
+	public SerializableProduct product(@PathVariable String id) throws CollectiblesException {
 		Long idLong = this.getId(id);
 		
 		if (idLong==null){
@@ -82,7 +91,7 @@ public class ProductController  extends CollectiblesController{
 			System.out.println("Is Amazon Processed? "+ product.getIsAmazonProcessed());
 			if (product.getIsAmazonProcessed()==null || product.getIsAmazonProcessed().equals(Boolean.FALSE)){
 				try{
-					amazonConnector.updateProductTransaction(product, productRepository, imageRepository,authorRepository);
+					amazonConnector.updateProductTransaction(product);
 				}catch (Exception ex){
 					ex.printStackTrace();
 				}
@@ -92,19 +101,19 @@ public class ProductController  extends CollectiblesController{
 			System.out.println("Is GoodReads Processed? "+product.getIsGoodreadsProcessed());
 			if (product.getIsGoodreadsProcessed()==null || product.getIsGoodreadsProcessed().equals(Boolean.FALSE)){
 				try {
-					goodReadsConnector.updateProductTransaction(product, productRepository, imageRepository,authorRepository);
+					goodReadsConnector.updateProductTransaction(product);
 				}catch (Exception ex){
 					ex.printStackTrace();
 				}
 			}
-						
-			return product;			
+			
+			return SerializableProduct.cloneProduct(product);			
 		}
 	}
 	
 	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/create/from/file/{hierarchy}", method = RequestMethod.POST)
-	public Collection<Product> addProductsFromFile(
+	public Collection<SerializableProduct> addProductsFromFile(
 			@PathVariable String hierarchy,
 			@RequestPart("file") MultipartFile file) throws CollectiblesException {
 		Long hierarchyId = this.getId(hierarchy);
@@ -137,7 +146,7 @@ public class ProductController  extends CollectiblesController{
 							if (name!=null && !"".equals(name.trim())){ product.setName(name); }
 							if (description!=null && !"".equals(description.trim())){ product.setDescription(description); }
 							if (reference!=null && !"".equals(reference.trim())){ product.setReference(reference); }
-							if (owned !=null && owned.trim().equals("true")){product.setOwned(true); }
+							//if (owned !=null && owned.trim().equals("true")){product.setOwned(true); }
 							if (ISBN !=null && !"".equals(ISBN.trim())) { product.setUniversalReference(ISBN.replaceAll("-", "")); }
 							if (date!=null && !date.trim().equals("")){
 								for (SimpleDateFormat format : formats ){
@@ -159,11 +168,11 @@ public class ProductController  extends CollectiblesController{
 						//productRepository.saveWithImages(products,images);
 						productRepository.save(products);
 												
-						amazonConnector.processInBackground(products, productRepository, imageRepository,authorRepository);
+						amazonConnector.processInBackground(products);
 						
-						goodReadsConnector.processInBackground(products, productRepository, imageRepository,authorRepository);
+						goodReadsConnector.processInBackground(products);
 						
-						return products;
+						return SerializableProduct.cloneProduct(products);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -183,8 +192,10 @@ public class ProductController  extends CollectiblesController{
 	
 	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/create/{hierarchy}", method = RequestMethod.POST)
-	public Product addProduct(@RequestBody Product product,@PathVariable String hierarchy) throws CollectiblesException {
+	public SerializableProduct addProduct(@RequestBody SerializableProduct serializableProduct,@PathVariable String hierarchy) throws CollectiblesException {
 		Long hierarchyId = this.getId(hierarchy);
+		Product product = null;
+		if (serializableProduct !=null) { product = serializableProduct.deserializeProduct(); }
 		
 		if (hierarchyId!=null){
 			
@@ -194,7 +205,7 @@ public class ProductController  extends CollectiblesController{
 				product.setHierarchyPlacement(hierarchyNode);
 				this.validate(product);				
 				productRepository.save(product);
-				return product;
+				return SerializableProduct.cloneProduct(product);
 			} else {
 				throw new NotFoundException(new String[]{"hierarchy"});
 			}
@@ -223,7 +234,7 @@ public class ProductController  extends CollectiblesController{
 	
 	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/find/{productId}/category/value/add/{categoryValueId}", method = RequestMethod.POST)
-	public Product addCategoryValue(@PathVariable String productId, @PathVariable String categoryValueId) throws CollectiblesException {
+	public SerializableProduct addCategoryValue(@PathVariable String productId, @PathVariable String categoryValueId) throws CollectiblesException {
 		Long longProductId = this.getId(productId);
 		Long longCategoryValueId = this.getId(categoryValueId);
 		List<String> errors = new ArrayList<>();
@@ -252,12 +263,15 @@ public class ProductController  extends CollectiblesController{
 		product.addCategoryValue(categoryValue);
 		productRepository.save(product);		
 
-		return product;
+		return SerializableProduct.cloneProduct(product);
 	}
 	
 	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/modify/", method = RequestMethod.PUT)
-	public Product modifyProduct(@RequestBody Product product) throws CollectiblesException {		
+	public SerializableProduct modifyProduct(@RequestBody SerializableProduct serializableProduct) throws CollectiblesException {		
+		Product product = null;
+		if (serializableProduct !=null) { product = serializableProduct.deserializeProduct(); }
+		
 		this.validate(product);
 		
 		if (product.getId()!=null){
@@ -275,13 +289,30 @@ public class ProductController  extends CollectiblesController{
 				if (product.getUniversalReference()!=null && !product.getUniversalReference().equals(productInDb.getUniversalReference())){
 					product.setIsAmazonProcessed(Boolean.FALSE);
 					product.setIsGoodreadsProcessed(Boolean.FALSE);
-					product.setAuthors(productInDb.getAuthors());
+					
 				}
-								
+				product.setOwners(productInDb.getOwners());
+				product.setAuthors(productInDb.getAuthors());								
 				product.setCategoryValues(productInDb.getCategoryValues());
 				product.setImages(productInDb.getImages());
+				
+				if (serializableProduct.getOwned()!=null){
+					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+					if (auth!=null){
+						User user = new User();
+						user.setUsername(auth.getName());
+						if (!serializableProduct.getOwned()) {
+							product.getOwners().remove(user);
+						} else {
+							user = userRepository.findOne(user.getUsername());
+							product.getOwners().add(user);
+						}
+					}
+				}
+				
 				Product result = productRepository.save(product);
-				return result;
+				
+				return SerializableProduct.cloneProduct(result);
 			} else {
 				throw new NotFoundException(new String[]{"product"});
 			}

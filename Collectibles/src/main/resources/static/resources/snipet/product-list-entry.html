@@ -16,7 +16,7 @@
 		</div>
 	</div>
 	<div class="col-lg-1 col-md-1 col-sm-3 col-xs-3">
-		<div ng-if="editMode && isAuthenticated()">
+		<div ng-if="editMode && isAdmin()">
 			<button type="button" 
 					class="btn btn-default" 
 					ng-model="product.owned" 
@@ -32,12 +32,12 @@
 				ng-change="productManagementCtrl.update(product)" />
  			-->
 		</div>
-		<div ng-if="!editMode || !isAuthenticated()">
+		<div ng-if="!editMode || !isAdmin()">
 			<span ng-if="product.owned">Owned</span>			
 		</div>
 	</div>	
 	<div class="col-lg-3 col-md-3 hidden-sm hidden-xs">		
-		<form ng-if="editMode && isAuthenticated()">
+		<form ng-if="editMode && isAdmin()">
 			<div class="form-group">
 				<select class="form-control"	
 					selectpicker									
@@ -60,12 +60,12 @@
 				</select>
 			</div>
 		</form>	
-		<div ng-if="!editMode || !isAuthenticated()">{{product.hierarchyPlacement.name}}</div>	 
+		<div ng-if="!editMode || !isAdmin()">{{product.hierarchyPlacement.name}}</div>	 
 	</div>
 	<div class="col-lg-1 col-md-2 hidden-sm hidden-xs">
 		<span>{{product.universalReference}}</span>
 	</div>
 	<div class="col-lg-1 col-md-1 col-sm-2 col-xs-3">
-		<a href ng-if="editMode && isAuthenticated()" class="btn btn-default" ng-click="remove(product)">Delete</a>
+		<a href ng-if="editMode && isAdmin()" class="btn btn-default" ng-click="remove(product)">Delete</a>
 	</div>
 </div>

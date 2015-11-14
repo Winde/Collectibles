@@ -1,6 +1,7 @@
 package configuration.security.jwt;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -14,6 +15,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter{
 
@@ -61,7 +64,16 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 		
 		tokenAuthenticationService.addAuthentication(response, userAuthentication);
 		SecurityContextHolder.getContext().setAuthentication(userAuthentication);
-
+		if (authenticatedUser!=null && authenticatedUser.getUser()!=null && authenticatedUser.getUser().getRoles()!=null){
+			Collection<String> roles = authenticatedUser.getUser().getRoles();
+			ObjectMapper mapper = new ObjectMapper();
+			String rolesJson = mapper.writeValueAsString(roles);
+			if (rolesJson!=null){
+				response.getWriter().write(rolesJson);
+				response.setContentType("Content-Type:application/json;charset=UTF-8");
+			}
+		}
+		
 	}	
 
 

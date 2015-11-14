@@ -20,9 +20,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.JoinColumn;
 
+import model.connection.ProductInfoConnector;
+import model.connection.TooFastConnectionException;
 import model.dataobjects.Author.AuthorView;
 import model.dataobjects.HierarchyNode.HierarchySimpleView;
 import model.dataobjects.Image.ImageSimpleView;
+import model.dataobjects.SimpleIdDao.SimpleIdDaoView;
 import model.dataobjects.supporting.ObjectList.ObjectListView;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -34,57 +37,39 @@ public class Product extends SimpleIdDao{
 
 	private static final long MINIMUM_LENGTH_DESCRIPTION = 100;
 	
-	public interface ProductSimpleView  extends SimpleIdDaoView{};
-	public interface ProductComplexView extends ProductSimpleView,AuthorView {};
-	public interface ProductListView extends ObjectListView,ProductSimpleView,HierarchySimpleView,ImageSimpleView{};
-	
-	@ManyToOne
-	@JsonIgnoreProperties({"children"})
-	@JsonView(ProductSimpleView.class)
+	@ManyToOne	
 	private HierarchyNode hierarchyPlacement;
 	
 	@OneToMany(fetch=FetchType.LAZY)
-	//@JsonView(ProductComplexView.class)
-	@JsonIgnore
 	private Set<CategoryValue> categoryValues;
 	
 	@Column(name="reference",unique=true )
-	@JsonView(ProductSimpleView.class)
 	private String reference = null;
 	
 	@Column(name="description")
-	@Lob @Basic
-	@JsonView(ProductSimpleView.class)
+	@Lob @Basic	
 	private String description = null;
 
 	@Column(name="name")
-	@JsonView(ProductSimpleView.class)
 	private String name = null;
 
 	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.MERGE,CascadeType.REMOVE})
-	@JsonIgnoreProperties({ "data" })
-	@JsonView(ProductSimpleView.class)
 	private List<Image> images = null;
 
-	@Column(name="owned")
-	@JsonView(ProductSimpleView.class)
-	private Boolean owned = Boolean.FALSE;	
+	@ManyToMany(fetch=FetchType.LAZY)	
+	private Set<User> owners = null;	
 	
 	@Column(name="release_date")
-	@JsonView(ProductSimpleView.class)
 	private Date releaseDate = null;
 			
 	@Column(name="universal_reference")
-	@JsonView(ProductSimpleView.class)
 	private String universalReference = null;
 	
 	
-	@Column(name="amazon_url")
-	@JsonView(ProductComplexView.class)
+	@Column(name="amazon_url")	
 	private String amazonUrl = null;
 	
 	@Column(name="goodreads_url")
-	@JsonView(ProductComplexView.class)
 	private String goodreadsUrl = null;
 	
 	
@@ -95,18 +80,13 @@ public class Product extends SimpleIdDao{
 	private Boolean isGoodreadsProcessed = null;		
 	
 	@ManyToMany(fetch=FetchType.LAZY,cascade = {CascadeType.MERGE})	
-	@JsonView(ProductComplexView.class)
 	private Collection<Author> authors;
 	
 	@Column(name="goodreads_related_link")
-	@JsonView(ProductComplexView.class)
 	private String goodreadsRelatedLink;
 	
 	@Column(name="publisher")
-	@JsonView(ProductSimpleView.class)
 	private String publisher;
-	
-	
 	
 	public Product(){}
 
@@ -184,14 +164,14 @@ public class Product extends SimpleIdDao{
 		}
 	}
 
-	public boolean getOwned() {
-		return Boolean.TRUE.equals(this.owned);
+	public Set<User> getOwners() {
+		return owners;
 	}
 
-	public void setOwned(Boolean owned) {
-		this.owned = owned;
+	public void setOwners(Set<User> owners) {
+		this.owners = owners;
 	}
-	
+
 	public Date getReleaseDate() {
 		return releaseDate;
 	}
@@ -294,6 +274,10 @@ public class Product extends SimpleIdDao{
 		} else {
 			return true;
 		}
+	}
+
+	public synchronized void updateWithConnector(ProductInfoConnector connector) throws TooFastConnectionException {
+		connector.updateProductTransaction(this);
 	}
 	
 }

@@ -2,6 +2,7 @@ package web.controllers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,13 +10,17 @@ import javax.servlet.http.HttpServletRequest;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Product;
-import model.dataobjects.Product.ProductListView;
+import model.dataobjects.User;
+import model.dataobjects.serializable.SerializableProduct;
+import model.dataobjects.serializable.SerializableProduct.ProductListView;
 import model.dataobjects.supporting.ObjectList;
 import model.persistence.HierarchyRepository;
 import model.persistence.ProductRepository;
 import model.persistence.queryParameters.ProductSearch;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,7 +43,7 @@ public class SearchController  extends CollectiblesController{
 	
 	private final String defaultPaginationSize = "50";
 	
-	private ObjectList<Product> findProduct(
+	private ObjectList<SerializableProduct> findProduct(
 			String hierarchy, 
 			String search, 
 			Collection<String> categoryValuesIds, 
@@ -108,42 +113,46 @@ public class SearchController  extends CollectiblesController{
 			
 			searchObject.setCategoryValues(categoryValues);
 						
-			ObjectList<Product> result = null;
+			ObjectList<Product> resultFromDB = null;
 
 			Collection<String> errors = searchObject.errors();
 			if (errors == null || errors.size()<=0){
-				result = productRepository.searchProduct(searchObject);
+				resultFromDB = productRepository.searchProduct(searchObject);
 			}else {
 				throw new IncorrectParameterException(errors);
 			}
+			
+			
+			
+			ObjectList<SerializableProduct> result = null;
 
-			System.out.println("Result: " + result);
-			if (result.getObjects()!=null) {
-				System.out.println("Result objects number: " + result.getObjects().size());
+			System.out.println("Result: " + resultFromDB);
+			if (resultFromDB!=null && resultFromDB.getObjects()!=null) {
+				System.out.println("Result objects number: " + resultFromDB.getObjects().size());
+				result = new ObjectList<>();
+				result.setHasNext(resultFromDB.getHasNext());
+				result.setMaxResults(resultFromDB.getMaxResults());				
+				result.setObjects(SerializableProduct.cloneProduct(resultFromDB.getObjects()));				
 			}
 			
-			if (result ==null){
-				return null;
-			} else {				
-				return result;
-			}
+			return result;
 	}
 		
-	@JsonView(ProductListView.class)	
+	@JsonView(model.dataobjects.serializable.SerializableProduct.ProductListView.class)	
 	@RequestMapping(value="/product/search")
-	public ObjectList<Product> search(HttpServletRequest request, 			
+	public ObjectList<SerializableProduct> search(HttpServletRequest request, 			
 			@RequestParam(required=false, name="withImages") String withImagesString,
 			@RequestParam(required=false, name="search") String searchString,
 			@RequestParam(required=false, name="owned" ) String owned,
 			@RequestParam(required=true, name="page") int page,
 			@RequestParam(required=false, name="maxResults") int maxResults) throws CollectiblesException{	
-		ObjectList<Product> objects = findProduct(null,searchString,null,withImagesString,owned,page,maxResults);
+		ObjectList<SerializableProduct> objects = findProduct(null,searchString,null,withImagesString,owned,page,maxResults);
 		return objects;
 	}
 	
 	@JsonView(ProductListView.class)
 	@RequestMapping(value="/product/search/{hierarchy}/")
-	public ObjectList<Product> searchCategory(HttpServletRequest request, 
+	public ObjectList<SerializableProduct> searchCategory(HttpServletRequest request, 
 			@PathVariable String hierarchy, 
 			@RequestParam(required=false, name="search") String searchString,
 			@RequestParam(required=false, name="withImages") String withImagesString,
@@ -151,7 +160,7 @@ public class SearchController  extends CollectiblesController{
 			@RequestParam(required=false, name="categoryValues" ) List<String> categories,
 			@RequestParam(required=true, name="page") int page,
 			@RequestParam(required=false, name="maxResults", defaultValue=defaultPaginationSize) int maxResults) throws CollectiblesException{					
-		ObjectList<Product> objects = findProduct(hierarchy,searchString,categories,withImagesString,owned,page,maxResults);
+		ObjectList<SerializableProduct> objects = findProduct(hierarchy,searchString,categories,withImagesString,owned,page,maxResults);
 		return objects;
 		
 	}

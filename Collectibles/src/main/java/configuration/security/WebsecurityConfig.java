@@ -1,14 +1,9 @@
 package configuration.security;
 
-import javax.servlet.Filter;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,7 +13,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 
 import configuration.security.jwt.JwtAuthenticationOnSuccess;
 import configuration.security.jwt.JwtAuthenticationProvider;
@@ -62,50 +56,49 @@ public class WebsecurityConfig extends WebSecurityConfigurerAdapter {
 	    return new BCryptPasswordEncoder();
 	}
 	
-    @Bean
-    public FilterRegistrationBean insertRegistrationAfter() {
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-        JwtAuthenticationOnSuccess userFilter = new JwtAuthenticationOnSuccess(tokenAuthenticationService);
-        registrationBean.setFilter(userFilter);
-        registrationBean.setOrder(Integer.MAX_VALUE);
-        return registrationBean;
-    }
+	@Bean
+	public FilterRegistrationBean insertRegistrationAfter() {
+		FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+		JwtAuthenticationOnSuccess userFilter = new JwtAuthenticationOnSuccess(tokenAuthenticationService);
+		registrationBean.setFilter(userFilter);
+		registrationBean.setOrder(Integer.MAX_VALUE);
+		return registrationBean;
+	}
 	
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-    	
-	    http    
-	    	.csrf().disable()  
-	    	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
-	    .and()
-	    	.authorizeRequests()
-	    	.antMatchers("/app/**").permitAll()		
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+	
+		http    
+			.csrf().disable()  
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
+		.and()
+			.authorizeRequests()
+				.antMatchers("/app/**").permitAll()		
 		.and()	     
-	     	.headers()     	 		
-	     		.cacheControl()
-	     			.disable()
-	    .and()
+			.headers()     	 		
+				.cacheControl()
+				.disable()
+		.and()
 	    
-		// custom JSON based authentication by POST of 
-		// {"username":"<name>","password":"<password>"} 
-		// which sets the token header upon authentication
-		.addFilterBefore(new StatelessLoginFilter("/login",tokenAuthenticationService,
-	            userDetailsService,authenticationManagerBuilder.getOrBuild()), UsernamePasswordAuthenticationFilter.class)
-	 
-		// custom Token based authentication based on 
-		// the header previously given to the client
-		.addFilterBefore(new StatelessAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);	
+			// custom JSON based authentication by POST of 
+			// {"username":"<name>","password":"<password>"} 
+			// which sets the token header upon authentication
+			.addFilterBefore(new StatelessLoginFilter("/login",tokenAuthenticationService,userDetailsService,authenticationManagerBuilder.getOrBuild()), UsernamePasswordAuthenticationFilter.class)
+
+			// custom Token based authentication based on 
+			// the header previously given to the client
+			.addFilterBefore(new StatelessAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);	
 	    
-    }
+	}
        
     
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+	@Autowired
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 
-    	auth
-    		.authenticationProvider(jwtAuthenticationProvider)
-    			.userDetailsService(userDetailsService)
-    				.passwordEncoder(passwordEncoder);
+		auth
+		.authenticationProvider(jwtAuthenticationProvider)
+			.userDetailsService(userDetailsService)
+				.passwordEncoder(passwordEncoder);
 
         
     }

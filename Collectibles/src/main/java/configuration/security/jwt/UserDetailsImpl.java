@@ -106,10 +106,15 @@ public class UserDetailsImpl implements UserDetails{
 	@Override
 	public Collection<SimpleGrantedAuthority> getAuthorities() {
 		Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority("USER"));
-		authorities.add(new SimpleGrantedAuthority("ADMIN"));
-		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-		authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+		if (user!=null){			
+			Collection<String> roles = user.getRoles();
+			if (roles!=null){				
+				for (String role: roles) {
+					SimpleGrantedAuthority auth = new SimpleGrantedAuthority(role);
+					authorities.add(auth);
+				}
+			}
+		}
 		return authorities;
 	}
 

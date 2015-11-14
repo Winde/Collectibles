@@ -21,6 +21,10 @@ import web.supporting.error.exceptions.NotFoundException;
 
 public abstract class CollectiblesController {
 
+	private static final String headerForDisableHttpAuthPopup = "WWW-Authenticate";
+	private static final String headerValueForDisableHttpAuthPopup = "FormBased";
+	
+	
 	@ExceptionHandler(Exception.class)
 	@ResponseBody
 	public ErrorCode error(Exception ex,final HttpServletResponse response){
@@ -36,7 +40,7 @@ public abstract class CollectiblesController {
 		ex.printStackTrace();
 		ErrorCode errorCode = new ErrorCode(new GenericException());		
 		response.setStatus( HttpServletResponse.SC_FORBIDDEN  );
-		response.setHeader("WWW-Authenticate", "FormBased");
+		response.setHeader(headerForDisableHttpAuthPopup, headerValueForDisableHttpAuthPopup);
 		return errorCode;
 	}
 	
