@@ -79,8 +79,8 @@ public class Product extends SimpleIdDao{
 	@Column(name="is_goodreads_processed")
 	private Boolean isGoodreadsProcessed = null;		
 	
-	@ManyToMany(fetch=FetchType.LAZY,cascade = {CascadeType.MERGE})	
-	private Collection<Author> authors;
+	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.MERGE})
+	private Set<Author> authors;
 	
 	@Column(name="goodreads_related_link")
 	private String goodreadsRelatedLink;
@@ -222,11 +222,11 @@ public class Product extends SimpleIdDao{
 		this.amazonUrl = amazonUrl;
 	}
 	
-	public Collection<Author> getAuthors() {
+	public Set<Author> getAuthors() {
 		return authors;
 	}
 
-	public void setAuthors(Collection<Author> authors) {
+	public void setAuthors(Set<Author> authors) {
 		this.authors = authors;
 	}
 

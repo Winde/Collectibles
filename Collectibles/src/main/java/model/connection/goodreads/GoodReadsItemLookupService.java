@@ -3,7 +3,9 @@ package model.connection.goodreads;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import model.connection.ProductInfoLookupServiceXML;
 import model.connection.TooFastConnectionException;
@@ -74,8 +76,8 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 		return this.getField(doc, "/GoodreadsResponse/book/url");
 	}
 	
-	public Collection<Author> getAuthors(Document doc){
-		List<Author> authors = new ArrayList<>();
+	public Set<Author> getAuthors(Document doc){
+		Set<Author> authors = new HashSet<>();
 		NodeList authorNodes = this.getNodes(doc, "/GoodreadsResponse/book/authors/author");
 		if (authorNodes!=null && authorNodes.getLength()>0){
 			for (int i=0;i<authorNodes.getLength();i++){

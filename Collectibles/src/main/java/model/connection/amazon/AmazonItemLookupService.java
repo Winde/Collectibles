@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import model.connection.ProductInfoLookupServiceXML;
 import model.connection.TooFastConnectionException;
@@ -137,7 +138,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	}
 
 	@Override
-	public Collection<Author> getAuthors(Document doc)
+	public Set<Author> getAuthors(Document doc)
 			throws TooFastConnectionException {
 		return null;
 	}

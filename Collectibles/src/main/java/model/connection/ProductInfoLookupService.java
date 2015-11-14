@@ -3,6 +3,7 @@ package model.connection;
 import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import model.dataobjects.Author;
 
@@ -18,7 +19,7 @@ public interface ProductInfoLookupService<E> {
 	
 	public Integer getPublicationYear(E doc) throws TooFastConnectionException;
 	
-	public Collection<Author> getAuthors(E doc) throws TooFastConnectionException;
+	public Set<Author> getAuthors(E doc) throws TooFastConnectionException;
 	
 	public String getSeriesUrl(E doc) throws TooFastConnectionException;
 

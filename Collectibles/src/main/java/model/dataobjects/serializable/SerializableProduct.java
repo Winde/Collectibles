@@ -77,7 +77,7 @@ public class SerializableProduct {
 	private String goodreadsUrl = null;
 	
 	@JsonView(ProductComplexView.class)
-	private Collection<Author> authors;
+	private Set<Author> authors;
 	
 	@JsonView(ProductComplexView.class)
 	private String goodreadsRelatedLink;
@@ -240,11 +240,11 @@ public class SerializableProduct {
 		this.goodreadsUrl = goodreadsUrl;
 	}
 
-	public Collection<Author> getAuthors() {
+	public Set<Author> getAuthors() {
 		return authors;
 	}
 
-	public void setAuthors(Collection<Author> authors) {
+	public void setAuthors(Set<Author> authors) {
 		this.authors = authors;
 	}
 

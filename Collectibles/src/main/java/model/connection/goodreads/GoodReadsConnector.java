@@ -3,6 +3,7 @@ package model.connection.goodreads;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 import model.connection.AbstractProductInfoConnector;
 import model.connection.BackgroundProcessor;
@@ -33,7 +34,7 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 
 
 	@Override
-	protected boolean updateProductDo(Product product, Collection<Image> imagesAdd, Collection<Image> imagesRemove, Collection<Author> authorsAdd) throws TooFastConnectionException, FileNotFoundException{
+	protected boolean updateProductDo(Product product, Collection<Image> imagesAdd, Collection<Image> imagesRemove, Set<Author> authorsAdd) throws TooFastConnectionException, FileNotFoundException{
 		boolean result = true;
 		try {
 			result = super.updateProductDo(product, imagesAdd, imagesRemove,authorsAdd);

@@ -4,7 +4,9 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import model.dataobjects.Author;
 import model.dataobjects.Image;
@@ -48,7 +50,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 				try {
 					Collection<Image> imagesAdd = new ArrayList<>();
 					Collection<Image> imagesRemove = new ArrayList<>();
-					Collection<Author> authorsAdd = new ArrayList<>();
+					Set<Author> authorsAdd = new HashSet<>();
 					
 					Product productInDb = productRepository.findOne(product.getId());				
 					updated = updateProductDo(productInDb, imagesAdd, imagesRemove,authorsAdd);
@@ -82,7 +84,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	protected abstract void storeAfterSuccess(Product product, ProductRepository productRepository); 
 	
 	
-	protected boolean updateProductDo(Product product, Collection<Image> imagesAdd, Collection<Image> imagesRemove, Collection<Author> authorsAdd) throws TooFastConnectionException, FileNotFoundException{
+	protected boolean updateProductDo(Product product, Collection<Image> imagesAdd, Collection<Image> imagesRemove, Set<Author> authorsAdd) throws TooFastConnectionException, FileNotFoundException{
 		boolean processed = false;
 		ProductInfoLookupService itemLookup = this.getImageLookupService();		
 		
@@ -212,7 +214,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					}
 					
 					if (product.getAuthors()==null || product.getAuthors().size()==0){
-						Collection<Author> authors = null;
+						Set<Author> authors = null;
 						authors = itemLookup.getAuthors(doc);
 						System.out.println("Obtained authors :" + authors);
 						if (authors!=null && authors.size()>0){
