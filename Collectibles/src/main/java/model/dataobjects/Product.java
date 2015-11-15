@@ -72,6 +72,10 @@ public class Product extends SimpleIdDao{
 	@Column(name="goodreads_url")
 	private String goodreadsUrl = null;
 
+	@Column(name="drivethrurpg_url")
+	private String drivethrurpgUrl = null;
+
+	
 	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.MERGE})
 	private Set<Author> authors;
 	
@@ -237,6 +241,16 @@ public class Product extends SimpleIdDao{
 	public void setGoodreadsUrl(String goodreadsUrl) {
 		this.goodreadsUrl = goodreadsUrl;
 	}
+	
+	
+
+	public String getDrivethrurpgUrl() {
+		return drivethrurpgUrl;
+	}
+
+	public void setDrivethrurpgUrl(String drivethrurpgUrl) {
+		this.drivethrurpgUrl = drivethrurpgUrl;
+	}
 
 	public String toString(){
 		return "{" + this.getId() + " - " + this.getName() + " - " + this.getDescription() +"}";		
@@ -275,8 +289,8 @@ public class Product extends SimpleIdDao{
 		}
 	}
 
-	public synchronized void updateWithConnector(ProductInfoConnector connector) throws TooFastConnectionException {
-		connector.updateProductTransaction(this);
+	public synchronized boolean updateWithConnector(ProductInfoConnector connector) throws TooFastConnectionException {
+		return connector.updateProductTransaction(this);
 	}
 	
 }

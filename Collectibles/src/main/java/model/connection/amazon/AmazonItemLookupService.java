@@ -29,6 +29,7 @@ import java.util.Set;
 import model.connection.ProductInfoLookupServiceXML;
 import model.connection.TooFastConnectionException;
 import model.dataobjects.Author;
+import model.dataobjects.Product;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,8 +127,11 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
     }
 
 	@Override
-	public Document fetchDocFromId(String id) throws TooFastConnectionException, FileNotFoundException {
-		String url = this.getMultipleUseUrl(id);
+	public Document fetchDocFromProduct(Product product) throws TooFastConnectionException, FileNotFoundException {
+		if (product.getUniversalReference()==null){
+			return null;
+		}
+		String url = this.getMultipleUseUrl(product.getUniversalReference());
 		return this.fetchDocFromUrl(url);
 	}
 
@@ -151,6 +155,12 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 
 	@Override
 	public String getGoodReadsUrl(Document doc)
+			throws TooFastConnectionException {
+		return null;
+	}
+
+	@Override
+	public String getDrivethrurpgUrl(Document doc)
 			throws TooFastConnectionException {
 		return null;
 	}

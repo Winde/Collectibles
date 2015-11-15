@@ -43,13 +43,13 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	@Override	
 	public boolean updateProductTransaction(Product product) throws TooFastConnectionException{
 		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-		
+		AbstractProductInfoConnector connector = this;
 		boolean result = true; 		
 		result = transactionTemplate.execute(new TransactionCallback<Boolean>(){
 
 			@Override
 			public Boolean doInTransaction(TransactionStatus status) {
-				logger.info("Starting access to provider : " + this.getClass());
+				logger.info("Starting access to provider : " + connector.getIdentifier());
 				boolean updated = false;
 				try {
 					Collection<Image> imagesAdd = new ArrayList<>();
@@ -69,7 +69,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					updated = false;			
 				}
 				
-				logger.info("Finishing access to provider "+this.getClass()+", was updated?  : " + updated );
+				logger.info("Finishing access to provider "+ connector.getIdentifier()+", was updated?  : " + updated );
 				return updated;
 			}
 			
@@ -78,11 +78,11 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		return result;
 	}
 
-	
-	protected boolean checkIfWeProcess(Product product) {
+	public boolean checkIfAlreadyProcessed(Product product) {
 		return product!=null && (product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(this.getIdentifier()));
 	}
-		
+
+			
 	protected void storeAfterSuccess(Product product,ProductRepository productRepository) {
 		product.addConnector(this.getIdentifier());		
 		productRepository.save(product);		
@@ -94,13 +94,13 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		
 		logger.info("Checking if we have product universal reference");
 		
-		if (product.getUniversalReference()!=null){
+		if (this.isApplicable(product)){
 			logger.info("Product universal reference: " +product.getUniversalReference());
-			if (checkIfWeProcess(product)) {
+			if (this.checkIfAlreadyProcessed(product)) {
 			
 				logger.info("Starting process");
 				
-				Object doc = itemLookup.fetchDocFromId(product.getUniversalReference());
+				Object doc = itemLookup.fetchDocFromProduct(product);
 				
 				if (doc!=null){
 					
@@ -146,6 +146,17 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 							
 						if (goodreadsUrl!=null){
 							product.setGoodreadsUrl(goodreadsUrl);
+						}
+					}
+					
+					if (product.getDrivethrurpgUrl()==null){
+						String drivethrurpgUrl = null;
+						
+						drivethrurpgUrl = itemLookup.getDrivethrurpgUrl(doc);
+						logger.info("Obtained Url from Drivethrurpg: " + drivethrurpgUrl);
+							
+						if (drivethrurpgUrl!=null){
+							product.setDrivethrurpgUrl(drivethrurpgUrl);
 						}
 					}
 					
@@ -240,7 +251,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		}
 		return processed;
 	}
-	
+
 	@Override
 	public void processInBackground(Collection<Product> products){
 		

@@ -55,5 +55,10 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 		return "GoodReadsConnector";
 	}
 	
+	@Override
+	public boolean isApplicable(Product product) {
+		return product!=null && product.getUniversalReference()!=null;
+	}
+	
 	
 }

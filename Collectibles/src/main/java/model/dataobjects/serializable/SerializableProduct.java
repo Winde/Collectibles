@@ -77,6 +77,10 @@ public class SerializableProduct {
 	private String goodreadsUrl = null;
 	
 	@JsonView(ProductComplexView.class)
+	private String drivethrurpgUrl = null;
+
+	
+	@JsonView(ProductComplexView.class)
 	private Set<Author> authors;
 	
 	@JsonView(ProductComplexView.class)
@@ -275,6 +279,14 @@ public class SerializableProduct {
 
 	public void setProcessedConnectors(Collection<String> processedConnectors) {
 		this.processedConnectors = processedConnectors;
+	}
+
+	public String getDrivethrurpgUrl() {
+		return drivethrurpgUrl;
+	}
+
+	public void setDrivethrurpgUrl(String drivethrurpgUrl) {
+		this.drivethrurpgUrl = drivethrurpgUrl;
 	}
 
 	public Product deserializeProduct(){

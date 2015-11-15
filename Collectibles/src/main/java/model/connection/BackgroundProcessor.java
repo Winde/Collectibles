@@ -46,8 +46,8 @@ public class BackgroundProcessor extends Thread{
 		return this.products;
 	}
 		
-	protected void doOne(Product product) throws TooFastConnectionException{
-		product.updateWithConnector(getConnector());
+	protected boolean  doOne(Product product) throws TooFastConnectionException{
+		return product.updateWithConnector(getConnector());
 		//getConnector().updateProductTransaction(product, getProductRepository(), getImageRepository(), getAuthorRepository());				
 	}
 	
@@ -68,8 +68,11 @@ public class BackgroundProcessor extends Thread{
 			    	Product product = iterator.next();    	
 				   	
 			    	try {
-			    		doOne(product);
-			    		Thread.sleep(1400);
+			    		
+			    		boolean updated = doOne(product);
+		    			if (updated){
+		    				Thread.sleep(1400);
+		    			}
 			    	}catch(TooFastConnectionException ex){
 			    		try {
 							Thread.sleep(2500);

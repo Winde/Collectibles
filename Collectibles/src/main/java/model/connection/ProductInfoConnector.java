@@ -21,4 +21,8 @@ public interface ProductInfoConnector {
 	public boolean updateProductTransaction(Product product) throws TooFastConnectionException;
 
 	public String getIdentifier();
+	
+	public boolean isApplicable(Product product);
+	
+	public boolean checkIfAlreadyProcessed(Product product);
 }

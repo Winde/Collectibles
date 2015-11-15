@@ -44,9 +44,16 @@
 			<div class="row providerLinksBlock">
 				<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.amazonUrl">
 					<a ng-if="product.amazonUrl" class="btn btn-block btn-lg btn-amazon" ng-href="{{product.amazonUrl}}">
-						<i class="fa fa-amazon"></i> amazon
+						<i class="fa fa-amazon"></i> Amazon
 					</a>
 				</div>
+				<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.amazonUrl">
+					<a ng-if="product.drivethrurpgUrl" class="btn btn-block btn-lg btn-yelp" ng-href="{{product.drivethrurpgUrl}}">
+						DriveThruRPG
+					</a>
+				</div>
+				
+				
 				<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.goodreadsUrl">
 					<a ng-if="product.goodreadsUrl" class="btn btn-block btn-lg btn-android" ng-href="{{product.goodreadsUrl}}">
 						<span style="font-family:helvetica;">g</span> Goodreads
@@ -57,6 +64,7 @@
 						<span style="font-family:helvetica;">g</span> Related items
 					</a>
 				</div>
+				
 			</div>
 		</div>
 	

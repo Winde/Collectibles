@@ -1,4 +1,4 @@
-package model.connection.amazon;
+package model.connection.drivethrurpg;
 
 import model.connection.AbstractProductInfoConnector;
 import model.connection.ProductInfoLookupService;
@@ -8,29 +8,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AmazonConnector extends AbstractProductInfoConnector {
+public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 
-	private static final String IDENTIFIER = "Amazon";
-	
+	private static final String IDENTIFIER = "DrivethruRPG";
+
 	@Autowired
-	private AmazonItemLookupService itemLookup;
+	private DrivethrurpgItemLookupService itemLookup;
 	
 	public ProductInfoLookupService getImageLookupService(){
 		return itemLookup;
 	}
-
+	
 	@Override
 	public String getIdentifier() {
+		// TODO Auto-generated method stub
 		return IDENTIFIER;
 	}
+	
 
 	public String toString(){
-		return "AmazonConnector";
+		return "GoodReadsConnector";
 	}
 
 	@Override
 	public boolean isApplicable(Product product) {
-		return product!=null && product.getUniversalReference()!=null;
+		return product!=null && product.getName()!=null;
 	}
-
+	
 }

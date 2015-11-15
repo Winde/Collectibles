@@ -413,6 +413,27 @@ public class ProductController  extends CollectiblesController{
 		
 	}
 	
+	@Secured(value = { "ROLE_ADMIN" })
+	@RequestMapping(value="/product/reprocess/", method = RequestMethod.POST)
+	public Boolean reProcess(){
+		
+		List<Product> products = productRepository.findAll();
+		Map<String, ProductInfoConnector> connectors = connectorFactory.getConnectors();
+		logger.info("Connectors: " + connectors);
+		if (connectors!=null) {
+			Iterator<Entry<String, ProductInfoConnector>> iterator = connectors.entrySet().iterator();
+			while (iterator.hasNext()){
+				Entry<String, ProductInfoConnector> entry = iterator.next();
+				ProductInfoConnector connector = entry.getValue();
+				if (connector!=null){
+					connector.processInBackground(products);
+				}
+			}				
+		}
+
+		return Boolean.TRUE;
+	}
+	
 	private List<String> validateImages(MultipartFile[] files){
 		List<String> errors = new ArrayList<>();
 		if (files==null || files.length<=0){
