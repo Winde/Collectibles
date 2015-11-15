@@ -77,12 +77,14 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	}
 
 	
-	
-	
-	protected abstract boolean checkIfWeProcess(Product product);
-	
-	protected abstract void storeAfterSuccess(Product product, ProductRepository productRepository); 
-	
+	protected boolean checkIfWeProcess(Product product) {
+		return product!=null && (product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(this.getIdentifier()));
+	}
+		
+	protected void storeAfterSuccess(Product product,ProductRepository productRepository) {
+		product.addConnector(this.getIdentifier());		
+		productRepository.save(product);		
+	}
 	
 	protected boolean updateProductDo(Product product, Collection<Image> imagesAdd, Collection<Image> imagesRemove, Set<Author> authorsAdd) throws TooFastConnectionException, FileNotFoundException{
 		boolean processed = false;

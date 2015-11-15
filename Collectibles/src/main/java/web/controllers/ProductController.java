@@ -8,8 +8,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import model.connection.ProductInfoConnector;
+import model.connection.ProductInfoConnectorFactory;
+import model.connection.TooFastConnectionException;
 import model.connection.amazon.AmazonConnector;
 import model.connection.goodreads.GoodReadsConnector;
 import model.dataobjects.Category;
@@ -69,10 +75,7 @@ public class ProductController  extends CollectiblesController{
 	private UserRepository userRepository;
 
 	@Autowired
-	private AmazonConnector amazonConnector;
-	
-	@Autowired
-	private GoodReadsConnector goodReadsConnector;
+	private ProductInfoConnectorFactory connectorFactory;
 	
 	
 	
@@ -88,24 +91,27 @@ public class ProductController  extends CollectiblesController{
 				throw new NotFoundException();
 			}
 			
-			System.out.println("Is Amazon Processed? "+ product.getIsAmazonProcessed());
-			if (product.getIsAmazonProcessed()==null || product.getIsAmazonProcessed().equals(Boolean.FALSE)){
-				try{
-					amazonConnector.updateProductTransaction(product);
-				}catch (Exception ex){
-					ex.printStackTrace();
-				}
-			}	
-			
-			
-			System.out.println("Is GoodReads Processed? "+product.getIsGoodreadsProcessed());
-			if (product.getIsGoodreadsProcessed()==null || product.getIsGoodreadsProcessed().equals(Boolean.FALSE)){
-				try {
-					goodReadsConnector.updateProductTransaction(product);
-				}catch (Exception ex){
-					ex.printStackTrace();
-				}
+			Map<String, ProductInfoConnector> connectors = connectorFactory.getConnectors();
+			if (connectors!=null) {
+				System.out.println("Connectors: " + connectors);
+				Iterator<Entry<String, ProductInfoConnector>> iterator = connectors.entrySet().iterator();
+				while (iterator.hasNext()){
+					Entry<String, ProductInfoConnector> entry = iterator.next();
+					System.out.println("Is "+entry.getKey()+" Processed? "+ (!(product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(entry.getKey()))));
+					if (product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(entry.getKey())){
+						ProductInfoConnector connector = entry.getValue();
+						if (connector!=null){
+							try {
+								connector.updateProductTransaction(product);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				}				
 			}
+			
+			
 			
 			return SerializableProduct.cloneProduct(product);			
 		}
@@ -167,10 +173,18 @@ public class ProductController  extends CollectiblesController{
 																		
 						//productRepository.saveWithImages(products,images);
 						productRepository.save(products);
-												
-						amazonConnector.processInBackground(products);
-						
-						goodReadsConnector.processInBackground(products);
+									
+						Map<String, ProductInfoConnector> connectors = connectorFactory.getConnectors();
+						if (connectors!=null) {
+							Iterator<Entry<String, ProductInfoConnector>> iterator = connectors.entrySet().iterator();
+							while (iterator.hasNext()){
+								Entry<String, ProductInfoConnector> entry = iterator.next();
+								ProductInfoConnector connector = entry.getValue();
+								if (connector!=null){
+									connector.processInBackground(products);
+								}
+							}				
+						}
 						
 						return SerializableProduct.cloneProduct(products);
 					} catch (IOException e) {
@@ -287,9 +301,9 @@ public class ProductController  extends CollectiblesController{
 				} 	
 				
 				if (product.getUniversalReference()!=null && !product.getUniversalReference().equals(productInDb.getUniversalReference())){
-					product.setIsAmazonProcessed(Boolean.FALSE);
-					product.setIsGoodreadsProcessed(Boolean.FALSE);
-					
+					if (product.getProcessedConnectors()!=null){
+						product.getProcessedConnectors().clear();
+					}
 				}
 				product.setOwners(productInDb.getOwners());
 				product.setAuthors(productInDb.getAuthors());								

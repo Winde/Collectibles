@@ -12,24 +12,25 @@
 					ngf-select="productChangeCtrl.uploadImage($file)" >Upload</span></div>
 	</div>
 				
+	<!-- 			
 	<div class="form-group" ng-if="product.id">
 		<label>Reset processing for next load</label>	
 						
 		<button type="button" 
 					class="btn btn-default" 
-					ng-model="product.isAmazonProcessed" 
+					ng-model="product.connectorsMap['Amazon']" 
 					uib-btn-checkbox 
 					btn-checkbox-true="true" 
 					btn-checkbox-false="false">Amazon Processed</button>									
 	
 		<button type="button" 
 					class="btn btn-default" 
-					ng-model="product.isGoodreadsProcessed" 
+					ng-model="product.connectorsMap['Goodreads']" 
 					uib-btn-checkbox 
 					btn-checkbox-true="true" 
 					btn-checkbox-false="false">Goodreads Processed</button>					
 	</div>
-	
+	 -->
 	
 	<div class="form-group">	
 		<label>Hierarchy</label>	<!-- selectpicker  -->	

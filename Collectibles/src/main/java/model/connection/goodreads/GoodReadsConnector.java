@@ -23,6 +23,8 @@ import org.w3c.dom.Document;
 @Component
 public class GoodReadsConnector extends AbstractProductInfoConnector{
 
+	private static final String IDENTIFIER = "Goodreads";
+	
 	@Autowired 
 	private GoodReadsItemLookupService lookUpService;
 	
@@ -30,8 +32,6 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 	public ProductInfoLookupService getImageLookupService(){
 		return lookUpService;
 	}
-
-
 
 	@Override
 	protected boolean updateProductDo(Product product, Collection<Image> imagesAdd, Collection<Image> imagesRemove, Set<Author> authorsAdd) throws TooFastConnectionException, FileNotFoundException{
@@ -47,18 +47,13 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 	}
 	
 	@Override
-	protected boolean checkIfWeProcess(Product product) {
-		return product!=null && (product.getIsGoodreadsProcessed()==null || !product.getIsGoodreadsProcessed());
+	public String getIdentifier() {
+		return IDENTIFIER;
 	}
 
-	@Override
-	protected void storeAfterSuccess(Product product,
-			ProductRepository productRepository) {
-		product.setIsGoodreadsProcessed(Boolean.TRUE);
-		productRepository.save(product);	
+	public String toString(){
+		return "GoodReadsConnector";
 	}
-
-
 	
 	
 }

@@ -18,24 +18,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class AmazonConnector extends AbstractProductInfoConnector {
 
+	private static final String IDENTIFIER = "Amazon";
+	
 	@Autowired
 	private AmazonItemLookupService itemLookup;
 	
 	public ProductInfoLookupService getImageLookupService(){
 		return itemLookup;
 	}
-	
-	@Override
-	protected boolean checkIfWeProcess(Product product) {
-		return product!=null && (product.getIsAmazonProcessed()==null || !product.getIsAmazonProcessed());
-	}
 
 	@Override
-	protected void storeAfterSuccess(Product product,
-			ProductRepository productRepository) {
-		product.setIsAmazonProcessed(Boolean.TRUE);
-		productRepository.save(product);		
+	public String getIdentifier() {
+		return IDENTIFIER;
 	}
 
+	public String toString(){
+		return "AmazonConnector";
+	}
 
 }

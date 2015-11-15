@@ -20,5 +20,5 @@ public interface ProductInfoConnector {
 	@Transactional
 	public boolean updateProductTransaction(Product product) throws TooFastConnectionException;
 
-	
+	public String getIdentifier();
 }

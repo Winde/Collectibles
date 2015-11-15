@@ -71,14 +71,7 @@ public class Product extends SimpleIdDao{
 	
 	@Column(name="goodreads_url")
 	private String goodreadsUrl = null;
-	
-	
-	@Column(name="is_amazon_processed")
-	private Boolean isAmazonProcessed = null;
-	
-	@Column(name="is_goodreads_processed")
-	private Boolean isGoodreadsProcessed = null;		
-	
+
 	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.MERGE})
 	private Set<Author> authors;
 	
@@ -87,6 +80,11 @@ public class Product extends SimpleIdDao{
 	
 	@Column(name="publisher")
 	private String publisher;
+	
+	@ElementCollection(fetch = FetchType.LAZY)
+	@CollectionTable(name="processed_connectors", joinColumns=@JoinColumn(name="id"))
+	@Column(name="connector")	
+	private Collection<String> processedConnectors;
 	
 	public Product(){}
 
@@ -195,21 +193,15 @@ public class Product extends SimpleIdDao{
 		}
 	}
 
-	public Boolean getIsAmazonProcessed() {
-		return isAmazonProcessed;
-	}
-
-	public void setIsAmazonProcessed(Boolean isAmazonProcessed) {
-		this.isAmazonProcessed = isAmazonProcessed;
-	}
-
 	public String getUniversalReference() {
 		return universalReference;
 	}
 
 	public void setUniversalReference(String universalReference) {
 		if (this.getUniversalReference()!=null && !this.getUniversalReference().equals(universalReference)){
-			this.setIsAmazonProcessed(isAmazonProcessed);
+			if (this.getProcessedConnectors()!=null){
+				this.getProcessedConnectors().clear();
+			}
 		}
 		this.universalReference = universalReference;
 	}
@@ -238,14 +230,6 @@ public class Product extends SimpleIdDao{
 		this.goodreadsRelatedLink = goodreadsRelatedLink;
 	}
 
-	public Boolean getIsGoodreadsProcessed() {
-		return isGoodreadsProcessed;
-	}
-
-	public void setIsGoodreadsProcessed(Boolean isGoodreadsProcessed) {
-		this.isGoodreadsProcessed = isGoodreadsProcessed;
-	}
-
 	public String getGoodreadsUrl() {
 		return goodreadsUrl;
 	}
@@ -264,6 +248,21 @@ public class Product extends SimpleIdDao{
 
 	public void setPublisher(String publisher) {
 		this.publisher = publisher;
+	}
+
+	public void addConnector(String connector){
+		if (this.getProcessedConnectors()==null){
+			this.setProcessedConnectors(new ArrayList<>());
+		}
+		this.getProcessedConnectors().add(connector);
+	}
+	
+	public Collection<String> getProcessedConnectors() {		
+		return processedConnectors;
+	}
+
+	public void setProcessedConnectors(Collection<String> processedConnectors) {
+		this.processedConnectors = processedConnectors;
 	}
 
 	public boolean isLengthyDescription() {

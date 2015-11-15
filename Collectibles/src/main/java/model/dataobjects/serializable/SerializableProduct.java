@@ -86,10 +86,7 @@ public class SerializableProduct {
 	private String publisher;
 	
 	@JsonView(ProductComplexView.class)
-	private Boolean isAmazonProcessed = null;
-	
-	@JsonView(ProductComplexView.class)
-	private Boolean isGoodreadsProcessed = null;		
+	private Collection<String> processedConnectors;
 	
 	
 	@JsonIgnore
@@ -271,21 +268,13 @@ public class SerializableProduct {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	
-	public Boolean getIsAmazonProcessed() {
-		return isAmazonProcessed;
+
+	public Collection<String> getProcessedConnectors() {
+		return processedConnectors;
 	}
 
-	public void setIsAmazonProcessed(Boolean isAmazonProcessed) {
-		this.isAmazonProcessed = isAmazonProcessed;
-	}
-
-	public Boolean getIsGoodreadsProcessed() {
-		return isGoodreadsProcessed;
-	}
-
-	public void setIsGoodreadsProcessed(Boolean isGoodreadsProcessed) {
-		this.isGoodreadsProcessed = isGoodreadsProcessed;
+	public void setProcessedConnectors(Collection<String> processedConnectors) {
+		this.processedConnectors = processedConnectors;
 	}
 
 	public Product deserializeProduct(){
