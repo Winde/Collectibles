@@ -47,6 +47,10 @@
 	margin-top: 15px;
 }
 
+.product .authorsBlock .authorContainer {
+	min-height: 200px;
+} 
+
 
 .bootstrap-select .root {
 	padding-left: 20px;
