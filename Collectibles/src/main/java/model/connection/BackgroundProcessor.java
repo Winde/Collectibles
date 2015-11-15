@@ -8,8 +8,13 @@ import model.persistence.AuthorRepository;
 import model.persistence.ImageRepository;
 import model.persistence.ProductRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class BackgroundProcessor extends Thread{
 
+	private static final Logger logger = LoggerFactory.getLogger(BackgroundProcessor.class);
+		
 	private ProductRepository productRepository = null;
 	private ImageRepository imageRepository = null;
 	private AuthorRepository authorRepository = null;
@@ -54,7 +59,7 @@ public class BackgroundProcessor extends Thread{
 
 	public void run(){
 				
-		System.out.println("Background Process Started");
+		logger.info("Background Process Started");
 		Collection<Product> products = getProducts();
 		if (products!=null){
 		    Iterator<Product> iterator = getProducts().iterator();
@@ -79,7 +84,7 @@ public class BackgroundProcessor extends Thread{
 			    }	 
 		    }
 		}
-	    System.out.println("Background Process Finished");
+		logger.info("Background Process Finished");
 		
 	}
 	 

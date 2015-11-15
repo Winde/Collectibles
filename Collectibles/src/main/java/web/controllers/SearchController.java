@@ -2,7 +2,6 @@ package web.controllers;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Product;
-import model.dataobjects.User;
 import model.dataobjects.serializable.SerializableProduct;
 import model.dataobjects.serializable.SerializableProduct.ProductListView;
 import model.dataobjects.supporting.ObjectList;
@@ -18,9 +16,9 @@ import model.persistence.HierarchyRepository;
 import model.persistence.ProductRepository;
 import model.persistence.queryParameters.ProductSearch;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +33,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 @RestController
 public class SearchController  extends CollectiblesController{
 
+	private static final Logger logger = LoggerFactory.getLogger(SearchController.class);
+		
 	@Autowired
 	private ProductRepository productRepository;
 	
@@ -126,9 +126,9 @@ public class SearchController  extends CollectiblesController{
 			
 			ObjectList<SerializableProduct> result = null;
 
-			System.out.println("Result: " + resultFromDB);
+			logger.info("Result: " + resultFromDB);
 			if (resultFromDB!=null && resultFromDB.getObjects()!=null) {
-				System.out.println("Result objects number: " + resultFromDB.getObjects().size());
+				logger.info("Result objects number: " + resultFromDB.getObjects().size());
 				result = new ObjectList<>();
 				result.setHasNext(resultFromDB.getHasNext());
 				result.setMaxResults(resultFromDB.getMaxResults());				

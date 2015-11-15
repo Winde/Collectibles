@@ -15,9 +15,6 @@ import java.util.Map.Entry;
 
 import model.connection.ProductInfoConnector;
 import model.connection.ProductInfoConnectorFactory;
-import model.connection.TooFastConnectionException;
-import model.connection.amazon.AmazonConnector;
-import model.connection.goodreads.GoodReadsConnector;
 import model.dataobjects.Category;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
@@ -35,6 +32,8 @@ import model.persistence.UserRepository;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.annotation.Secured;
@@ -56,6 +55,8 @@ import web.supporting.error.exceptions.NotFoundException;
 @RestController
 public class ProductController  extends CollectiblesController{
 
+	private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+	
 	@Autowired
 	private ProductRepository productRepository;
 
@@ -93,11 +94,11 @@ public class ProductController  extends CollectiblesController{
 			
 			Map<String, ProductInfoConnector> connectors = connectorFactory.getConnectors();
 			if (connectors!=null) {
-				System.out.println("Connectors: " + connectors);
+				logger.info("Connectors: " + connectors);
 				Iterator<Entry<String, ProductInfoConnector>> iterator = connectors.entrySet().iterator();
 				while (iterator.hasNext()){
 					Entry<String, ProductInfoConnector> entry = iterator.next();
-					System.out.println("Is "+entry.getKey()+" Processed? "+ (!(product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(entry.getKey()))));
+					logger.info("Is "+entry.getKey()+" Processed? "+ (!(product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(entry.getKey()))));
 					if (product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(entry.getKey())){
 						ProductInfoConnector connector = entry.getValue();
 						if (connector!=null){
@@ -173,8 +174,10 @@ public class ProductController  extends CollectiblesController{
 																		
 						//productRepository.saveWithImages(products,images);
 						productRepository.save(products);
-									
+								
+						
 						Map<String, ProductInfoConnector> connectors = connectorFactory.getConnectors();
+						logger.info("Connectors: " + connectors);
 						if (connectors!=null) {
 							Iterator<Entry<String, ProductInfoConnector>> iterator = connectors.entrySet().iterator();
 							while (iterator.hasNext()){

@@ -22,9 +22,7 @@
 package model.connection.amazon;
 
 import java.io.FileNotFoundException;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,16 +30,19 @@ import model.connection.ProductInfoLookupServiceXML;
 import model.connection.TooFastConnectionException;
 import model.dataobjects.Author;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 @Service
 public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 
+	private static final Logger logger = LoggerFactory.getLogger(AmazonItemLookupService.class);
+	
+	
     private String AWS_ACCESS_KEY_ID = null;
     private String AWS_SECRET_KEY = null;
     private String ENDPOINT = null;
@@ -94,7 +95,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
     
     public String getMultipleUseUrl(String id) throws TooFastConnectionException {
     	String url = getUrl("AWSECommerceService","ItemLookup","Large",id);
-    	System.out.println("Amazon url for fetch data: " + url);
+    	logger.info("Amazon url for fetch data: " + url);
     	return url;
     }
 

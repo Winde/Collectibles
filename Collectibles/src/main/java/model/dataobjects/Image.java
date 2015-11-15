@@ -11,10 +11,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.imgscalr.Scalr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -22,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 @Entity(name="Image")
 public class Image extends SimpleIdDao{
 
+	private static final Logger logger = LoggerFactory.getLogger(Image.class);	
+	
 	private static final int thumbSize = 125;
 	
 	public interface ImageSimpleView{};
@@ -127,7 +130,7 @@ public class Image extends SimpleIdDao{
 	}
 	
 	private void createThumb(BufferedImage bimg) throws IOException {
-		System.out.println("*******GENERATING THUMBNAIL***********");
+		logger.info("GENERATING THUMBNAIL");
 		BufferedImage thumb = Scalr.resize(bimg,  Scalr.Method.BALANCED, thumbSize);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ImageIO.write( thumb, "jpg", baos );

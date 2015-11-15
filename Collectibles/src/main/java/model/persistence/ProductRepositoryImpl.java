@@ -9,18 +9,20 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
-
-import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
 import model.dataobjects.supporting.ObjectList;
 import model.persistence.queryParameters.ProductSearch;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 public class ProductRepositoryImpl implements ProductRepositoryCustom{
 
+	private static final Logger logger = LoggerFactory.getLogger(ProductRepositoryImpl.class);		
+	
 	@Autowired
 	private ImageRepository imageRepository;
 	
@@ -164,14 +166,14 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		
 		if (search.getMaxResults()!=null && search.getPage()!=null) {
 			
-			System.out.println("Obtaining results - Max results: " + search.getMaxResults());
-			System.out.println("Obtaining results - Starting in : " + search.getPage()*search.getMaxResults());
+			logger.info("Obtaining results - Max results: " + search.getMaxResults());
+			logger.info("Obtaining results - Starting in : " + search.getPage()*search.getMaxResults());
 			
 			query.setMaxResults(search.getMaxResults()+1);
 			query.setFirstResult(search.getPage()*search.getMaxResults());
 			
 		} else {
-			System.out.println("Skipping setting paginated results");
+			logger.info("Skipping setting paginated results");
 		}
 
 		List<Product> listFromDB = query.getResultList();
@@ -185,7 +187,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		
 		result.addAll(listFromDB);
 		
-		System.out.println("Obtained "+ result.size() + " products");
+		logger.info("Obtained "+ result.size() + " products");
 		
 		wrapper.setObjects(result);
 		if (search.getMaxResults()!=null && search.getPage()!=null) {

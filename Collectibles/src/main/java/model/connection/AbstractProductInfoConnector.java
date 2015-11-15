@@ -15,6 +15,8 @@ import model.persistence.AuthorRepository;
 import model.persistence.ImageRepository;
 import model.persistence.ProductRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -23,6 +25,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public abstract class AbstractProductInfoConnector implements ProductInfoConnector{
 
+	private static final Logger logger = LoggerFactory.getLogger(AbstractProductInfoConnector.class);
+		
 	@Autowired
 	PlatformTransactionManager transactionManager;
 	
@@ -45,7 +49,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 
 			@Override
 			public Boolean doInTransaction(TransactionStatus status) {
-				System.out.println("Starting access to provider : " + this.getClass());
+				logger.info("Starting access to provider : " + this.getClass());
 				boolean updated = false;
 				try {
 					Collection<Image> imagesAdd = new ArrayList<>();
@@ -55,9 +59,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					Product productInDb = productRepository.findOne(product.getId());				
 					updated = updateProductDo(productInDb, imagesAdd, imagesRemove,authorsAdd);
 					if (updated){	
-						//System.out.println("Removing images");
-						//System.out.println(imagesRemove);				
-						System.out.println("Saving product");
+						logger.info("Saving product");
 						productRepository.save(productInDb);
 						imageRepository.delete(imagesRemove);
 						storeAfterSuccess(productInDb,productRepository);
@@ -67,7 +69,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					updated = false;			
 				}
 				
-				System.out.println("Finishing access to provider "+this.getClass()+", was updated?  : " + updated );
+				logger.info("Finishing access to provider "+this.getClass()+", was updated?  : " + updated );
 				return updated;
 			}
 			
@@ -90,13 +92,13 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		boolean processed = false;
 		ProductInfoLookupService itemLookup = this.getImageLookupService();		
 		
-		System.out.println("Checking if we have product universal reference");
+		logger.info("Checking if we have product universal reference");
 		
 		if (product.getUniversalReference()!=null){
-			System.out.println("Product universal reference: " +product.getUniversalReference());
+			logger.info("Product universal reference: " +product.getUniversalReference());
 			if (checkIfWeProcess(product)) {
 			
-				System.out.println("Starting process");
+				logger.info("Starting process");
 				
 				Object doc = itemLookup.fetchDocFromId(product.getUniversalReference());
 				
@@ -105,7 +107,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					String obtainedDescription = null;
 					
 					obtainedDescription = itemLookup.getDescription(doc);
-					System.out.println("Obtained Description from Service: " + obtainedDescription);
+					logger.info("Obtained Description from Service: " + obtainedDescription);
 					if (obtainedDescription!=null){
 						boolean overwrite = true;
 						String oldDescription = product.getDescription();
@@ -119,7 +121,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						if (overwrite 
 								&& product.getDescription()!=null 
 								&& product.getDescription().length()<obtainedDescription.length()){
-							System.out.println("Description is lengthier, replacing");
+							logger.info("Description is lengthier, replacing");
 							product.setDescription(obtainedDescription);
 						}							
 					}				
@@ -129,7 +131,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						String amazonUrl = null;
 						
 						amazonUrl = itemLookup.getAmazonUrl(doc);
-						System.out.println("Obtained Url from Amazon: " + amazonUrl);
+						logger.info("Obtained Url from Amazon: " + amazonUrl);
 							
 						if (amazonUrl!=null){
 							product.setAmazonUrl(amazonUrl);
@@ -140,7 +142,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						String goodreadsUrl = null;
 						
 						goodreadsUrl = itemLookup.getGoodReadsUrl(doc);
-						System.out.println("Obtained Url from Goodreads: " + goodreadsUrl);
+						logger.info("Obtained Url from Goodreads: " + goodreadsUrl);
 							
 						if (goodreadsUrl!=null){
 							product.setGoodreadsUrl(goodreadsUrl);
@@ -151,7 +153,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						String publisher = null;
 						
 						publisher = itemLookup.getPublisher(doc);
-						System.out.println("Obtained publisher: " + publisher);
+						logger.info("Obtained publisher: " + publisher);
 							
 						if (publisher!=null && !"".equals(publisher.trim())){
 							product.setPublisher(publisher);
@@ -178,11 +180,11 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						
 						if (executeChange){
 							if (product.getImages()!=null && product.getImages().size()>0){
-								System.out.println("Substituting images: " + product.getImages());
+								logger.info("Substituting images: " + product.getImages());
 								imagesRemove.addAll(product.getImages());
 							}						
 														
-							System.out.println("Obtained image from: " + this.getClass() );
+							logger.info("Obtained image from: " + this.getClass() );
 							List<Image> images = new ArrayList<>();
 							images.add(newImage);
 							imagesAdd.add(newImage);
@@ -193,7 +195,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					if (product.getReleaseDate()==null){
 						Integer year = null;
 						year = itemLookup.getPublicationYear(doc);
-						System.out.println("Obtained publication year :" + year);
+						logger.info("Obtained publication year :" + year);
 						if (year!=null){
 							Calendar calendar = Calendar.getInstance();
 							calendar.set(Calendar.HOUR, 0);
@@ -209,7 +211,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					if (product.getGoodreadsRelatedLink()==null){
 						String seriesUrl = null;
 						seriesUrl = itemLookup.getSeriesUrl(doc);
-						System.out.println("Obtained series url :" + seriesUrl);
+						logger.info("Obtained series url :" + seriesUrl);
 						if (seriesUrl!=null){
 							product.setGoodreadsRelatedLink(seriesUrl);
 						}
@@ -218,9 +220,9 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					if (product.getAuthors()==null || product.getAuthors().size()==0){
 						Set<Author> authors = null;
 						authors = itemLookup.getAuthors(doc);
-						System.out.println("Obtained authors :" + authors);
+						logger.info("Obtained authors :" + authors);
 						if (authors!=null && authors.size()>0){
-							System.out.println("Obtained " + authors.size() + " authors");
+							logger.info("Obtained " + authors.size() + " authors");
 							product.setAuthors(authors);
 							authorsAdd.addAll(authors);
 						}
@@ -229,12 +231,12 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 				}
 				processed = true;
 			} else {
-				System.out.println("Skipping process, product already processed");
+				logger.info("Skipping process, product already processed");
 			}
 			
 						
 		} else {
-			System.out.println("NO Product universal reference");
+			logger.info("NO Product universal reference");
 		}
 		return processed;
 	}

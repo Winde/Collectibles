@@ -14,9 +14,13 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TokenHandler {
 
+	private static final Logger logger = LoggerFactory.getLogger(TokenHandler.class);
+		
 	private static final String CIPHER_NAME = "AES/ECB/PKCS5Padding";
 	private static final String KEY_CIPHER = "AES";
 	private static final String HMAC_ALGO = "HmacSHA256";
@@ -117,16 +121,17 @@ public class TokenHandler {
 					final UserDetailsImpl user = UserDetailsImpl.fromJSON(json);
 					
 					if (user!=null && new Date().getTime() < user.getExpires()) {
-						System.out.println("User is valid, still valid for " + ((user.getExpires() -new Date().getTime() )/1000) + " seconds");						
+						logger.info("User is valid, still valid for " + ((user.getExpires() -new Date().getTime() )/1000) + " seconds");						
 						return user;
 					} else {
-						System.out.println("User is null?: " + user==null );
-						System.out.println("CurrentTime: " + new Date().getTime() );
-						System.out.println("ExpirationTime: " +  user.getExpires());
-						System.out.println("User is expired");
+						logger.info("Token was: " + token);
+						logger.info("User is null?: " + (user==null) );
+						logger.info("CurrentTime: " + new Date().getTime() );
+						logger.info("ExpirationTime: " +  user.getExpires());
+						logger.info("User is expired");
 					}
 				} else{
-					System.out.println("Invalid hash received");
+					logger.info("Invalid hash received");
 				}
 			} catch (IllegalArgumentException e) {
 				//log tampering attempt here

@@ -8,6 +8,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter{
 
+	private static final Logger logger = LoggerFactory.getLogger(StatelessLoginFilter.class);
+	 	
 	private UserDetailsServiceImpl userDetailsService = null;
 	private TokenAuthenticationService tokenAuthenticationService = null;
 
@@ -38,14 +42,14 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException, IOException, ServletException {
 
-		System.out.println("Obtaining Login Authentication");
+		logger.info("Obtaining Login Authentication");		
 		
 		String username = request.getParameter("username"); 
 		String password = request.getParameter("password");
 		
 		final UsernamePasswordAuthenticationToken loginToken = new UsernamePasswordAuthenticationToken(username,password);
         
-		System.out.println("Obtained LoginToken");
+		logger.info("Obtained LoginToken");		
 		
 		return getAuthenticationManager().authenticate(loginToken);
     }
@@ -55,12 +59,12 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 			FilterChain chain, Authentication authentication) throws IOException, ServletException {
 
 
-		System.out.println("Succesful Login Authentication");
+		logger.info("Succesful Login Authentication");
 		
 		final UserDetailsImpl authenticatedUser = userDetailsService.loadUserByUsername(authentication.getName());
 		final UserAuthentication userAuthentication = new UserAuthentication(authenticatedUser);
 
-		System.out.println("Adding token");
+		logger.info("Adding token");
 		
 		tokenAuthenticationService.addAuthentication(response, userAuthentication);
 		SecurityContextHolder.getContext().setAuthentication(userAuthentication);

@@ -1,16 +1,15 @@
 package model.connection.goodreads;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import model.connection.ProductInfoLookupServiceXML;
 import model.connection.TooFastConnectionException;
 import model.dataobjects.Author;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,6 +22,8 @@ import org.w3c.dom.NodeList;
 @Service
 public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 
+	private static final Logger logger = LoggerFactory.getLogger(GoodReadsItemLookupService.class);
+		
 	private String key = null;
 	private String entryPointQueryOne = null;
 	private String baseUrlSeries = null;
@@ -39,7 +40,7 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	
 	public String getLookupUrl(String id){
 		String url = entryPointQueryOne + "?isbn="+id+"&key="+key;
-		System.out.println("Goodreads url for fetch data: " + url);
+		logger.info("Goodreads url for fetch data: " + url);
 		return url;
 	}
 			
