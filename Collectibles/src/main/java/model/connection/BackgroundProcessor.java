@@ -61,18 +61,26 @@ public class BackgroundProcessor extends Thread{
 				
 		logger.info("Background Process Started");
 		Collection<Product> products = getProducts();
-		if (products!=null){
+		if (products!=null && connector!=null){
 		    Iterator<Product> iterator = getProducts().iterator();
 		    if (iterator!=null){
+		    	double i=0;
 			    while (iterator.hasNext()){
 			    	Product product = iterator.next();    	
 				   	
 			    	try {
 			    		
 			    		boolean updated = doOne(product);
-		    			if (updated){
+			    		i=i+1;
+			    		if (getProducts().size()!=0){
+			    			double percentage = (i / new Integer(getProducts().size()).doubleValue())*100.0;			    		
+		    				logger.info(getConnector().getIdentifier()+" percentage completed: " + String.format("%.2f", percentage) + "%");
+			    		}
+			    		if (updated){
 		    				Thread.sleep(1400);
-		    			}
+		    			} 
+		    			
+		    			
 			    	}catch(TooFastConnectionException ex){
 			    		try {
 							Thread.sleep(2500);
