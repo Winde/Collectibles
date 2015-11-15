@@ -308,6 +308,7 @@ public class ProductController  extends CollectiblesController{
 						product.getProcessedConnectors().clear();
 					}
 				}
+				product.setDollarPrice(productInDb.getDollarPrice());
 				product.setOwners(productInDb.getOwners());
 				product.setAuthors(productInDb.getAuthors());								
 				product.setCategoryValues(productInDb.getCategoryValues());
