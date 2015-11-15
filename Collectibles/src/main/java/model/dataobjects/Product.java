@@ -3,7 +3,9 @@ package model.dataobjects;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -90,7 +92,14 @@ public class Product extends SimpleIdDao{
 	@Column(name="connector")	
 	private Collection<String> processedConnectors;
 	
-	public Product(){}
+	@ElementCollection(fetch = FetchType.LAZY)
+	@CollectionTable(name="dollar_price", joinColumns=@JoinColumn(name="id"))
+	@Column(name="dollar_price")
+	private Map<String,Long> dollarPrice = null;
+	
+	public Product(){
+		dollarPrice = new HashMap<>();
+	}
 
 	public String getReference() {
 		return reference;
@@ -279,6 +288,14 @@ public class Product extends SimpleIdDao{
 		this.processedConnectors = processedConnectors;
 	}
 
+	public Map<String, Long> getDollarPrice() {
+		return dollarPrice;
+	}
+
+	public void setDollarPrice(Map<String, Long> dollarPrice) {
+		this.dollarPrice = dollarPrice;
+	}
+
 	public boolean isLengthyDescription() {
 		if (this.getDescription()==null){
 			return false;
@@ -292,6 +309,7 @@ public class Product extends SimpleIdDao{
 	public synchronized boolean updateWithConnector(ProductInfoConnector connector) throws TooFastConnectionException {
 		return connector.updateProductTransaction(this);
 	}
+	
 	
 }
 

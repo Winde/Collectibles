@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -91,6 +92,9 @@ public class SerializableProduct {
 	
 	@JsonView(ProductComplexView.class)
 	private Collection<String> processedConnectors;
+	
+	@JsonView(ProductComplexView.class)
+	private Map<String,Long> dollarPrice = null;
 	
 	
 	@JsonIgnore
@@ -289,6 +293,14 @@ public class SerializableProduct {
 		this.drivethrurpgUrl = drivethrurpgUrl;
 	}
 
+	public Map<String, Long> getDollarPrice() {
+		return dollarPrice;
+	}
+
+	public void setDollarPrice(Map<String, Long> dollarPrice) {
+		this.dollarPrice = dollarPrice;
+	}
+
 	public Product deserializeProduct(){
 		Product product = new Product();
 		PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();		
@@ -301,6 +313,7 @@ public class SerializableProduct {
 		}
 		return product;
 	}
-		
+
+
 	
 }

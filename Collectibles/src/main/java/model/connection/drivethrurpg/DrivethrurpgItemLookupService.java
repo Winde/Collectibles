@@ -186,5 +186,32 @@ public class DrivethrurpgItemLookupService implements ProductInfoLookupService<E
 		logger.info("Found link: " + link);
 		return link;
 	}
+	
+	public Long getDollarPrice(Element productListing) throws TooFastConnectionException{
+		Long priceLong = null;
+		String priceString = null;
+		if (productListing!=null){	
+			
+			Elements productSepcialPriceNode = productListing.getElementsByClass("productSpecialPrice");
+			if (productSepcialPriceNode!=null && productSepcialPriceNode.size()==1){
+				priceString = productSepcialPriceNode.get(0).text();
+				
+			}else {
+				Element lastColumn = productListing.getElementsByTag("td").last();
+				priceString = lastColumn.ownText();
+			}
+		}
+		try {
+			if (priceString!=null){
+				priceString = priceString.replaceAll("\\.", "");
+				priceString = priceString.replaceAll("\\$", "");
+				priceString = priceString.replaceAll("\u00A0", "");
+				priceString = priceString.trim();
+				logger.info("Price string: *" + priceString+"*");			
+				priceLong = Long.parseLong(priceString.replaceAll("\\.", ""));
+			}
+		}catch(Exception ex){ ex.printStackTrace();}
+		return priceLong;
+	}
 
 }

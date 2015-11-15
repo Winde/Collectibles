@@ -21,8 +21,13 @@
 					<div class="productDescription">
 						<div ng-bind-html="product.description"></div>
 					</div>
+					<div >
+						
+					</div>
 					<div class="authorsBlock" ng-if="product.authors && product.authors.length>0">										
-						<p><b>Publisher:</b> <span>{{product.publisher}}</span></p>
+						<p ng-if="product.minimumPrice"><b>Price: </b>{{(product.minimumPrice/100) | currency}}</p>
+						
+						<p ng-if="product.publisher"><b>Publisher:</b> <span>{{product.publisher}}</span></p>
 						
 						<!-- <p><b>Authors:</b> <span >{{$first ? '' : $last ? ' and ' : ', '}}{{author}}</span></p> -->
 						<div ng-if="product.authors && product.authors.length && product.authors.length>0">

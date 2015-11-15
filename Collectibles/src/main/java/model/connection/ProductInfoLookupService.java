@@ -8,6 +8,7 @@ import java.util.Set;
 import model.dataobjects.Author;
 import model.dataobjects.Product;
 
+import org.jsoup.nodes.Element;
 import org.w3c.dom.Document;
 
 public interface ProductInfoLookupService<E> {
@@ -31,4 +32,6 @@ public interface ProductInfoLookupService<E> {
 	public String getDrivethrurpgUrl(E doc) throws TooFastConnectionException;
     
 	public String getPublisher(E doc)  throws TooFastConnectionException;
+	
+	public Long getDollarPrice(E doc) throws TooFastConnectionException;
 }

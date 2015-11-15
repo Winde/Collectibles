@@ -177,6 +177,11 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 		return null;
 	}
 
+	@Override
+	public Long getDollarPrice(Document doc) throws TooFastConnectionException {
+		return null;
+	}
+
 
 
 

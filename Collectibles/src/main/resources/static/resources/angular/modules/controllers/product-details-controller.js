@@ -57,6 +57,19 @@
 					}
 					
 				}
+				
+				if (data.dollarPrice){
+					console.log(data.dollarPrice);
+					var price = null;
+					for (key in data.dollarPrice) {
+						if (price == null || data.dollarPrice[key]<price){
+							price = data.dollarPrice[key];
+						}						
+					}
+					if (price!=null){
+						$scope.product.minimumPrice = price;						
+					}
+				}
 			})
 			.catch(function(){	
 				Message.alert("There was an error");

@@ -236,9 +236,16 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 							logger.info("Obtained " + authors.size() + " authors");
 							product.setAuthors(authors);
 							authorsAdd.addAll(authors);
+						}						
+					}	
+					
+					
+						Long dollarPrice = itemLookup.getDollarPrice(doc);
+						logger.info("Obtained price: " + dollarPrice);
+						if (dollarPrice!=null){
+							product.getDollarPrice().put(this.getIdentifier(),dollarPrice);
 						}
-						
-					}					
+					
 				}
 				processed = true;
 			} else {
