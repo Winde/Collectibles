@@ -141,6 +141,26 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			needsAnd = true;
 		}
 		
+		if (search.getWithPrice()!=null){
+			if (needsAnd){ hql = hql + " AND ";}			
+			if (search.getWithPrice()){
+				hql = hql + "(p.minPrice IS NOT NULL ) ";
+			} else {
+				hql = hql + "(p.minPrice IS NULL ) ";
+			}
+			needsAnd = true;			
+		}
+		
+		if (search.getWithDriveThruRPGLink()!=null){
+			if (needsAnd){ hql = hql + " AND ";}			
+			if (search.getWithDriveThruRPGLink()){
+				hql = hql + "(p.drivethrurpgUrl IS NOT NULL ) ";
+			} else {
+				hql = hql + "(p.drivethrurpgUrl IS NULL ) ";
+			}
+			needsAnd = true;			
+		}
+		
 		
 		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
 			hql = hql + "GROUP BY p having count(categoryValues)=:sizeCategoryValues "; 			

@@ -33,6 +33,10 @@
 			
 			if ($scope.withImages){ searchObject.withImages = $scope.withImages; }
 			
+			if ($scope.withPrice){ searchObject.withPrice = $scope.withPrice; }
+			
+			if ($scope.withDriveThruLink){ searchObject.withDriveThruLink = $scope.withDriveThruLink; }
+			
 			if ($scope.owned){ searchObject.owned = $scope.owned}
 			
 			if ($scope.page){ searchObject.page = $scope.page } else { $scope.page = 0; searchObject.page = 0; }
@@ -42,8 +46,7 @@
 			if (newSearch){
 				searchObject.page = 0;
 				$scope.page = 0;
-			}
-			
+			}			
 			$location.search(searchObject);
 			controller.search();
 		}
@@ -67,6 +70,12 @@
 			
 			if (searchObject.withImages){	$scope.withImages = searchObject.withImages;
 			} else {	$scope.withImages = "";}
+			
+			if (searchObject.withPrice){	$scope.withPrice = searchObject.withPrice;
+			} else {	$scope.withPrice = "";}
+						
+			if (searchObject.withDriveThruLink){	$scope.withDriveThruLink = searchObject.withDriveThruLink;
+			} else {	$scope.withDriveThruLink = "";}
 			
 			if (searchObject.owned){	$scope.owned = searchObject.owned;
 			} else {	$scope.owned = "";}
