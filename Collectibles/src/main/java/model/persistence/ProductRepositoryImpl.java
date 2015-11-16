@@ -97,7 +97,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		
 		String hql = "";
 		
-		hql = hql + "select p from Product p LEFT JOIN p.images LEFT JOIN p.owners owners";
+		hql = hql + "select p from Product p LEFT JOIN p.images LEFT JOIN p.owners owners LEFT JOIN p.ownersOtherLanguage ownersOtherLanguage";
 		//hql = hql + "select p from Product p LEFT JOIN FETCH p.images LEFT JOIN FETCH p.owners owners";
 		
 		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
@@ -141,9 +141,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		if (search.getOwned()!=null && search.getOwner()!=null){
 			if (needsAnd){ hql = hql + " AND ";}
 			if (search.getOwned()){
-				hql = hql + "((:owned) IN owners) ";
+				hql = hql + "((:owned) IN owners OR (:owned) IN ownersOtherLanguage) ";
 			} else {
-				hql = hql + "(p.owners IS EMPTY OR (:owned) NOT IN owners)";			
+				hql = hql + "((p.owners IS EMPTY OR (:owned) NOT IN owners) AND (p.ownersOtherLanguage IS EMPTY OR (:owned) NOT IN ownersOtherLanguage))";			
 			}
 			
 			needsAnd = true;

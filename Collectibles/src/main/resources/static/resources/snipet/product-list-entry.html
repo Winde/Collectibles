@@ -26,6 +26,16 @@
 					ng-change="update(product)">
 				Owned
 			</button>
+			<button type="button" 
+					class="btn btn-default" 
+					ng-model="product.ownedAnotherLanguage" 
+					uib-btn-checkbox 
+					btn-checkbox-true="true" 
+					btn-checkbox-false="false"
+					ng-change="update(product)">
+				Owned(non english)
+			</button>
+			
 			<!-- 
 			<input type="checkbox" 
 				ng-model="product.owned" 
@@ -34,6 +44,9 @@
 		</div>
 		<div ng-if="!editMode || !isAdmin()">
 			<span ng-if="product.owned">Owned</span>			
+		</div>
+		<div ng-if="!editMode || !isAdmin()">
+			<span ng-if="product.ownedAnotherLanguage">Owned(non english)</span>			
 		</div>
 	</div>	
 	<div class="col-lg-3 col-md-3 hidden-sm hidden-xs">		

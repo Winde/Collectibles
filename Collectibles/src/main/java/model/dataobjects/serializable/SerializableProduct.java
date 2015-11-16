@@ -66,6 +66,9 @@ public class SerializableProduct {
 	private Boolean owned = Boolean.FALSE;	
 
 	@JsonView(ProductSimpleView.class)
+	private Boolean ownedAnotherLanguage = Boolean.FALSE;
+	
+	@JsonView(ProductSimpleView.class)
 	private Date releaseDate = null;
 			
 	@JsonView(ProductSimpleView.class)
@@ -107,6 +110,8 @@ public class SerializableProduct {
 	
 	@JsonIgnore
 	private User user;
+
+	
 	
 	public static Collection<SerializableProduct> cloneProduct(Collection<Product> products){
 		
@@ -154,6 +159,7 @@ public class SerializableProduct {
 		this.user = user;
 		if (user!=null){
 			this.owned = productToClone.getOwners()!=null && productToClone.getOwners().contains(user);
+			this.ownedAnotherLanguage = productToClone.getOwnersOtherLanguage()!=null && productToClone.getOwnersOtherLanguage().contains(user);
 		}
 	}
 	
@@ -219,6 +225,14 @@ public class SerializableProduct {
 
 	public void setOwned(Boolean owned) {
 		this.owned = owned;
+	}
+
+	public Boolean getOwnedAnotherLanguage() {
+		return ownedAnotherLanguage;
+	}
+
+	public void setOwnedAnotherLanguage(boolean ownedAnotherLanguage) {
+		this.ownedAnotherLanguage = ownedAnotherLanguage;
 	}
 
 	public Date getReleaseDate() {

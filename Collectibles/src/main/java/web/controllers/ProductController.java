@@ -8,10 +8,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import model.connection.ProductInfoConnector;
 import model.connection.ProductInfoConnectorFactory;
@@ -353,6 +355,25 @@ public class ProductController  extends CollectiblesController{
 				product.setCategoryValues(productInDb.getCategoryValues());
 				product.setImages(productInDb.getImages());
 				
+				if (serializableProduct.getOwnedAnotherLanguage()!=null){
+					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+					if (auth!=null){
+						User user = new User();
+						user.setUsername(auth.getName());
+						if (!serializableProduct.getOwnedAnotherLanguage()) {
+							product.getOwners().remove(user);
+						} else {
+							user = userRepository.findOne(user.getUsername());
+							Set<User> owners = product.getOwnersOtherLanguage();
+							if (owners==null){
+								owners = new HashSet<>();
+								product.setOwnersOtherLanguage(owners);
+							}						
+							product.getOwnersOtherLanguage().add(user);
+						}
+					}
+				}
+				
 				if (serializableProduct.getOwned()!=null){
 					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 					if (auth!=null){
@@ -362,6 +383,12 @@ public class ProductController  extends CollectiblesController{
 							product.getOwners().remove(user);
 						} else {
 							user = userRepository.findOne(user.getUsername());
+							Set<User> owners = product.getOwners();
+							if (owners==null){
+								owners = new HashSet<>();
+								product.setOwners(owners);
+							}
+							
 							product.getOwners().add(user);
 						}
 					}

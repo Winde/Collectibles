@@ -64,7 +64,11 @@ public class Product extends SimpleIdDao{
 
 	@ManyToMany(fetch=FetchType.LAZY)	
 	@BatchSize(size = 50)
-	private Set<User> owners = null;	
+	private Set<User> owners = null;
+	
+	@ManyToMany(fetch=FetchType.LAZY)	
+	@BatchSize(size = 50)
+	private Set<User> ownersOtherLanguage = null;
 	
 	@Column(name="release_date")
 	private Date releaseDate = null;
@@ -194,6 +198,14 @@ public class Product extends SimpleIdDao{
 
 	public void setOwners(Set<User> owners) {
 		this.owners = owners;
+	}
+
+	public Set<User> getOwnersOtherLanguage() {
+		return ownersOtherLanguage;
+	}
+
+	public void setOwnersOtherLanguage(Set<User> ownersOtherLanguage) {
+		this.ownersOtherLanguage = ownersOtherLanguage;
 	}
 
 	public Date getReleaseDate() {
