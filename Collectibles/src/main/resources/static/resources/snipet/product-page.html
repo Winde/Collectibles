@@ -24,21 +24,23 @@
 					<div >
 						
 					</div>
-					<div class="authorsBlock" ng-if="product.authors && product.authors.length>0">										
-						<div class="priceBlock">
-							<p><b>Price: </b></p>
-							<div class="priceBlockContent">							
-								<p ng-id="product.dollarPrice" ng-repeat="(key, value) in product.dollarPrice">
-									<span ng-if="value">{{(value/100) | currency}}</span>
-									<span ng-if="key">({{key}})</span>
-								</p>
-								<p ng-if="product.lastPriceUpdate">Last updated: {{product.lastPriceUpdate | date:'yyyy-MM-dd HH:mm:ss'}}</p>
-							</div>
-							<span class="btn btn-default" ng-if="editable && product && product.id && isAdmin()" ng-click="productCtrl.updatePrices(product.id)">Update prices</span>
-							
+															
+					<div class="priceBlock">
+						<p ng-show="product.dollarPrice"><b>Price: </b></p>
+						<div class="priceBlockContent">							
+							<p ng-if="product.dollarPrice" ng-repeat="(key, value) in product.dollarPrice">
+								<span ng-if="value">{{(value/100) | currency}}</span>
+								<span ng-if="key">({{key}})</span>
+							</p>
+							<p ng-if="product.lastPriceUpdate">Last updated: {{product.lastPriceUpdate | date:'yyyy-MM-dd HH:mm:ss'}}</p>
 						</div>
-						<p ng-if="product.publisher"><b>Publisher:</b> <span>{{product.publisher}}</span></p>
+						<span class="btn btn-default" ng-if="editable && product && product.id && isAdmin()" ng-click="productCtrl.updatePrices(product.id)">Update prices</span>
 						
+					</div>
+					
+					<p ng-if="product.publisher"><b>Publisher:</b> <span>{{product.publisher}}</span></p>	
+						
+					<div class="authorsBlock" ng-if="product.authors && product.authors.length>0">						
 						<!-- <p><b>Authors:</b> <span >{{$first ? '' : $last ? ' and ' : ', '}}{{author}}</span></p> -->
 						<div ng-if="product.authors && product.authors.length && product.authors.length>0">
 							<p><b>Authors:</b></p>
