@@ -174,8 +174,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			hql = hql + "GROUP BY p having count(categoryValues)=:sizeCategoryValues "; 			
 		}
 			
-		System.out.println("HQL = " + hql);
-		
 		TypedQuery<Product> query = entityManager.createQuery(hql, Product.class);
 		
 		if (search.getSearchTerm()!=null){ query.setParameter("search",search.getSearchTerm());}

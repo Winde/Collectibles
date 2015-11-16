@@ -88,8 +88,6 @@ public class SearchController extends CollectiblesController{
 				User owner = userRepository.findOne(auth.getName());
 				searchObject.setOwner(owner);
 			}
-			System.out.println(searchObject.getOwned());
-			System.out.println(searchObject.getOwner());
 			
 			if (withImagesString!=null && withImagesString.equals("true")){
 				withImages = Boolean.TRUE;
