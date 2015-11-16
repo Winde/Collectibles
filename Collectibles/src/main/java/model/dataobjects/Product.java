@@ -22,6 +22,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.JoinColumn;
 
+import org.hibernate.annotations.BatchSize;
+
 import model.connection.ProductInfoConnector;
 import model.connection.TooFastConnectionException;
 import model.dataobjects.Author.AuthorView;
@@ -43,6 +45,7 @@ public class Product extends SimpleIdDao{
 	private HierarchyNode hierarchyPlacement;
 	
 	@OneToMany(fetch=FetchType.LAZY)
+	@BatchSize(size = 20)
 	private Set<CategoryValue> categoryValues;
 	
 	@Column(name="reference",unique=true )
@@ -56,9 +59,11 @@ public class Product extends SimpleIdDao{
 	private String name = null;
 
 	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.MERGE,CascadeType.REMOVE})
+	@BatchSize(size = 50)
 	private List<Image> images = null;
 
 	@ManyToMany(fetch=FetchType.LAZY)	
+	@BatchSize(size = 50)
 	private Set<User> owners = null;	
 	
 	@Column(name="release_date")

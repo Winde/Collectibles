@@ -12,9 +12,11 @@ import javax.persistence.TypedQuery;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
+import model.dataobjects.User;
 import model.dataobjects.supporting.ObjectList;
 import model.persistence.queryParameters.ProductSearch;
 
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +33,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 	
 	@Autowired
 	private EntityManager entityManager;
-	
-	
+
 	@Override
 	public Product addImage(Product product, Image image) {
 		if (product.getImages()==null || product.getImages().size()<=0){
@@ -93,9 +94,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 
 	@Override
 	public ObjectList<Product> searchProduct(ProductSearch search) {
+		
 		String hql = "";
 		
-		hql = hql + "select p from Product p LEFT JOIN FETCH p.images LEFT JOIN FETCH p.owners";
+		hql = hql + "select p from Product p LEFT JOIN p.images LEFT JOIN p.owners owners";
+		//hql = hql + "select p from Product p LEFT JOIN FETCH p.images LEFT JOIN FETCH p.owners owners";
 		
 		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
 			hql = hql + " INNER JOIN p.categoryValues categoryValues ";
@@ -135,9 +138,14 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			needsAnd = true;
 		}
 		
-		if (search.getOwned()!=null){
-			if (needsAnd){ hql = hql + " AND ";}			
-			hql = hql + "(p.owned = :owned ) ";			
+		if (search.getOwned()!=null && search.getOwner()!=null){
+			if (needsAnd){ hql = hql + " AND ";}
+			if (search.getOwned()){
+				hql = hql + "((:owned) IN owners) ";
+			} else {
+				hql = hql + "(p.owners IS EMPTY OR (:owned) NOT IN owners)";			
+			}
+			
 			needsAnd = true;
 		}
 		
@@ -165,8 +173,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
 			hql = hql + "GROUP BY p having count(categoryValues)=:sizeCategoryValues "; 			
 		}
-		
-	
+			
+		System.out.println("HQL = " + hql);
 		
 		TypedQuery<Product> query = entityManager.createQuery(hql, Product.class);
 		
@@ -176,7 +184,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 				query.setParameter("categoryValues", search.getCategoryValues()); 
 				query.setParameter("sizeCategoryValues",search.getCategoryValues().size());
 		}
-		if (search.getOwned()!=null) { query.setParameter("owned",search.getOwned()); }
+		if (search.getOwned()!=null && search.getOwner()!=null){
+			Set<User> setUsers = new HashSet<>();
+			setUsers.add(search.getOwner());
+			query.setParameter("owned",setUsers); 
+		}
 		
 		
 		Set<Product> result = new HashSet<>();	

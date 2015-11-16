@@ -5,13 +5,15 @@ import java.util.Collection;
 
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
+import model.dataobjects.User;
 
 public class ProductSearch implements SearchObject {
 	private HierarchyNode hierarchy = null;	
 	private String searchTerm = null;	
 	private Collection<CategoryValue> categoryValues = null;	
-	private Boolean withImages = null;	
+	private Boolean withImages = null;
 	private Boolean owned = null;
+	private User owner = null;
 	private Integer maxResults = null;
 	private Integer page = null;
 	private Boolean withPrice = null;
@@ -51,12 +53,12 @@ public class ProductSearch implements SearchObject {
 		this.withImages = withImages;
 	}
 
-	public Boolean getOwned() {
-		return owned;
+	public User getOwner() {
+		return owner;
 	}
 
-	public void setOwned(Boolean owned) {
-		this.owned = owned;
+	public void setOwner(User owner) {
+		this.owner = owner;
 	}
 
 	public Integer getMaxResults() {
@@ -90,6 +92,14 @@ public class ProductSearch implements SearchObject {
 	public void setWithDriveThruRPGLink(Boolean withDriveThruRPGLink) {
 		this.withDriveThruRPGLink = withDriveThruRPGLink;
 	}
+	
+	public Boolean getOwned() {
+		return owned;
+	}
+
+	public void setOwned(Boolean owned) {
+		this.owned = owned;
+	}
 
 	@Override
 	public Collection<String> errors() {
@@ -100,5 +110,6 @@ public class ProductSearch implements SearchObject {
 
 		return errors;
 	}
+
 
 }

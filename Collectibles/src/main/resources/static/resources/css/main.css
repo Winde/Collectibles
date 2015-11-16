@@ -62,6 +62,10 @@
 	border-top-right-radius: 10px;
 }
 
+.product .priceBlock {	
+	margin-top: 15px;
+}
+
 .product .authorsBlock{
 	margin-top: 15px;
 }

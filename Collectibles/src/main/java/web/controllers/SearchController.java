@@ -9,16 +9,20 @@ import javax.servlet.http.HttpServletRequest;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Product;
+import model.dataobjects.User;
 import model.dataobjects.serializable.SerializableProduct;
 import model.dataobjects.serializable.SerializableProduct.ProductListView;
 import model.dataobjects.supporting.ObjectList;
 import model.persistence.HierarchyRepository;
 import model.persistence.ProductRepository;
+import model.persistence.UserRepository;
 import model.persistence.queryParameters.ProductSearch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 
 @RestController
-public class SearchController  extends CollectiblesController{
+public class SearchController extends CollectiblesController{
 
 	private static final Logger logger = LoggerFactory.getLogger(SearchController.class);
 		
@@ -40,6 +44,9 @@ public class SearchController  extends CollectiblesController{
 	
 	@Autowired
 	private HierarchyRepository hierarchyRepository;
+
+	@Autowired
+	private UserRepository userRepository;
 	
 	private final String defaultPaginationSize = "50";
 	
@@ -75,6 +82,14 @@ public class SearchController  extends CollectiblesController{
 			}
 			
 			searchObject.setOwned(owned);
+			if (ownedString!=null){
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();				
+				
+				User owner = userRepository.findOne(auth.getName());
+				searchObject.setOwner(owner);
+			}
+			System.out.println(searchObject.getOwned());
+			System.out.println(searchObject.getOwner());
 			
 			if (withImagesString!=null && withImagesString.equals("true")){
 				withImages = Boolean.TRUE;

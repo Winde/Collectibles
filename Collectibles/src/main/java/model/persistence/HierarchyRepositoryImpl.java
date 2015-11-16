@@ -74,8 +74,7 @@ public class HierarchyRepositoryImpl implements HierarchyRepositoryCustom{
 		
 		node.getFather().removeChildren(node);
 		
-		entityManager.remove(node);
-		entityManager.flush();
+		hierarchyRepository.delete(node);		
 	}
 	
 	@Override 

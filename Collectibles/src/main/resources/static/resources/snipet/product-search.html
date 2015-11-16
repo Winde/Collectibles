@@ -61,7 +61,7 @@
 			</label>		
 		</div>
 	</div>
-	<div class="form-group optionsSearch">
+	<div class="form-group optionsSearch" ng-show="isAuthenticated()">
 		<span>Owned:</span>
 		<div class="btn-group">				
 			<label class="btn btn-default" uib-btn-radio="''" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
