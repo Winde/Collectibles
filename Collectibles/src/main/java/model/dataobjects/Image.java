@@ -30,11 +30,13 @@ public class Image extends SimpleIdDao{
 	public interface ImageSimpleView{};
 	
 	@Column(name="data")
-	@Lob 		
+	@Lob 
+	@JsonIgnore
 	private byte[] data;
 	
 	@Column(name="thumb")
 	@Lob
+	@JsonIgnore
 	private byte[] thumb;
 	
 	@Column(name="main")

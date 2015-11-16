@@ -17,7 +17,7 @@
 					url: '/product/find/'+id, 
 					progressbar: true 
 				});
-			},			
+			},				
 			create: function(product){
 				factory.cleanUpProduct(product);
 				return $http({ 
@@ -39,6 +39,13 @@
 			remove: function(product){
 				return $http.post('/product/remove/'+product.id,{
 					progressbar: true
+				});
+			},
+			updatePrice: function(id){
+				return $http({ 
+					method: 'PUT', 
+					url: '/product/update/price/'+id, 
+					progressbar: true 
 				});
 			},
 			search: function(searchObject){				

@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import model.dataobjects.Author;
@@ -39,6 +41,70 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	@Autowired
 	private AuthorRepository authorRepository;
 	
+	@Override	
+	public boolean updatePriceTransaction(Product product) throws TooFastConnectionException{
+		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+		AbstractProductInfoConnector connector = this;
+		boolean result = true; 		
+		result = transactionTemplate.execute(new TransactionCallback<Boolean>(){
+
+			@Override
+			public Boolean doInTransaction(TransactionStatus status) {
+				Product productInDb = productRepository.findOne(product.getId());
+				boolean updated = false;
+				try {
+					updated = connector.updatePrice(productInDb);
+				} catch (TooFastConnectionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (updated){
+					productRepository.save(productInDb);
+				}
+				return updated;
+			}
+			
+		});
+		
+		return result;
+	}
+	
+	@Override	
+	public boolean updatePrice(Product product) throws TooFastConnectionException{
+		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+		AbstractProductInfoConnector connector = this;
+		boolean result = true; 		
+
+		logger.info("Starting access to provider : " + connector.getIdentifier());
+		boolean updated = false;
+		try {
+								
+			ProductInfoLookupService imageLookup = connector.getImageLookupService();										
+			if (imageLookup!=null){
+				Object doc = imageLookup.fetchDocFromProduct(product);
+				if (doc!=null){
+					Map<String,Long> prices = imageLookup.getDollarPrice(doc);					
+					if (prices!=null){
+						for (Entry<String,Long> priceEntry: prices.entrySet()){
+							String key = connector.getIdentifier();
+							if (priceEntry.getKey()!=null && !"".equals(priceEntry.getKey().trim())){
+								key = key + " - " + priceEntry.getKey(); 
+							}
+							product.setDollarPrice(key,priceEntry.getValue());
+						}
+					}
+				}
+			}
+		}catch (Exception ex){
+			ex.printStackTrace();
+			updated = false;			
+		}
+		
+		logger.info("Finishing access to provider "+ connector.getIdentifier()+", was updated?  : " + updated );
+		result = updated;
+		
+		return result;
+	}
 	
 	@Override	
 	public boolean updateProductTransaction(Product product) throws TooFastConnectionException{
@@ -94,11 +160,10 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		
 		logger.info("Checking if we have product universal reference");
 		
-		if (this.isApplicable(product)){
-			logger.info("Product universal reference: " +product.getUniversalReference());
+		if (this.isApplicable(product)){			
 			if (this.checkIfAlreadyProcessed(product)) {
 			
-				logger.info("Starting process");
+				logger.info("Starting process "+this.getIdentifier()+" : " + product.getName());
 				
 				Object doc = itemLookup.fetchDocFromProduct(product);
 				
@@ -239,12 +304,16 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						}						
 					}	
 					
-					
-						Long dollarPrice = itemLookup.getDollarPrice(doc);
-						logger.info("Obtained price: " + dollarPrice);
-						if (dollarPrice!=null){
-							product.getDollarPrice().put(this.getIdentifier(),dollarPrice);
+					Map<String,Long> prices = itemLookup.getDollarPrice(doc);					
+					if (prices!=null){
+						for (Entry<String,Long> priceEntry: prices.entrySet()){
+							String key = this.getIdentifier();
+							if (priceEntry.getKey()!=null && !"".equals(priceEntry.getKey().trim())){
+								key = key + " - " + priceEntry.getKey(); 
+							}
+							product.setDollarPrice(key,priceEntry.getValue());
 						}
+					}
 					
 				}
 				processed = true;
@@ -265,6 +334,15 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		Collection<Product> clonedProducts = new ArrayList<Product>();		
 		clonedProducts.addAll(products);
 		BackgroundProcessor thread = new BackgroundProcessor(clonedProducts, productRepository, imageRepository,authorRepository,  this);
+		thread.start();
+	}
+	
+	@Override
+	public void processPricesInBackground(Collection<Product> products){
+		
+		Collection<Product> clonedProducts = new ArrayList<Product>();		
+		clonedProducts.addAll(products);
+		BackgroundProcessorPrices thread = new BackgroundProcessorPrices(clonedProducts, productRepository, imageRepository,authorRepository,  this);
 		thread.start();
 	}
 }

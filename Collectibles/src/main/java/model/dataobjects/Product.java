@@ -67,6 +67,11 @@ public class Product extends SimpleIdDao{
 	@Column(name="universal_reference")
 	private String universalReference = null;
 	
+	@Column(name="goodreads_reference")
+	private String goodreadsReference = null;
+	
+	@Column(name="last_price_update")
+	private Date lastPriceUpdate = null;
 	
 	@Column(name="amazon_url")	
 	private String amazonUrl = null;
@@ -93,9 +98,12 @@ public class Product extends SimpleIdDao{
 	private Collection<String> processedConnectors;
 	
 	@ElementCollection(fetch = FetchType.LAZY)
-	@CollectionTable(name="dollar_price", joinColumns=@JoinColumn(name="id"))
+	@CollectionTable(name="product_dollar_price", joinColumns=@JoinColumn(name="id"))
 	@Column(name="dollar_price")
 	private Map<String,Long> dollarPrice = null;
+	
+	@Column(name="min_price")
+	private Long minPrice = null;	
 	
 	public Product(){
 		dollarPrice = new HashMap<>();
@@ -296,6 +304,31 @@ public class Product extends SimpleIdDao{
 		this.dollarPrice = dollarPrice;
 	}
 
+	public void setDollarPrice(String provider, Long dollarPrice) {
+		Map<String, Long> map = this.getDollarPrice();
+		if (map == null){
+			map = new HashMap<>();
+			this.setDollarPrice(map);
+		}
+		map.put(provider, dollarPrice);
+		
+		if (dollarPrice!=null){
+			this.setLastPriceUpdate(new Date());
+		}
+		
+		if (dollarPrice!=null && (minPrice == null || dollarPrice < minPrice)){
+			this.setMinPrice(dollarPrice);
+		}
+	}	
+	
+	public Long getMinPrice() {
+		return minPrice;
+	}
+
+	public void setMinPrice(Long minPrice) {
+		this.minPrice = minPrice;
+	}
+
 	public boolean isLengthyDescription() {
 		if (this.getDescription()==null){
 			return false;
@@ -306,8 +339,28 @@ public class Product extends SimpleIdDao{
 		}
 	}
 
+	public String getGoodreadsReference() {
+		return goodreadsReference;
+	}
+
+	public void setGoodreadsReference(String goodreadsReference) {
+		this.goodreadsReference = goodreadsReference;
+	}
+
 	public synchronized boolean updateWithConnector(ProductInfoConnector connector) throws TooFastConnectionException {
 		return connector.updateProductTransaction(this);
+	}
+
+	public synchronized boolean updatePricesWithConnector(ProductInfoConnector connector) throws TooFastConnectionException {
+		return connector.updatePriceTransaction(this);
+	}
+
+	public Date getLastPriceUpdate() {
+		return lastPriceUpdate;
+	}
+
+	public void setLastPriceUpdate(Date lastPriceUpdate) {
+		this.lastPriceUpdate = lastPriceUpdate;
 	}
 	
 	

@@ -284,6 +284,45 @@ public class ProductController  extends CollectiblesController{
 	}
 	
 	@Secured(value = { "ROLE_ADMIN" })
+	@RequestMapping(value="/product/update/price/{id}", method = RequestMethod.PUT)
+	public SerializableProduct updatePrice(@PathVariable String id) throws CollectiblesException {		
+		Long idLong = this.getId(id);
+		
+		if (idLong==null){
+			throw new IncorrectParameterException(new String[]{"id"});
+		} else {
+			Product product = productRepository.findOne(idLong);
+			if (product==null){
+				throw new NotFoundException();
+			}
+			
+			product.setDollarPrice(null);
+			product.setMinPrice(null);
+			Map<String, ProductInfoConnector> connectors = connectorFactory.getConnectors();
+			if (connectors!=null) {
+				logger.info("Connectors: " + connectors);
+				Iterator<Entry<String, ProductInfoConnector>> iterator = connectors.entrySet().iterator();
+				while (iterator.hasNext()){
+					Entry<String, ProductInfoConnector> entry = iterator.next();
+					ProductInfoConnector connector = entry.getValue();
+					if (connector!=null){
+						try {
+							connector.updatePrice(product);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+					
+				}				
+			}
+			
+			productRepository.save(product);
+			
+			return SerializableProduct.cloneProduct(product);			
+		}			
+	}
+	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/modify/", method = RequestMethod.PUT)
 	public SerializableProduct modifyProduct(@RequestBody SerializableProduct serializableProduct) throws CollectiblesException {		
 		Product product = null;
@@ -415,8 +454,8 @@ public class ProductController  extends CollectiblesController{
 	}
 	
 	@Secured(value = { "ROLE_ADMIN" })
-	@RequestMapping(value="/product/reprocess/", method = RequestMethod.POST)
-	public Boolean reProcess(){
+	@RequestMapping(value="/product/all/reprocess/", method = RequestMethod.POST)
+	public Boolean reProcessAll(){
 		
 		List<Product> products = productRepository.findAll();
 		Map<String, ProductInfoConnector> connectors = connectorFactory.getConnectors();
@@ -428,6 +467,32 @@ public class ProductController  extends CollectiblesController{
 				ProductInfoConnector connector = entry.getValue();
 				if (connector!=null){
 					connector.processInBackground(products);
+				}
+			}				
+		}
+
+		return Boolean.TRUE;
+	}
+	
+	@Secured(value = { "ROLE_ADMIN" })
+	@RequestMapping(value="/product/all/update/prices/", method = RequestMethod.POST)
+	public Boolean updatePricessAll(){
+		
+		List<Product> products = productRepository.findAll();
+		for (Product product: products){
+			product.setDollarPrice(null);
+			product.setMinPrice(null);			
+		}
+		productRepository.save(products);
+		Map<String, ProductInfoConnector> connectors = connectorFactory.getConnectors();
+		logger.info("Connectors: " + connectors);
+		if (connectors!=null) {
+			Iterator<Entry<String, ProductInfoConnector>> iterator = connectors.entrySet().iterator();
+			while (iterator.hasNext()){
+				Entry<String, ProductInfoConnector> entry = iterator.next();
+				ProductInfoConnector connector = entry.getValue();
+				if (connector!=null){					
+					connector.processPricesInBackground(products);
 				}
 			}				
 		}

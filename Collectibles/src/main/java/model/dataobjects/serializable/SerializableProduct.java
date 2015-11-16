@@ -70,6 +70,9 @@ public class SerializableProduct {
 			
 	@JsonView(ProductSimpleView.class)
 	private String universalReference = null;
+		
+	@JsonView(ProductSimpleView.class)
+	private String goodreadsReference = null;
 	
 	@JsonView(ProductComplexView.class)
 	private String amazonUrl = null;
@@ -96,6 +99,11 @@ public class SerializableProduct {
 	@JsonView(ProductComplexView.class)
 	private Map<String,Long> dollarPrice = null;
 	
+	@JsonView(ProductSimpleView.class)
+	private Long minPrice = null;	
+	
+	@JsonView(ProductSimpleView.class)
+	private Date lastPriceUpdate = null;
 	
 	@JsonIgnore
 	private User user;
@@ -299,6 +307,30 @@ public class SerializableProduct {
 
 	public void setDollarPrice(Map<String, Long> dollarPrice) {
 		this.dollarPrice = dollarPrice;
+	}
+	
+	public Long getMinPrice() {
+		return minPrice;
+	}
+
+	public void setMinPrice(Long minPrice) {
+		this.minPrice = minPrice;
+	}
+
+	public String getGoodreadsReference() {
+		return goodreadsReference;
+	}
+
+	public void setGoodreadsReference(String goodreadsReference) {
+		this.goodreadsReference = goodreadsReference;
+	}
+
+	public Date getLastPriceUpdate() {
+		return lastPriceUpdate;
+	}
+
+	public void setLastPriceUpdate(Date lastPriceUpdate) {
+		this.lastPriceUpdate = lastPriceUpdate;
 	}
 
 	public Product deserializeProduct(){

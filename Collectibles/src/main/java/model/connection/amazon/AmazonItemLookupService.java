@@ -166,8 +166,32 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	}
 
 	@Override
-	public Long getDollarPrice(Document doc) throws TooFastConnectionException {
-		return null;
+	public Map<String, Long> getDollarPrice(Document doc) throws TooFastConnectionException {
+		Map<String,Long> result = null;
+		String newField = this.getField(doc, "/ItemLookupResponse/Items/Item/OfferSummary/LowestNewPrice/Amount");
+		String usedField = this.getField(doc, "/ItemLookupResponse/Items/Item/OfferSummary/LowestUsedPrice/Amount");
+		if (newField!=null || usedField!=null){
+			result = new HashMap<>();
+			if (newField!=null){
+				Long newPrice = null;
+				try {
+					newPrice = Long.parseLong(newField);
+				}catch(Exception ex) {ex.printStackTrace();}
+				if (newPrice!=null){
+					result.put("New", newPrice);
+				}
+			}
+			if (usedField!=null){
+				Long usedPrice = null;
+				try {
+					usedPrice = Long.parseLong(usedField);
+				}catch(Exception ex) {ex.printStackTrace();}
+				if (usedPrice!=null){
+					result.put("Used", usedPrice);
+				}
+			}			
+		}
+		return result;
 	}
 
 

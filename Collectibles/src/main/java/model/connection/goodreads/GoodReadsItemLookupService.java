@@ -2,6 +2,7 @@ package model.connection.goodreads;
 
 import java.io.FileNotFoundException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import model.connection.ProductInfoLookupServiceXML;
@@ -152,10 +153,15 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 
 	@Override
 	public Document fetchDocFromProduct(Product product) throws TooFastConnectionException {
-		if (product.getUniversalReference()==null){
+		if (product.getUniversalReference()==null && product.getGoodreadsReference()==null){
 			return null;
 		}
-		String requestUrl = this.getLookupUrl(product.getUniversalReference());
+		String requestUrl = null;
+		if (product.getUniversalReference()!=null){
+			requestUrl = this.getLookupUrl(product.getUniversalReference());
+		} else {
+			requestUrl = this.getLookupUrl(product.getGoodreadsReference());
+		}
 		Document doc = null;
 		try{
 			doc = this.fetchDocFromUrl(requestUrl);
@@ -178,7 +184,7 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	}
 
 	@Override
-	public Long getDollarPrice(Document doc) throws TooFastConnectionException {
+	public Map<String,Long> getDollarPrice(Document doc) throws TooFastConnectionException {
 		return null;
 	}
 

@@ -1,9 +1,9 @@
 <div class="row productListEntry">
-	<div class="col-lg-4 col-md-2 col-sm-3 col-xs-12">
-		<a class="btn btn-primary" ng-href="#/product/{{product.id}}"><span>{{product.name}}</span></a>
+	<div class="col-lg-3 col-md-2 col-sm-3 col-xs-12">
+		<a class="btn btn-primary product-name-btn" ng-href="#/product/{{product.id}}"><span>{{product.name}}</span></a>
 	</div>		
 	
-	<div class="col-lg-2 col-md-2 col-sm-4 col-xs-6">
+	<div class="col-lg-2 col-md-2 col-sm-3 col-xs-12">
 		<div class="imageContainer">
 			<div class="squareImage">		
 				<a ng-if="product.selectedImage.id" ng-href="#/product/{{product.id}}">
@@ -15,7 +15,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-lg-1 col-md-1 col-sm-3 col-xs-3">
+	<div class="col-lg-1 col-md-1 col-sm-2 col-xs-6">
 		<div ng-if="editMode && isAdmin()">
 			<button type="button" 
 					class="btn btn-default" 
@@ -62,10 +62,13 @@
 		</form>	
 		<div ng-if="!editMode || !isAdmin()">{{product.hierarchyPlacement.name}}</div>	 
 	</div>
-	<div class="col-lg-1 col-md-2 hidden-sm hidden-xs">
-		<span>{{product.universalReference}}</span>
+	<div class="col-lg-2 col-md-2 col-xs-2 col-xs-6">
+		<span ng-if="product.minPrice">{{(product.minPrice/100) | currency}}</span>		
+		<div ng-if="product && product.id && editMode && isAdmin()">
+			<span class="btn btn-default" ng-if="product && product.id && isAdmin()" ng-click="productManagementCtrl.updatePrices(product.id)">Update prices</span>
+		</div>
 	</div>
-	<div class="col-lg-1 col-md-1 col-sm-2 col-xs-3">
+	<div class="col-lg-1 col-md-1 col-sm-2 col-xs-12">
 		<a href ng-if="editMode && isAdmin()" class="btn btn-default" ng-click="remove(product)">Delete</a>
 	</div>
 </div>

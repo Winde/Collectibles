@@ -14,6 +14,10 @@
 	margin-top: 25px;	
 }
 
+.product-name-btn {
+	white-space: normal;
+}
+
 .productGrid {
 	border: solid 1px #ccc; 
 	border-radius: 10px; 
@@ -51,6 +55,14 @@
 	min-height: 200px;
 } 
 
+.product .priceBlock {
+	margin-bottom: 15px;
+}
+
+.product .priceBlock .priceBlockContent{
+	padding-left: 20px;
+}
+    
 
 .bootstrap-select .root {
 	padding-left: 20px;

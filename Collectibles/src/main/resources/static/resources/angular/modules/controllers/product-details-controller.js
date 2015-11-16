@@ -5,71 +5,12 @@
 	                                           function($routeParams,$scope,Product,Image,Message){
 		var controller = this;
 		
-		$scope.newProductAvailable = false;
-	
-		this.setProduct = function(product){					
-			angular.copy(product,$scope.product);
-			angular.copy($scope.product,controller.product);			
-		};
-		
-		this.setSelectedImage = function(image){			
-			$scope.product.selectedImage = image;
-		}
-				
-		if ($scope.product && $scope.product.images){
-			var image = null;
-			if ($scope.product.images && $scope.product.images.length){
-				for (var i=0;i<$scope.product.images.length;i++){
-					if ($scope.product.images[i].main == true){
-						image = $scope.product.images[i];
-					}
-				}
-				if (image == null){
-					image = $scope.product.image[0];
-				}
-				$scope.product.selectedImage = image;
-			}			
-		}
 		
 		
-		if ($routeParams.id){
-			Product.one($routeParams.id)
+		this.pullProduct = function(id){
+			Product.one(id)
 			.success(function(data){
-				controller.setProduct(data);			
-				if (data.images!=undefined && data.images!=null && data.images.length>0){
-					if ($scope.product.mainImage != null) {
-						for (var i=0;i<data.images.length;i++){
-							if (data.images[i].id == $scope.product.mainImage.id){
-								$scope.product.selectedImage =data.images[i]; 
-							}
-						}
-					} else {
-						$scope.product.selectedImage =data.images[0]; 
-					}										
-				}
-				
-				if (data.hierarchyPlacement) {
-					$scope.product.hierarchyPath = [];
-					var current = data.hierarchyPlacement; 										
-					while (current.father){
-						$scope.product.hierarchyPath.unshift(current);
-						current = current.father;
-					}
-					
-				}
-				
-				if (data.dollarPrice){
-					console.log(data.dollarPrice);
-					var price = null;
-					for (key in data.dollarPrice) {
-						if (price == null || data.dollarPrice[key]<price){
-							price = data.dollarPrice[key];
-						}						
-					}
-					if (price!=null){
-						$scope.product.minimumPrice = price;						
-					}
-				}
+				controller.prepareProduct(data);
 			})
 			.catch(function(){	
 				Message.alert("There was an error");
@@ -77,6 +18,44 @@
 			.finally(function(){			
 			});
 		}
+		
+		this.updatePrices = function(id){
+			Product.updatePrice(id)
+			.success(function(data){
+				controller.prepareProduct(data);
+			})
+			.catch(function(){	
+				Message.alert("There was an error");
+			})
+			.finally(function(){			
+			});
+		}
+		
+		this.prepareProduct = function(data){
+			controller.setProduct(data);			
+			if (data.images!=undefined && data.images!=null && data.images.length>0){
+				if ($scope.product.mainImage != null) {
+					for (var i=0;i<data.images.length;i++){
+						if (data.images[i].id == $scope.product.mainImage.id){
+							$scope.product.selectedImage =data.images[i]; 
+						}
+					}
+				} else {
+					$scope.product.selectedImage =data.images[0]; 
+				}										
+			}
+			
+			if (data.hierarchyPlacement) {
+				$scope.product.hierarchyPath = [];
+				var current = data.hierarchyPlacement; 										
+				while (current.father){
+					$scope.product.hierarchyPath.unshift(current);
+					current = current.father;
+				}
+				
+			}
+		} 
+		
 		this.removeImage = function(image){
 			
 			Product.removeImage($scope.product,image)
@@ -107,6 +86,37 @@
 		this.isEditForbidden = function(){
 			return ($scope.forbidedit == true);
 		};
+
+		this.setProduct = function(product){					
+			angular.copy(product,$scope.product);
+			angular.copy($scope.product,controller.product);			
+		};
+		
+		this.setSelectedImage = function(image){			
+			$scope.product.selectedImage = image;
+		}
+			
+		
+		$scope.newProductAvailable = false;		
+		
+		if ($scope.product && $scope.product.images){
+			var image = null;
+			if ($scope.product.images && $scope.product.images.length){
+				for (var i=0;i<$scope.product.images.length;i++){
+					if ($scope.product.images[i].main == true){
+						image = $scope.product.images[i];
+					}
+				}
+				if (image == null){
+					image = $scope.product.image[0];
+				}
+				$scope.product.selectedImage = image;
+			}			
+		}
+
+		if ($routeParams.id){
+			controller.pullProduct($routeParams.id);
+		}
 		
 	}]);
 	

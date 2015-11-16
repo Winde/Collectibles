@@ -3,7 +3,9 @@ package model.connection.drivethrurpg;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import model.connection.ProductInfoLookupService;
@@ -20,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DrivethrurpgItemLookupService implements ProductInfoLookupService<Element> {
+public class DrivethrurpgItemLookupService implements ProductInfoLookupService<DrivethrurpgData> {
 
 
 	private static final Logger logger = LoggerFactory.getLogger(DrivethrurpgItemLookupService.class);
@@ -36,9 +38,8 @@ public class DrivethrurpgItemLookupService implements ProductInfoLookupService<E
 		return result;
 	}
 	
-	@Override
-	public Element fetchDocFromProduct(Product product) throws TooFastConnectionException {
-		Element result = null;
+	public String fetchUrlFromProductName(Product product) throws TooFastConnectionException {
+		String link = null;
 		String url = null;
 		try {
 			if (product.getName()!=null){
@@ -111,7 +112,31 @@ public class DrivethrurpgItemLookupService implements ProductInfoLookupService<E
 		
 								if (selectedIndex>=0){
 									logger.info("Selected: " + productNames.get(selectedIndex));
-									result = productListings.get(selectedIndex +1);
+									Element selected = productListings.get(selectedIndex +1);
+									
+									
+									if (selected!=null){	
+										Elements links = selected.getElementsByTag("a");
+										for (Element linkTag : links) {
+											String href = linkTag.attr("href");
+											if (href!=null && href.startsWith("http://www.drivethrurpg.com/product/")){
+												link = href;
+												break;
+											}
+										}
+									}
+									
+									if (link!=null){
+										
+										if (link.indexOf("?")>0){
+											link = link + "&";
+										} else {
+											link = link + "?";
+										}
+										link = link +  "affiliate_id=597859";			
+									}
+									
+									logger.info("Found link: " + link);																		
 								}
 								
 								
@@ -124,94 +149,208 @@ public class DrivethrurpgItemLookupService implements ProductInfoLookupService<E
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return result;
+		return link;
+	
 	}
-
+	
 	@Override
-	public byte[] getImageData(Element doc) throws TooFastConnectionException {
-		return null;
-	}
-
-	@Override
-	public String getDescription(Element doc) throws TooFastConnectionException {
-		return null;
-	}
-
-	@Override
-	public Integer getPublicationYear(Element doc) throws TooFastConnectionException {
-		return null;
-	}
-
-	@Override
-	public Set getAuthors(Element doc) throws TooFastConnectionException {
-		return null;
-	}
-
-	@Override
-	public String getSeriesUrl(Element doc) throws TooFastConnectionException {
-		return null;
-	}
-
-	@Override
-	public String getAmazonUrl(Element doc) throws TooFastConnectionException {
-		return null;
-	}
-
-
-	@Override
-	public String getGoodReadsUrl(Element doc) throws TooFastConnectionException {
-		return null;
-	}
-
-	@Override
-	public String getPublisher(Element doc) throws TooFastConnectionException {
-		return null;
-	}
-
-	@Override
-	public String getDrivethrurpgUrl(Element productListing) throws TooFastConnectionException {
-						
-		String link = null;
-		if (productListing!=null){	
-			Elements links = productListing.getElementsByTag("a");
-			for (Element linkTag : links) {
-				String href = linkTag.attr("href");
-				if (href!=null && href.startsWith("http://www.drivethrurpg.com/product/")){
-					link = href;
-					break;
+	public DrivethrurpgData fetchDocFromProduct(Product product) throws TooFastConnectionException {
+		DrivethrurpgData data = new DrivethrurpgData();
+		if (product.getDrivethrurpgUrl()!=null && !"".equals(product.getDrivethrurpgUrl().trim())){
+			data.setLink(product.getDrivethrurpgUrl());
+		} else {
+			data.setLink(this.fetchUrlFromProductName(product));
+		}
+		if (data.getLink()!=null){
+			try {
+				Document doc = Jsoup.connect(data.getLink()).get();
+				if (doc!=null){
+					data.setDoc(doc);
 				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
-		
-		logger.info("Found link: " + link);
+		return data;
+	}
+
+	@Override
+	public byte[] getImageData(DrivethrurpgData doc) throws TooFastConnectionException {
+		return null;
+	}
+
+	@Override
+	public String getDescription(DrivethrurpgData doc) throws TooFastConnectionException {
+		return null;
+	}
+
+	@Override
+	public Integer getPublicationYear(DrivethrurpgData doc) throws TooFastConnectionException {
+		return null;
+	}
+
+	@Override
+	public Set getAuthors(DrivethrurpgData doc) throws TooFastConnectionException {
+		return null;
+	}
+
+	@Override
+	public String getSeriesUrl(DrivethrurpgData doc) throws TooFastConnectionException {
+		return null;
+	}
+
+	@Override
+	public String getAmazonUrl(DrivethrurpgData doc) throws TooFastConnectionException {
+		return null;
+	}
+
+
+	@Override
+	public String getGoodReadsUrl(DrivethrurpgData doc) throws TooFastConnectionException {
+		return null;
+	}
+
+	@Override
+	public String getPublisher(DrivethrurpgData doc) throws TooFastConnectionException {
+		return null;
+	}
+
+	@Override
+	public String getDrivethrurpgUrl(DrivethrurpgData doc) throws TooFastConnectionException {
+		String link = null;
+		if (doc!=null){
+			link = doc.getLink();
+		}
 		return link;
 	}
 	
-	public Long getDollarPrice(Element productListing) throws TooFastConnectionException{
+	private Long getPriceFromProductPriceNode(Element element){
+		String priceText = null;
 		Long priceLong = null;
-		String priceString = null;
-		if (productListing!=null){	
-			
-			Elements productSepcialPriceNode = productListing.getElementsByClass("productSpecialPrice");
-			if (productSepcialPriceNode!=null && productSepcialPriceNode.size()==1){
-				priceString = productSepcialPriceNode.get(0).text();
-				
-			}else {
-				Element lastColumn = productListing.getElementsByTag("td").last();
-				priceString = lastColumn.ownText();
+		if (element!=null){
+			Elements priceElements = null;
+			priceElements = element.getElementsByClass("product-price-special");
+			if (priceElements==null || priceElements.size()<=0){
+				priceElements = element.getElementsByClass("product-price-base");
+			}
+			if (priceElements!=null && priceElements.size()>0){
+				priceText = priceElements.text();  
+			}
+			if (priceText!=null){
+				priceText = priceText.replaceAll("\\.", "");
+				priceText = priceText.replaceAll("\\$", "");
+				priceText = priceText.replaceAll("\u00A0", "");
+				priceText = priceText.trim();					
+				try{
+					priceLong = Long.parseLong(priceText.replaceAll("\\.", ""));				
+				}catch(Exception ex){ex.printStackTrace();}
 			}
 		}
-		try {
-			if (priceString!=null){
-				priceString = priceString.replaceAll("\\.", "");
-				priceString = priceString.replaceAll("\\$", "");
-				priceString = priceString.replaceAll("\u00A0", "");
-				priceString = priceString.trim();
-				logger.info("Price string: *" + priceString+"*");			
-				priceLong = Long.parseLong(priceString.replaceAll("\\.", ""));
-			}
-		}catch(Exception ex){ ex.printStackTrace();}
+				
 		return priceLong;
+	}
+	
+	public Map<String,Long> getDollarPrice(DrivethrurpgData doc) throws TooFastConnectionException{
+		Long priceLong = null;
+		String priceString = null;
+		Map<String,Long> result = null;
+		if (doc!=null && doc.getDoc()!=null){
+			
+			Elements priceEntries = doc.getDoc().getElementsByClass("product-price-item");
+			
+
+			Element hardcoverColorPremiumNode = null;
+			Element hardcoverPremiumNode = null;
+			Element hardcoverNode = null;
+			Element softcoverColorPremiumNode = null;
+			Element softcoverPremiumNode = null;
+			Element softcoverNode = null;
+			
+			Long hardcoverColorPremiumPrice = null;
+			Long hardcoverPremiumPrice = null;
+			Long hardcoverPrice = null;
+			Long softcoverColorPremiumPrice = null;
+			Long softcoverPremiumPrice = null;
+			Long softcoverPrice = null;
+			
+			
+			if (priceEntries!=null){
+				for (int i=0;i<priceEntries.size();i++){
+					Element priceEntry = priceEntries.get(i);
+					String text = priceEntry.text();
+					if (text!=null){
+						
+						Long price = getPriceFromProductPriceNode(priceEntry);
+						logger.info("Text: " + text);
+						
+						if (text.contains("Hardcover") && text.contains("Premium") && text.contains("Color")){
+							if (price!=null && (hardcoverColorPremiumPrice==null || price <hardcoverColorPremiumPrice)){
+								hardcoverColorPremiumNode = priceEntry;
+								hardcoverColorPremiumPrice = price;								
+							}
+							logger.info("Price Hardcover Premium Color: " + price);
+						}else if (text.contains("Hardcover") && text.contains("Premium")){
+							if (price!=null && (hardcoverPremiumPrice==null || price <hardcoverPremiumPrice)){
+								hardcoverPremiumNode = priceEntry;
+								hardcoverPremiumPrice = price;
+							}
+							logger.info("Price Hardcover Premium: " + price);
+						} else if (text.contains("Softcover") && text.contains("Premium") && text.contains("Color")){
+							if (price!=null && (softcoverColorPremiumPrice==null || price <softcoverColorPremiumPrice)){
+								softcoverColorPremiumNode = priceEntry;
+								softcoverColorPremiumPrice = price;
+							}
+							logger.info("Price Softcover Premium Color: " + price);
+						} else if (text.contains("Softcover") && text.contains("Premium")){
+							if (price!=null && (softcoverPremiumPrice==null || price <softcoverPremiumPrice)){
+								softcoverPremiumNode = priceEntry;
+								softcoverPremiumPrice = price;
+							}
+							logger.info("Price Softcover Premium: " + price);
+						} else if (text.contains("Hardcover")){
+							if (price!=null && (hardcoverPrice==null || price <hardcoverPrice)){
+								hardcoverNode = priceEntry;
+								hardcoverPrice = price;
+							}						
+							logger.info("Price Hardcover: " + price);
+						} else if (text.contains("Softcover")){
+							if (price!=null && (softcoverPrice==null || price <softcoverPrice)){
+								softcoverNode = priceEntry;
+								softcoverPrice = price;
+							}	
+							logger.info("Price Softcover: " + price);
+						}
+					}
+				}
+				
+				result = new HashMap<>();
+				if (hardcoverColorPremiumPrice!=null) { 
+					result.put("Hardcover Premium Color", hardcoverColorPremiumPrice);
+				}
+				if (hardcoverPremiumPrice!=null) {
+					result.put("Hardcover Premium", hardcoverPremiumPrice);					
+				}
+				if (hardcoverPrice!=null) {
+					result.put("Hardcover", hardcoverPrice);					
+				}
+				if (softcoverColorPremiumPrice!=null) {
+					result.put("Softcover Premium Color", softcoverColorPremiumPrice);					
+				}
+				if (softcoverPremiumPrice!=null) {
+					result.put("Softcover Premium", softcoverPremiumPrice);					
+				}
+				if (softcoverPrice!=null) {
+					result.put("Softcover", softcoverPrice);
+				}
+				if (result.isEmpty()){
+					result = null;
+				}
+			}
+			
+		}
+
+		return result;
 	}
 
 }
