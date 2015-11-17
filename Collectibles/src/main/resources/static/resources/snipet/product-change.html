@@ -78,7 +78,7 @@
 	<div ng-if="product.connectorInfo && product.connectorInfo.length>0">
 		<div class="row">			
 			<div class="form-group col-lg-4 col-md-6 col-xs-12" ng-repeat="connector in product.connectorInfo" ng-if="connector.hasReference">
-				<label>{{connector.name}}</label>
+				<label>{{connector.name}} Reference</label>
 				<input class="form-control" ng-model="product.connectorReferences[connector.name]"/>
 			</div>			
 		</div>

@@ -33,8 +33,7 @@
 			if ($scope.product!=null && $scope.product.id!=null){
 				Product.refresh($scope.product)
 				.success(function(data){					
-					$scope.product = Product.prepareProduct(data);
-					console.log($scope.product);
+					$scope.product = Product.prepareProduct(data);					
 					Message.success("Products has been refreshed");			
 				})
 				.catch(function(){
@@ -72,7 +71,6 @@
 				product.hierarchyPlacement.id!=null && product.hierarchyPlacement.id!=undefined){					
 				
 				var productToSend = angular.copy(product);
-				productToSend.images = null;
 				
 				var promise = null;				
 				if (product.id==null || product.id==undefined){					
@@ -88,7 +86,7 @@
 					} else {
 						Message.success("Product was updated");
 					}					
-					$scope.product = data;	
+					$scope.product = Product.prepareProduct(data);
 					
 				})
 				.catch(function(){					

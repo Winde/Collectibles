@@ -350,8 +350,7 @@ public class Product extends SimpleIdDao{
 		this.ratings = ratings;
 	}
 
-	public Map<String, String> getExternalLinks() {
-		System.out.println("External Links: "+ externalLinks);
+	public Map<String, String> getExternalLinks() {		
 		return externalLinks;
 	}
 
