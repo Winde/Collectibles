@@ -11,13 +11,6 @@
 					ngf-pattern="'image/*'"
 					ngf-select="productChangeCtrl.uploadImage($file)" >Upload</span></div>
 	</div>
-	
-	<div class="form-group" ng-if="product.id">
-		<label>Scrape</label>				
-		<span class="btn btn-default" 					
-			ng-click="productChangeCtrl.refreshScrape()" >Refresh</span>
-	</div>
-	
 				
 	<!-- 			
 	<div class="form-group" ng-if="product.id">
@@ -99,7 +92,7 @@
 	</div>
 	
 	
-		
-	<button type="submit" value="Submit">Save</button>		
-	<button ng-click="productChangeCtrl.newProduct()" ng-if="productChangeCtrl.canCreateNew()">New Product</button>
+	<button class="btn btn-default" ng-if="product.id && productChangeCtrl.canCreateNew()" ng-click="productChangeCtrl.newProduct()" >New Product</button>
+	<span class="btn btn-default" ng-if="product.id" ng-click="productChangeCtrl.refreshScrape()" >Scrape</span>	
+	<button class="btn btn-default" type="submit" value="Submit">Save</button>			
 </form>

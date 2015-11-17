@@ -5,7 +5,7 @@
 	       function httpInjectProgress($q, $rootScope,ngProgressFactory) {
 		
 		var factory = this;
-		this.progressBarColor = '#fff';
+		this.progressBarColor = '#F62217';
 		   
 		  return {
 			 'request': function(request) {

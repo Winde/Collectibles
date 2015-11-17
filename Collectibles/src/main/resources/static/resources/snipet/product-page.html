@@ -49,7 +49,7 @@
 							<p><b>Price: </b></p>
 							<div class="blockContent">							
 								<p ng-if="product.dollarPrice" ng-repeat="(key, value) in product.dollarPrice">
-									<span ng-if="value">{{(value/100) | currency}}</span>
+									<span ng-if="value===0.0 || value">{{(value/100) | currency}}</span>
 									<span ng-if="key">({{key}})</span>
 								</p>
 								<p ng-if="product.lastPriceUpdate">Last updated: {{product.lastPriceUpdate | date:'yyyy-MM-dd HH:mm:ss'}}</p>
@@ -65,7 +65,7 @@
 						<div class="blockContent">							
 							<p ng-if="product.ratings" ng-repeat="(key, value) in product.ratings">
 								<span ng-if="key">{{key}}: </span>
-								<span ng-if="value">{{value | number:2}}</span>								
+								<span ng-if="value===0.0 || value">{{value | number:2}}</span>								
 							</p>							
 						</div>						
 					</div>	

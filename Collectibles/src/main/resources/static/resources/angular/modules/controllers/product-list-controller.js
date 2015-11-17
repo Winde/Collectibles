@@ -58,13 +58,16 @@
 		this.setSearchParameters = function(){
 			var searchObject = controller.obtainSearchParameters();
 
-			if (searchObject.hierarchy){
+			if (searchObject.hierarchy){			
 				var hierarchy = parseInt(searchObject.hierarchy)
 				if (!isNaN(hierarchy)){
 					$scope.hierarchy = {id: hierarchy};
 				}
-			} else {	$scope.hierarchy = {};}
-			
+			} else if ($scope.hierarchy == null || $scope.hierarchy == undefined){				
+				$scope.hierarchy = {};
+			}
+
+						
 			if (searchObject.search){		$scope.searchTerm = searchObject.search;
 			} else {	$scope.searchTerm = "";}
 			
@@ -122,14 +125,20 @@
 		if ($scope.root == undefined || $scope.root == null){
 			Hierarchy.root()
 			.success(function(data){
+				console.log("OBTAINED HIERARCHY")
 				$scope.root = { id: data.id };				
 				if ($scope.hierarchy == null || $scope.hierarchy == undefined){
 					$scope.hierarchy = { id: data.id };
 				}				
-				$scope.hierarchies.push({ id: data.id, name: "All", isRoot: true});			
+				var all = { id: data.id, name: "All", isRoot: true};
+				$scope.hierarchies.push(all);			
 				Hierarchy.calculateTree(data,$scope.hierarchies);
-				/**/
-				controller.setSearchParameters();			
+				
+				$scope.hierarchy = all;				
+				controller.setSearchParameters();	
+				
+				console.log($scope.hierarchy);
+				
 				if (!angular.equals({}, controller.obtainSearchParameters())){
 					controller.search();
 				}
