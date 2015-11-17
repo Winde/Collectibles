@@ -18,8 +18,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import model.connection.amazon.AmazonItemLookupService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -28,7 +26,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public abstract class ProductInfoLookupServiceXML implements ProductInfoLookupService<Document> {
+public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLookupService<Document> {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProductInfoLookupServiceXML.class);	
 	

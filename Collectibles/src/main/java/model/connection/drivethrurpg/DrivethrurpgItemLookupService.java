@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import model.connection.AbstractProductInfoLookupService;
 import model.connection.ProductInfoLookupService;
 import model.connection.TooFastConnectionException;
 import model.dataobjects.Product;
@@ -22,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DrivethrurpgItemLookupService implements ProductInfoLookupService<DrivethrurpgData> {
+public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupService<DrivethrurpgData> {
 
 
 	private static final Logger logger = LoggerFactory.getLogger(DrivethrurpgItemLookupService.class);
@@ -82,35 +83,7 @@ public class DrivethrurpgItemLookupService implements ProductInfoLookupService<D
 									productNames.add(title);
 								}
 								
-								int selectedIndex = -1;
-								int minDistance = -1;
-								for (int i=0;i<productNames.size();i++){
-									if (productNames.get(i)!=null && !"".equals(productNames.get(i).trim())){
-										
-										int distance = StringUtils.getLevenshteinDistance(product.getName(), productNames.get(i));
-										if (product.getHierarchyPlacement()!=null && product.getHierarchyPlacement().getName()!=null){
-											int distanceWithHierarchy = StringUtils.getLevenshteinDistance(product.getHierarchyPlacement().getName() + ": " + product.getName(), productNames.get(i));
-											distance = Math.min(distance, distanceWithHierarchy);
-										}
-										
-										logger.info("Title to discriminate: " + productNames.get(i) + ", distance= " + distance);
-										
-										if (distance < minDistance || minDistance < 0){
-											logger.info("Could be current best");
-											logger.info("Distance < maximum for multiple? " + (distance <= MAXIMUM_DISTANCE_TO_CONSIDER_MULTIPLE_RESULTS));
-											logger.info("Distance < maximum for single? " + (distance <= MAXIMUM_DISTANCE_TO_CONSIDER_SINGLE_RESULTS));
-											logger.info("We have X results =  " + productNames.size());
-											if (
-												(distance <= MAXIMUM_DISTANCE_TO_CONSIDER_MULTIPLE_RESULTS)
-												||
-												(distance <= MAXIMUM_DISTANCE_TO_CONSIDER_SINGLE_RESULTS && productNames.size()==1)
-											){
-											minDistance = distance;
-											selectedIndex = i;
-											}																																
-										}						
-									}					
-								}
+								int selectedIndex = super.selectName(productNames,product.getName());
 								
 		
 								if (selectedIndex>=0){
@@ -352,6 +325,13 @@ public class DrivethrurpgItemLookupService implements ProductInfoLookupService<D
 	@Override
 	public Double getRating(DrivethrurpgData doc)
 			throws TooFastConnectionException {
+		return null;
+	}
+
+	@Override
+	public String getReference(DrivethrurpgData doc)
+			throws TooFastConnectionException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

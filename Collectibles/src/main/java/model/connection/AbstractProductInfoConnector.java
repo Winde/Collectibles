@@ -191,9 +191,9 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						}							
 					}				
 
-					
-					if (product.getExternalLinks()==null || !product.getExternalLinks().keySet().contains(this.getIdentifier())){
-						String externalLink = null;
+					String externalLink = null;
+					if (product.getExternalLinks()==null || product.getExternalLinks().get(this.getIdentifier())==null){
+						
 						
 						externalLink = itemLookup.getExternalUrlLink(doc);
 						logger.info("Obtained Url for "+this.getIdentifier()+": " + externalLink);
@@ -206,10 +206,12 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 							}
 							externalLinks.put(this.getIdentifier(), externalLink);
 						}
+					} else {
+						logger.info("Already got url? : " + product.getExternalLinks().get(this.getIdentifier()));
 					}
 					
 					String seriesKey = this.getIdentifier() + "Series";
-					if (product.getExternalLinks()==null || !product.getExternalLinks().keySet().contains(seriesKey)){
+					if (product.getExternalLinks()==null || product.getExternalLinks().get(seriesKey)!=null){
 						String seriesUrl = null;
 						seriesUrl = itemLookup.getSeriesUrl(doc);
 						logger.info("Obtained "+this.getIdentifier()+" series url :" + seriesUrl);
@@ -319,6 +321,20 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						}
 						ratings.put(this.getIdentifier(), rating);
 					}
+					
+					if (product.getConnectorReferences() == null || product.getConnectorReferences().get(this.getIdentifier())==null){
+						String reference = itemLookup.getReference(doc);
+						logger.info("Obtained reference :" + reference);
+						if (reference!=null){
+							Map<String, String> references = product.getConnectorReferences();
+							if (references==null){
+								references = new HashMap<>();
+								product.setConnectorReferences(references);
+							}
+							references.put(this.getIdentifier(), reference);
+						}
+					}
+					
 				} else {
 					logger.info(this.getIdentifier() + " o btained null doc for product: "+ product.getName());
 				}

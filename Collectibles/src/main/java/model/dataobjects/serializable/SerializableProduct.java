@@ -373,6 +373,15 @@ public class SerializableProduct {
 	}
 
 	public void setExternalLinks(Map<String, String> externalLinks) {
+		if (externalLinks!=null){
+			Iterator<Entry<String, String>> iterator = externalLinks.entrySet().iterator();
+			while (iterator.hasNext()){
+				Entry<String, String> entry = iterator.next();
+				if (entry!=null && (entry.getValue()==null || "".equals(entry.getValue().trim()))){
+					iterator.remove();
+				}
+			}			
+		}				
 		this.externalLinks = externalLinks;
 	}
 

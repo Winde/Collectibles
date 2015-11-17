@@ -39,4 +39,6 @@ public interface ProductInfoLookupService<E> {
 	public Map<String, Long> getDollarPrice(E doc) throws TooFastConnectionException;
 	
 	public Double getRating(E doc) throws TooFastConnectionException;
+	
+	public String getReference(E doc) throws TooFastConnectionException;
 }

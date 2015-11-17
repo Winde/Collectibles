@@ -196,6 +196,11 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 		return null;
 	}
 
+	@Override
+	public String getReference(Document doc) throws TooFastConnectionException {
+		return super.getField(doc, "/GoodreadsResponse/book/id");
+	}
+
 	
 	
 }

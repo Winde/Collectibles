@@ -252,7 +252,10 @@ public class ProductController  extends CollectiblesController{
 				product.setHierarchyPlacement(hierarchyNode);
 				this.validate(product);				
 				Product result = productRepository.save(product);
-				return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
+				
+				this.scrapeProduct(result);
+				
+				return SerializableProduct.cloneProduct(result,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
 			} else {
 				throw new NotFoundException(new String[]{"hierarchy"});
 			}
@@ -382,7 +385,7 @@ public class ProductController  extends CollectiblesController{
 				product.setCategoryValues(productInDb.getCategoryValues());
 				product.setImages(productInDb.getImages());							
 				product.setProcessedConnectors(productInDb.getProcessedConnectors());
-				
+				//product.setConnectorReferences(productInDb.getConnectorReferences());
 
 				if (serializableProduct.getOwnedAnotherLanguage()!=null){
 					Authentication auth = SecurityContextHolder.getContext().getAuthentication();

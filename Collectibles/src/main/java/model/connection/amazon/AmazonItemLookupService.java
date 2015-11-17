@@ -22,7 +22,9 @@
 package model.connection.amazon;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,6 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 @Service
 public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
@@ -61,6 +65,83 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
     	this.ENDPOINT = ENDPOINT;
 	    this.ASSOCIATE_TAG = ASSOCIATE_TAG;
     }    
+  
+	private String getReferenceByName(String name) {
+		String reference = null;
+		String url = this.getSearchByName(name);
+		if (url!=null){
+			Document doc = null;
+			try {
+				doc = super.fetchDocFromUrl(url);
+			} catch (FileNotFoundException | TooFastConnectionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (doc!=null){
+				NodeList nodes = super.getNodes(doc, "/ItemSearchResponse/Items/Item/ItemAttributes/Title");
+				if (nodes!=null){
+					List<String> productNames = new ArrayList<>();
+					for (int i=0;i<nodes.getLength();i++){
+						String title = "";
+						title = nodes.item(i).getTextContent();
+						productNames.add(title);
+					}
+					
+					int selectedIndex = super.selectName(productNames, name);
+					if (selectedIndex>=0){
+						Node selectedNode = nodes.item(selectedIndex);
+						if (selectedNode!=null && selectedNode.getParentNode()!=null && selectedNode.getParentNode().getParentNode()!=null){
+							NodeList dataNodes = selectedNode.getParentNode().getParentNode().getChildNodes();
+							if (dataNodes!=null){
+								for (int i=0;i<dataNodes.getLength();i++){
+									if ("ASIN".equals(dataNodes.item(i).getNodeName())){
+										reference = dataNodes.item(i).getTextContent();
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return reference;
+		
+	}
+    
+    private String getSearchByNameUrl(String service,String operation,String responseGroup, String title){
+    	/*
+         * Set up the signed requests helper 
+         */
+        SignedRequestsHelper helper;
+        try {
+            helper = SignedRequestsHelper.getInstance(ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        
+        String requestUrl = null;
+
+        /* The helper can sign requests in two forms - map form and string form */
+        
+        /*
+         * Here is an example in map form, where the request parameters are stored in a map.
+         */        
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("Service", service);
+        params.put("Version", "2009-03-31");
+        params.put("Operation", operation);
+        params.put("Keywords", title);
+        params.put("SearchIndex", "All");        
+        params.put("ResponseGroup", responseGroup);
+        params.put("AssociateTag", ASSOCIATE_TAG);
+
+        requestUrl = helper.sign(params);
+        
+        return requestUrl;
+    	
+    }
     
     private String getUrl(String service,String operation,String responseGroup, String id){
     	/*
@@ -94,9 +175,15 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
         return requestUrl;
     }
     
-    public String getMultipleUseUrl(String id) throws TooFastConnectionException {
+    public String getMultipleUseUrl(String id) {
     	String url = getUrl("AWSECommerceService","ItemLookup","Large",id);
     	logger.info("Amazon url for fetch data: " + url);
+    	return url;
+    }
+    
+    public String getSearchByName(String name) {
+    	String url = getSearchByNameUrl("AWSECommerceService","ItemSearch","Small",name);
+    	logger.info("Amazon url for fetch data by name: " + url);
     	return url;
     }
 
@@ -129,6 +216,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 
 	@Override
 	public Document fetchDocFromProduct(Product product) throws TooFastConnectionException, FileNotFoundException {
+		this.getSearchByName(product.getName());
 		String reference = null;
 		if (product.getConnectorReferences()!=null && product.getConnectorReferences().get(this.getIdentifier())!=null){
 			reference = product.getConnectorReferences().get(this.getIdentifier());		
@@ -136,12 +224,26 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		if (reference==null || "".equals(reference.trim())){
 			reference = product.getUniversalReference();
 		}
+		if (reference==null){			
+			reference = this.getReferenceByName(product.getName());
+			if (reference!=null){
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
 		if (reference == null){
 			return null;
 		}
 		String url = this.getMultipleUseUrl(reference);
 		return this.fetchDocFromUrl(url);
 	}
+
+
 
 
 	@Override
@@ -198,6 +300,11 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	@Override
 	public Double getRating(Document doc) throws TooFastConnectionException {
 		return null;
+	}
+
+	@Override
+	public String getReference(Document doc) throws TooFastConnectionException {
+		return super.getField(doc, "/ItemLookupResponse/Items/Item/ASIN");
 	}
 
 }
