@@ -389,7 +389,7 @@ public class ProductController  extends CollectiblesController{
 				
 				Product result = productRepository.save(product);
 				
-				return SerializableProduct.cloneProduct(product,connectorFactory.getConnectorNames(product));
+				return SerializableProduct.cloneProduct(result,connectorFactory.getConnectorNames(result));
 			} else {
 				throw new NotFoundException(new String[]{"product"});
 			}

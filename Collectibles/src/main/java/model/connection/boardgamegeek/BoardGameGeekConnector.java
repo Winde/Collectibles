@@ -33,5 +33,10 @@ public class BoardGameGeekConnector extends AbstractProductInfoConnector{
 	public boolean hasOwnReference() {
 		return true;
 	}
+	
+	@Override
+	public String toString(){
+		return "BoardGameGeekConnector";
+	}
 
 }

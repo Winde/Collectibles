@@ -18,13 +18,20 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import model.connection.amazon.AmazonItemLookupService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public abstract class ProductInfoLookupServiceXML implements ProductInfoLookupService<Document> {
 
+	private static final Logger logger = LoggerFactory.getLogger(ProductInfoLookupServiceXML.class);	
+	
 	protected byte[] fetchImage(String url) throws TooFastConnectionException {
 		byte[] imageInByte = null;
 		if (url!=null){
@@ -143,6 +150,41 @@ public abstract class ProductInfoLookupServiceXML implements ProductInfoLookupSe
 		}
 		
 		return fields;
+	}
+	
+	public String getAttribute(Document doc, String xpath, String attributeToReturn) {
+		String result = null;
+		XPath xPath = XPathFactory.newInstance().newXPath();			
+		try {
+			NodeList nodes = (NodeList)xPath.evaluate(xpath, doc.getDocumentElement(),XPathConstants.NODESET);
+			if (nodes!=null && nodes.getLength()>0) {
+				for (int i=0;i<nodes.getLength();i++){
+					Node node = nodes.item(i);
+					NamedNodeMap attributes = node.getAttributes();
+					logger.info("Node: " +node );
+					if (attributes!=null && attributes.getLength()>0) {
+						for (int j=0;j<attributes.getLength();j++) {							
+							Node attribute = attributes.item(j);	
+							logger.info("Attribute: " +attribute + "[name: " + attribute.getNodeName() + ", value: " + attribute.getNodeValue() + "]" );
+							logger.info(attributeToReturn + "=" + attribute.getNodeName() +"? " + (attribute!=null && attributeToReturn.equals(attribute.getNodeName())));
+							if (attribute!=null && attributeToReturn.equals(attribute.getNodeName())){
+								result = attribute.getNodeValue();
+								break;
+							}
+							
+						}
+					}
+					if (result!=null){
+						break;
+					}
+				}
+			}
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 	
 }

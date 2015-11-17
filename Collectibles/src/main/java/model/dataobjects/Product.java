@@ -112,6 +112,17 @@ public class Product extends SimpleIdDao{
 	@Column(name="dollar_price")
 	private Map<String,Long> dollarPrice = null;
 	
+	@ElementCollection(fetch = FetchType.LAZY)
+	@CollectionTable(name="product_rating", joinColumns=@JoinColumn(name="id"))
+	@Column(name="rating")
+	private Map<String,Double> ratings = null;
+	
+	@ElementCollection(fetch = FetchType.LAZY)
+	@CollectionTable(name="product_links", joinColumns=@JoinColumn(name="id"))
+	@Column(name="external_links")
+	private Map<String,String> externalLinks = null;
+	
+	
 	@Column(name="min_price")
 	private Long minPrice = null;	
 	
@@ -376,6 +387,24 @@ public class Product extends SimpleIdDao{
 	public void setLastPriceUpdate(Date lastPriceUpdate) {
 		this.lastPriceUpdate = lastPriceUpdate;
 	}
+
+	public Map<String, Double> getRatings() {
+		return ratings;
+	}
+
+	public void setRatings(Map<String, Double> ratings) {
+		this.ratings = ratings;
+	}
+
+	public Map<String, String> getExternalLinks() {
+		System.out.println("External Links: "+ externalLinks);
+		return externalLinks;
+	}
+
+	public void setExternalLinks(Map<String, String> externalLinks) {
+		this.externalLinks = externalLinks;
+	}
+
 	
 	
 }

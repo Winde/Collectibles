@@ -4,12 +4,14 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import model.connection.amazon.AmazonItemLookupService;
 import model.dataobjects.Author;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
@@ -28,9 +30,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 public abstract class AbstractProductInfoConnector implements ProductInfoConnector{
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractProductInfoConnector.class);
-		
+	
 	@Autowired
-	PlatformTransactionManager transactionManager;
+	private PlatformTransactionManager transactionManager;
 	
 	@Autowired
 	private ProductRepository productRepository;
@@ -157,9 +159,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	protected boolean updateProductDo(Product product, Collection<Image> imagesAdd, Collection<Image> imagesRemove, Set<Author> authorsAdd) throws TooFastConnectionException, FileNotFoundException{
 		boolean processed = false;
 		ProductInfoLookupService itemLookup = this.getImageLookupService();		
-		
-		logger.info("Checking if we have product universal reference");
-		
+
 		if (this.isApplicable(product)){			
 			if (this.checkIfAlreadyProcessed(product)) {
 			
@@ -192,36 +192,34 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					}				
 
 					
-					if (product.getAmazonUrl()==null){
-						String amazonUrl = null;
+					if (product.getExternalLinks()==null || !product.getExternalLinks().keySet().contains(this.getIdentifier())){
+						String externalLink = null;
 						
-						amazonUrl = itemLookup.getAmazonUrl(doc);
-						logger.info("Obtained Url from Amazon: " + amazonUrl);
+						externalLink = itemLookup.getExternalUrlLink(doc);
+						logger.info("Obtained Url for "+this.getIdentifier()+": " + externalLink);
 							
-						if (amazonUrl!=null){
-							product.setAmazonUrl(amazonUrl);
+						if (externalLink!=null){
+							Map<String, String> externalLinks = product.getExternalLinks();
+							if (externalLinks==null){
+								externalLinks = new HashMap<>();
+								product.setExternalLinks(externalLinks);								
+							}
+							externalLinks.put(this.getIdentifier(), externalLink);
 						}
 					}
 					
-					if (product.getGoodreadsUrl()==null){
-						String goodreadsUrl = null;
-						
-						goodreadsUrl = itemLookup.getGoodReadsUrl(doc);
-						logger.info("Obtained Url from Goodreads: " + goodreadsUrl);
-							
-						if (goodreadsUrl!=null){
-							product.setGoodreadsUrl(goodreadsUrl);
-						}
-					}
-					
-					if (product.getDrivethrurpgUrl()==null){
-						String drivethrurpgUrl = null;
-						
-						drivethrurpgUrl = itemLookup.getDrivethrurpgUrl(doc);
-						logger.info("Obtained Url from Drivethrurpg: " + drivethrurpgUrl);
-							
-						if (drivethrurpgUrl!=null){
-							product.setDrivethrurpgUrl(drivethrurpgUrl);
+					String seriesKey = this.getIdentifier() + "Series";
+					if (product.getExternalLinks()==null || !product.getExternalLinks().keySet().contains(seriesKey)){
+						String seriesUrl = null;
+						seriesUrl = itemLookup.getSeriesUrl(doc);
+						logger.info("Obtained "+this.getIdentifier()+" series url :" + seriesUrl);
+						if (seriesUrl!=null){
+							Map<String, String> externalLinks = product.getExternalLinks();
+							if (externalLinks==null){
+								externalLinks = new HashMap<>();
+								product.setExternalLinks(externalLinks);								
+							}
+							externalLinks.put(seriesKey, seriesUrl);
 						}
 					}
 					
@@ -284,14 +282,9 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						}
 					}
 					
-					if (product.getGoodreadsRelatedLink()==null){
-						String seriesUrl = null;
-						seriesUrl = itemLookup.getSeriesUrl(doc);
-						logger.info("Obtained series url :" + seriesUrl);
-						if (seriesUrl!=null){
-							product.setGoodreadsRelatedLink(seriesUrl);
-						}
-					}
+					
+					
+					
 					
 					if (product.getAuthors()==null || product.getAuthors().size()==0){
 						Set<Author> authors = null;
@@ -306,6 +299,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					
 					Map<String,Long> prices = itemLookup.getDollarPrice(doc);					
 					if (prices!=null){
+						logger.info("Obtained prices :" + prices);
 						for (Entry<String,Long> priceEntry: prices.entrySet()){
 							String key = this.getIdentifier();
 							if (priceEntry.getKey()!=null && !"".equals(priceEntry.getKey().trim())){
@@ -315,15 +309,27 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						}
 					}
 					
+					Double rating = itemLookup.getRating(doc);
+					if (rating!=null){
+						logger.info("Obtained rating :" + rating);
+						Map<String, Double> ratings = product.getRatings();
+						if (ratings!=null){
+							ratings = new HashMap<>();
+							product.setRatings(ratings);
+						}
+						ratings.put(this.getIdentifier(), rating);
+					}
+				} else {
+					logger.info(this.getIdentifier() + " o btained null doc for product: "+ product.getName());
 				}
 				processed = true;
 			} else {
-				logger.info("Skipping process, product already processed");
+				logger.info("Skipping process, product already processed for product: " + product.getName());
 			}
 			
 						
 		} else {
-			logger.info("NO Product universal reference");
+			logger.info("Connector "+this.getIdentifier()+" is not applicable to product: " + product.getName());
 		}
 		return processed;
 	}

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import model.connection.ProductInfoLookupServiceXML;
 import model.connection.TooFastConnectionException;
+import model.connection.drivethrurpg.DrivethrurpgData;
 import model.dataobjects.Author;
 import model.dataobjects.Product;
 
@@ -76,8 +77,7 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	}
 	
 	@Override
-	public String getGoodReadsUrl(Document doc)
-			throws TooFastConnectionException {
+	 public String getExternalUrlLink(Document doc) throws TooFastConnectionException {
 		return this.getField(doc, "/GoodreadsResponse/book/url");
 	}
 	
@@ -157,18 +157,20 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	public Document fetchDocFromProduct(Product product) throws TooFastConnectionException {
 		String reference = null;
 		if (product.getConnectorReferences()!=null && product.getConnectorReferences().get(this.getIdentifier())!=null){
-			reference = product.getConnectorReferences().get(this.getIdentifier());
-			if (reference==null){
-				reference = product.getUniversalReference();
-			}
+			reference = product.getConnectorReferences().get(this.getIdentifier());		
+		}
+		if (reference==null || "".equals(reference.trim())){
+			reference = product.getUniversalReference();
 		}
 		if (reference == null){
 			return null;
 		}
 		String requestUrl = null;
 		
+		
 		requestUrl = this.getLookupUrl(reference);
 		
+		logger.info(this.getIdentifier()+ "connecting to url: " + requestUrl);
 		Document doc = null;
 		try{
 			doc = this.fetchDocFromUrl(requestUrl);
@@ -180,17 +182,6 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	}
 
 	@Override
-	public String getAmazonUrl(Document doc) throws TooFastConnectionException {
-		return null;
-	}
-
-	@Override
-	public String getDrivethrurpgUrl(Document doc)
-			throws TooFastConnectionException {
-		return null;
-	}
-
-	@Override
 	public Map<String,Long> getDollarPrice(Document doc) throws TooFastConnectionException {
 		return null;
 	}
@@ -198,6 +189,11 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 
 	public String getIdentifier() {
 		return IDENTIFIER;
+	}
+
+	@Override
+	public Double getRating(Document doc) throws TooFastConnectionException {
+		return null;
 	}
 
 	

@@ -1,6 +1,5 @@
 package model.dataobjects.serializable;
 
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,21 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.persistence.Column;
-
-import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-
-import model.connection.AbstractProductInfoConnector;
-import model.connection.ProductInfoConnector;
-import model.connection.ProductInfoConnectorFactory;
 import model.dataobjects.Author;
 import model.dataobjects.Author.AuthorView;
 import model.dataobjects.CategoryValue;
@@ -38,11 +22,18 @@ import model.dataobjects.SimpleIdDao.SimpleIdDaoView;
 import model.dataobjects.User;
 import model.dataobjects.supporting.ObjectList.ObjectListView;
 
+import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonView;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class SerializableProduct {
 
@@ -126,6 +117,13 @@ public class SerializableProduct {
 	
 	@JsonView(ProductComplexView.class)
 	private Map<String,String> connectorReferences;
+	
+	@JsonView(ProductComplexView.class)
+	private Map<String,Double> ratings = null;
+	
+	@JsonView(ProductComplexView.class)
+	@JsonInclude(Include.ALWAYS) 
+	private Map<String,String> externalLinks = null;
 	
 	public static Collection<SerializableProduct> cloneProduct(Collection<Product> products){
 		return cloneProduct(products,null);
@@ -407,6 +405,22 @@ public class SerializableProduct {
 		return product;
 	}
 
+	public Map<String, Double> getRatings() {
+		return ratings;
+	}
+
+	public void setRatings(Map<String, Double> ratings) {
+		this.ratings = ratings;
+	}
+
+	public Map<String, String> getExternalLinks() {
+		return externalLinks;
+	}
+
+	public void setExternalLinks(Map<String, String> externalLinks) {
+		this.externalLinks = externalLinks;
+	}
 
 	
+
 }

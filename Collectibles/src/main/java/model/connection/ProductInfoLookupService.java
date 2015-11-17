@@ -26,13 +26,17 @@ public interface ProductInfoLookupService<E> {
 	
 	public String getSeriesUrl(E doc) throws TooFastConnectionException;
 	
+	public String getExternalUrlLink(E doc) throws TooFastConnectionException;
+	/*
 	public String getAmazonUrl(E doc) throws TooFastConnectionException;
     
 	public String getGoodReadsUrl(E doc) throws TooFastConnectionException;
 	
 	public String getDrivethrurpgUrl(E doc) throws TooFastConnectionException;
-    
+    */
 	public String getPublisher(E doc)  throws TooFastConnectionException;
 	
 	public Map<String, Long> getDollarPrice(E doc) throws TooFastConnectionException;
+	
+	public Double getRating(E doc) throws TooFastConnectionException;
 }

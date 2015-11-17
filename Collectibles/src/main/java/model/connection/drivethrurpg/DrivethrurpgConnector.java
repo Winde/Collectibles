@@ -26,7 +26,7 @@ public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 	
 
 	public String toString(){
-		return "GoodReadsConnector";
+		return "DrivethruRPGConnector";
 	}
 
 	@Override

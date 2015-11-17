@@ -100,7 +100,8 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
     	return url;
     }
 
-    public String getAmazonUrl(Document doc) throws TooFastConnectionException {
+	@Override
+    public String getExternalUrlLink(Document doc){
     	return this.getField(doc, "/ItemLookupResponse/Items/Item/DetailPageURL");		    	
 	}
     
@@ -130,10 +131,10 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	public Document fetchDocFromProduct(Product product) throws TooFastConnectionException, FileNotFoundException {
 		String reference = null;
 		if (product.getConnectorReferences()!=null && product.getConnectorReferences().get(this.getIdentifier())!=null){
-			reference = product.getConnectorReferences().get(this.getIdentifier());
-			if (reference==null){
-				reference = product.getUniversalReference();
-			}
+			reference = product.getConnectorReferences().get(this.getIdentifier());		
+		}
+		if (reference==null || "".equals(reference.trim())){
+			reference = product.getUniversalReference();
 		}
 		if (reference == null){
 			return null;
@@ -157,18 +158,6 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 
 	@Override
 	public String getSeriesUrl(Document doc) throws TooFastConnectionException {
-		return null;
-	}
-
-	@Override
-	public String getGoodReadsUrl(Document doc)
-			throws TooFastConnectionException {
-		return null;
-	}
-
-	@Override
-	public String getDrivethrurpgUrl(Document doc)
-			throws TooFastConnectionException {
 		return null;
 	}
 
@@ -205,4 +194,10 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	public String getIdentifier(){
 		return IDENTIFIER;
 	}
+
+	@Override
+	public Double getRating(Document doc) throws TooFastConnectionException {
+		return null;
+	}
+
 }

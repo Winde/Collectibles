@@ -201,23 +201,12 @@ public class DrivethrurpgItemLookupService implements ProductInfoLookupService<D
 	}
 
 	@Override
-	public String getAmazonUrl(DrivethrurpgData doc) throws TooFastConnectionException {
-		return null;
-	}
-
-
-	@Override
-	public String getGoodReadsUrl(DrivethrurpgData doc) throws TooFastConnectionException {
-		return null;
-	}
-
-	@Override
 	public String getPublisher(DrivethrurpgData doc) throws TooFastConnectionException {
 		return null;
 	}
 
 	@Override
-	public String getDrivethrurpgUrl(DrivethrurpgData doc) throws TooFastConnectionException {
+    public String getExternalUrlLink(DrivethrurpgData doc) throws TooFastConnectionException {
 		String link = null;
 		if (doc!=null){
 			link = doc.getLink();
@@ -351,6 +340,12 @@ public class DrivethrurpgItemLookupService implements ProductInfoLookupService<D
 		}
 
 		return result;
+	}
+
+	@Override
+	public Double getRating(DrivethrurpgData doc)
+			throws TooFastConnectionException {
+		return null;
 	}
 
 }
