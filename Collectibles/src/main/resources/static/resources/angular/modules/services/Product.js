@@ -17,7 +17,15 @@
 					url: '/product/find/'+id, 
 					progressbar: true 
 				});
-			},				
+			},
+			refresh: function(product) {				
+				return $http({ 
+					method: 'PUT', 
+					url: '/product/refresh/', 
+					data: product,
+					progressbar: true 
+				});
+			},
 			create: function(product){
 				factory.cleanUpProduct(product);
 				return $http({ 
@@ -82,8 +90,31 @@
 				});
 								
 				return upload;
-			}
-			
+			},
+			prepareProduct : function(data){							
+				if (data.images!=undefined && data.images!=null && data.images.length>0){
+					if (data.mainImage != null) {
+						for (var i=0;i<data.images.length;i++){
+							if (data.images[i].id == data.mainImage.id){
+								data.selectedImage =data.images[i]; 
+							}
+						}
+					} else {
+						data.selectedImage =data.images[0]; 
+					}										
+				}
+				
+				if (data.hierarchyPlacement) {
+					data.hierarchyPath = [];
+					var current = data.hierarchyPlacement; 										
+					while (current.father){
+						data.hierarchyPath.unshift(current);
+						current = current.father;
+					}
+					
+				}
+				return data;
+			} 			
 		}		
 	});
 	

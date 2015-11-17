@@ -29,6 +29,23 @@
 			$scope.product = {};
 		}
 		
+		this.refreshScrape = function(){
+			if ($scope.product!=null && $scope.product.id!=null){
+				Product.refresh($scope.product)
+				.success(function(data){					
+					$scope.product = Product.prepareProduct(data);
+					console.log($scope.product);
+					Message.success("Products has been refreshed");			
+				})
+				.catch(function(){
+					Message.alert("There was an error");
+				})
+				.finally(function(){
+					
+				})
+			}			
+		}
+		
 		this.uploadFile = function(){			
 			if (controller.uploading!=true){
 				controller.uploading = true;
@@ -70,8 +87,8 @@
 						Message.success("Product was created",true);
 					} else {
 						Message.success("Product was updated");
-					}
-					product.id = data.id;	
+					}					
+					$scope.product = data;	
 					
 				})
 				.catch(function(){					

@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -81,9 +82,29 @@ public class ProductController  extends CollectiblesController{
 	@Autowired
 	private ProductInfoConnectorFactory connectorFactory;
 	
+	private Product scrapeProduct(Product product){
+		Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(product);
+		if (connectors!=null) {
+			logger.info("Connectors: " + connectors);
+			Iterator<ProductInfoConnector> iterator = connectors.iterator();
+			while (iterator.hasNext()){
+				ProductInfoConnector connector = iterator.next();
+				logger.info("Is "+connector.getIdentifier()+" Processed? "+ (!(product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(connector.getIdentifier()))));
+				if (product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(connector.getIdentifier())){						
+					if (connector!=null){
+						try {
+							connector.updateProductTransaction(product);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}				
+		}
+		return product;
+	}
 	
-	
-	@RequestMapping(value="/product/find/{id}")
+	@RequestMapping(value="/product/find/{id}", method = RequestMethod.GET)
 	public SerializableProduct product(@PathVariable String id) throws CollectiblesException {
 		Long idLong = this.getId(id);
 		
@@ -94,31 +115,39 @@ public class ProductController  extends CollectiblesController{
 			if (product==null){
 				throw new NotFoundException();
 			}
-			
-			Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(product);
-			if (connectors!=null) {
-				logger.info("Connectors: " + connectors);
-				Iterator<ProductInfoConnector> iterator = connectors.iterator();
-				while (iterator.hasNext()){
-					ProductInfoConnector connector = iterator.next();
-					logger.info("Is "+connector.getIdentifier()+" Processed? "+ (!(product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(connector.getIdentifier()))));
-					if (product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(connector.getIdentifier())){						
-						if (connector!=null){
-							try {
-								connector.updateProductTransaction(product);
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-					}
-				}				
-			}
-			
-			
+			this.scrapeProduct(product);
 			
 			return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));			
 		}
 	}
+	
+	@RequestMapping(value="/product/refresh/{id}", method = RequestMethod.PUT)
+	public SerializableProduct productRefresh(@PathVariable String id) throws CollectiblesException {
+		Long idLong = this.getId(id);
+		
+		if (idLong==null){
+			throw new IncorrectParameterException(new String[]{"id"});
+		} else {
+			Product product = productRepository.findOne(idLong);
+			if (product==null){
+				throw new NotFoundException();
+			}
+			
+			product.setProcessedConnectors(null);
+			
+			this.scrapeProduct(product);
+			
+			return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));			
+		}
+	}
+	
+	@RequestMapping(value="/product/refresh/", method = RequestMethod.PUT)
+	public SerializableProduct productSaveAndRefresh(@RequestBody SerializableProduct product) throws CollectiblesException {
+		SerializableProduct result = this.modifyProductScrapeOption(product,true);
+							
+		return result;
+	}
+	
 	
 	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/create/from/file/{hierarchy}", method = RequestMethod.POST)
@@ -222,8 +251,8 @@ public class ProductController  extends CollectiblesController{
 				product.setId(null);
 				product.setHierarchyPlacement(hierarchyNode);
 				this.validate(product);				
-				productRepository.save(product);
-				return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));
+				Product result = productRepository.save(product);
+				return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
 			} else {
 				throw new NotFoundException(new String[]{"hierarchy"});
 			}
@@ -325,7 +354,11 @@ public class ProductController  extends CollectiblesController{
 	
 	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/modify/", method = RequestMethod.PUT)
-	public SerializableProduct modifyProduct(@RequestBody SerializableProduct serializableProduct) throws CollectiblesException {		
+	public SerializableProduct modifyProductDefault(@RequestBody SerializableProduct serializableProduct)throws CollectiblesException {
+		return modifyProductScrapeOption(serializableProduct,false);
+	}
+	
+	public SerializableProduct modifyProductScrapeOption(SerializableProduct serializableProduct, boolean scrape) throws CollectiblesException {		
 		Product product = null;
 		if (serializableProduct !=null) { product = serializableProduct.deserializeProduct(); }
 		
@@ -347,8 +380,10 @@ public class ProductController  extends CollectiblesController{
 				product.setOwners(productInDb.getOwners());
 				product.setAuthors(productInDb.getAuthors());								
 				product.setCategoryValues(productInDb.getCategoryValues());
-				product.setImages(productInDb.getImages());
+				product.setImages(productInDb.getImages());							
+				product.setProcessedConnectors(productInDb.getProcessedConnectors());
 				
+
 				if (serializableProduct.getOwnedAnotherLanguage()!=null){
 					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 					if (auth!=null){
@@ -387,10 +422,18 @@ public class ProductController  extends CollectiblesController{
 						}
 					}
 				}
-				
+
 				Product result = productRepository.save(product);
 				
-				return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
+				
+				if (scrape){
+					result.setProcessedConnectors(null);
+					result = productRepository.save(result);
+					result = this.scrapeProduct(result);
+					result.getProcessedConnectors();
+				}
+				
+				return SerializableProduct.cloneProduct(result,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
 			} else {
 				throw new NotFoundException(new String[]{"product"});
 			}

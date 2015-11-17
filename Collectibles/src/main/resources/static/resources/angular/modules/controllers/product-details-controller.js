@@ -10,7 +10,7 @@
 		this.pullProduct = function(id){
 			Product.one(id)
 			.success(function(data){
-				controller.prepareProduct(data);
+				$scope.product = Product.prepareProduct(data);
 			})
 			.catch(function(){	
 				Message.alert("There was an error");
@@ -22,7 +22,7 @@
 		this.updatePrices = function(id){
 			Product.updatePrice(id)
 			.success(function(data){
-				controller.prepareProduct(data);
+				$scope.product = Product.prepareProduct(data);				
 			})
 			.catch(function(){	
 				Message.alert("There was an error");
@@ -31,30 +31,7 @@
 			});
 		}
 		
-		this.prepareProduct = function(data){
-			controller.setProduct(data);			
-			if (data.images!=undefined && data.images!=null && data.images.length>0){
-				if ($scope.product.mainImage != null) {
-					for (var i=0;i<data.images.length;i++){
-						if (data.images[i].id == $scope.product.mainImage.id){
-							$scope.product.selectedImage =data.images[i]; 
-						}
-					}
-				} else {
-					$scope.product.selectedImage =data.images[0]; 
-				}										
-			}
-			
-			if (data.hierarchyPlacement) {
-				$scope.product.hierarchyPath = [];
-				var current = data.hierarchyPlacement; 										
-				while (current.father){
-					$scope.product.hierarchyPath.unshift(current);
-					current = current.father;
-				}
-				
-			}
-		} 
+		
 		
 		this.removeImage = function(image){
 			

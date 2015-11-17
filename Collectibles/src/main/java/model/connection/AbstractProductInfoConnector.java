@@ -313,7 +313,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					if (rating!=null){
 						logger.info("Obtained rating :" + rating);
 						Map<String, Double> ratings = product.getRatings();
-						if (ratings!=null){
+						if (ratings==null){
 							ratings = new HashMap<>();
 							product.setRatings(ratings);
 						}
