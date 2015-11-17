@@ -24,7 +24,7 @@
 									
 					<div class="priceBlock">
 						<p ng-show="product.dollarPrice"><b>Price: </b></p>
-						<div class="priceBlockContent">							
+						<div class="blockContent">							
 							<p ng-if="product.dollarPrice" ng-repeat="(key, value) in product.dollarPrice">
 								<span ng-if="value">{{(value/100) | currency}}</span>
 								<span ng-if="key">({{key}})</span>
@@ -35,7 +35,18 @@
 						
 					</div>
 					
-					<p ng-if="product.publisher"><b>Publisher:</b> <span>{{product.publisher}}</span></p>	
+					
+					<div class="ratingsBlock">
+						<p ng-show="product.ratings"><b>Ratings: </b></p>
+						<div class="blockContent">							
+							<p ng-if="product.ratings" ng-repeat="(key, value) in product.ratings">
+								<span ng-if="key">{{key}}: </span>
+								<span ng-if="value">{{value | number:2}}</span>								
+							</p>							
+						</div>						
+					</div>	
+					
+					<p ng-if="product.publisher"><b>Publisher:</b> <span>{{product.publisher}}</span></p>							
 						
 					<div class="authorsBlock" ng-if="product.authors && product.authors.length>0">						
 						<!-- <p><b>Authors:</b> <span >{{$first ? '' : $last ? ' and ' : ', '}}{{author}}</span></p> -->
