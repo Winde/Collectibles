@@ -1,21 +1,43 @@
 <div class="product">	
+	
 
-	<div ng-if="!productCtrl.isEditForbidden() && isAdmin()">
+	<div class="editButton" ng-if="!productCtrl.isEditForbidden() && isAdmin()">
 		<button class="btn" ng-click="productCtrl.setEditable(true)" ng-show="!productCtrl.isEditable()">EDIT</button>
 		<button class="btn" ng-click="productCtrl.setEditable(false)" ng-show="productCtrl.isEditable()">STOP EDITING</button>
 	</div>
 
-	<h3 ng-if="product.hierarchyPath">
-		<span ng-repeat="node in product.hierarchyPath">{{$first ? '' : $last ? ' &gt; ' : ' &gt; '}} 
-		<a ng-href="#{{'/products/?hierarchy='+node.id}}">{{node.name}}</a>  
-	</span>
-	</h3>
+	<ol class="breadcrumb product-crumb hidden-sm" ng-if="product.hierarchyPath">
+	  <li ng-repeat="node in product.hierarchyPath"><a ng-href="#{{'/products/?hierarchy='+node.id}}">{{node.name}}</a> </li>
+	  <li class="active">{{product.name}}</li>	  	  
+	</ol>
 
 	<h2>{{product.name}}</h2>
-	
+
 	<div class="row">
 	
-		<div class="col-lg-8 col-sm-8 col-xs-12">
+			
+		<div class="col-lg-4 col-sm-4 col-sm-push-8 col-xs-12">
+			<div class="images">	
+				<div ng-if="product.selectedImage"> 		
+					<a href ng-if="productCtrl.isEditable() && isAdmin()" ng-click="productCtrl.removeImage(product.selectedImage)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+					<img class="img-responsive mainImage" ng-id="image.id" ng-src="/image/content/{{product.selectedImage.id}}">
+				</div>
+			
+				<div class="carousel hidden-xs" ng-if="product.images && product.images.length>1">
+					<div class="row">
+						<div class="col-xs-4" ng-repeat="image in product.images">
+							<a href ng-if="productCtrl.isEditable() && isAdmin()" ng-click="productCtrl.removeImage(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>			
+							<img class="img-responsive img-thumbnail" 
+								ng-click="productCtrl.setSelectedImage(image)" 
+								ng-id="image.id" 
+								ng-src="/image/content/{{image.id}}">		
+						</div>
+					</div>
+				</div>	
+			</div>
+		</div>
+	
+		<div class="col-lg-8 col-sm-8 col-sm-pull-4 col-xs-12">
 			<div class="row">
 				<div class="col-xs-12">
 					<div class="productDescription">
@@ -53,11 +75,13 @@
 						<div ng-if="product.authors && product.authors.length && product.authors.length>0">
 							<p><b>Authors:</b></p>
 							<div class="row">
-								<div class="authorContainer col-md-2 col-sm-4 col-xs-6" ng-repeat="author in product.authors">															
+								<div class="col-md-2 col-sm-4 col-xs-12 authorEntry" ng-repeat="author in product.authors">															
 										<a href="{{author.goodreadsAuthorLink}}">																		
-											<img class="img-responsive img-thumbnail" ng-if="author.id && author.hasImage" ng-src="/image/author/{{author.id}}" />
-											<img class="img-responsive img-thumbnail" ng-if="!author.id || !author.hasImage" src="https://s.gr-assets.com/assets/nophoto/user/u_200x266-e183445fd1a1b5cc7075bb1cf7043306.png" />
-											<span>{{author.name}}</span>
+											<span class="authorContainer">
+												<img class="img-responsive img-thumbnail " ng-if="author.id && author.hasImage" ng-src="/image/author/{{author.id}}" />											
+												<img class="img-responsive img-thumbnail" ng-if="!author.id || !author.hasImage" src="https://s.gr-assets.com/assets/nophoto/user/u_200x266-e183445fd1a1b5cc7075bb1cf7043306.png" />
+											</span>
+											<span>{{author.name}}</span>											
 										</a>
 									
 								</div>
@@ -97,27 +121,7 @@
 				
 			</div>
 		</div>
-	
-		<div class="col-lg-4 col-sm-4 col-xs-12">
-			<div class="images">	
-				<div ng-if="product.selectedImage" > 		
-					<a href ng-if="productCtrl.isEditable() && isAdmin()" ng-click="productCtrl.removeImage(product.selectedImage)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-					<img class="img-responsive" ng-id="image.id" ng-src="/image/content/{{product.selectedImage.id}}">
-				</div>
-			
-				<div class="carousel">
-					<div class="row">
-						<div class="col-xs-4" ng-repeat="image in product.images">
-							<a href ng-if="productCtrl.isEditable() && isAdmin()" ng-click="productCtrl.removeImage(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>			
-							<img class="img-responsive img-thumbnail" 
-								ng-click="productCtrl.setSelectedImage(image)" 
-								ng-id="image.id" 
-								ng-src="/image/content/{{image.id}}">		
-						</div>
-					</div>
-				</div>	
-			</div>
-		</div>
+
 		
 	
 	</div>

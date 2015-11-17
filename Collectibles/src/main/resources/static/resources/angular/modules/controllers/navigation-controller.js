@@ -1,7 +1,7 @@
 (function(){
 	angular.module('collections')
-	.controller('NavigationController',['$rootScope','$scope','$location','Auth', 
-	                                       function($rootScope,$scope,$location,Auth){
+	.controller('NavigationController',['$rootScope','$scope','$location','$uibModal','Auth', 
+	                                       function($rootScope,$scope,$location,$uibModal,Auth){
 
 		
 		$scope.isCollapsed = true;
@@ -36,6 +36,18 @@
 		$scope.isActive = function (viewLocation) { 
 	        return viewLocation === $location.path();
 	    };
+	    
+	    $scope.openLogin = function(){
+	    	var modalInstance = $uibModal.open({
+    	      animation: true,
+    	      windowClass: "modal fade in",
+    	      templateUrl: 'templates/login/login.html',
+    	      controller: 'LoginController',
+    	      size: 'lg',
+    	      resolve: {    	        
+    	      }
+	    	});
+	    }
 	}]);
 
 })();

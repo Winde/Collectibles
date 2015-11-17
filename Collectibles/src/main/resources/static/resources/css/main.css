@@ -1,3 +1,7 @@
+.editButton {
+	margin-bottom: 15px;
+}
+
 .productGrid {
 	margin-top: 20px;
 }
@@ -62,18 +66,38 @@
 	border-top-right-radius: 10px;
 }
 
+.product .product-crumb {
+	display: inline-block;
+	border-radius: 5px;
+}
+
 .product .priceBlock {	
 	margin-top: 15px;
+}
+
+.product .images {
+	margin-bottom: 15px;
+}
+
+.product .mainImage {
+	margin: 0 auto;
 }
 
 .product .authorsBlock{
 	margin-top: 15px;
 }
 
+.product .authorsBlock .authorEntry {
+	margin-bottom: 10px;
+}
+
 .product .authorsBlock .authorContainer {
-	min-height: 200px;
+	/*min-height: 130px;*/
 } 
 
+.msd-elastic {
+	max-height: 250px;
+}
 .product .priceBlock {
 	margin-bottom: 15px;
 }

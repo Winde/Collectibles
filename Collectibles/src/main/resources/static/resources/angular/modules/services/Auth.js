@@ -93,7 +93,7 @@
 				}
 								
 			},			
-			login: function(credentials,callbackError){						
+			login: function(credentials,callbackSuccess,callbackError){						
 				$injector.invoke(function($http) {															
 					$http({
 						url: '/login', 
@@ -107,8 +107,9 @@
 						if (data!=null && data!=undefined){
 							factory.setRoles(JSON.stringify(data));
 						}
-						factory.authenticated = true;						
-						$location.path("/products/").replace();						
+						factory.authenticated = true;
+						callbackSuccess();
+						//$location.path("/products/").replace();						
 					})
 					.catch(function(error){
 						callbackError();

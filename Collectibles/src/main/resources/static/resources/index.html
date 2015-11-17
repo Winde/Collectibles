@@ -19,7 +19,7 @@
 		
 		<link rel="stylesheet" type="text/css" href="/app/bootstrap/css/bootstrap.min.css" />
 		<link rel="stylesheet" type="text/css" href="/app/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" />
-		<link rel="stylesheet" type="text/css" href="/app/css/angular.css" />
+		<!--  <link rel="stylesheet" type="text/css" href="/app/css/angular.css" />-->
 		<link rel="stylesheet" type="text/css" href="/app/vendor/ng-progress/ngProgress.css">
 		<link rel="stylesheet" type="text/css" href="/app/vendor/brand-buttons/dist/brand-buttons.min.css" />
 		<link rel="stylesheet" type="text/css" href="/app/vendor/font-awesome-4.4.0/css/font-awesome.min.css" />
@@ -103,11 +103,11 @@
 						</div>
 						<div id="navbar" class="collapse navbar-collapse" uib-collapse="isCollapsed">
 							<ul class="nav navbar-nav">							
-								<li ng-show="!isAuthenticated()" ng-class="{ active: isActive('/login/')}"><a href="#/login/" ng-click="isCollapsed = true">Login</a></li>
+								<li ng-show="!isAuthenticated()" ng-class="{ active: isActive('/login/')}"><a href="" ng-click="openLogin() || (isCollapsed = true)">Login</a></li>
 								<li ng-class="{ active: isActive('/products/')}"><a href="#/products/" ng-click="isCollapsed = true">Products</a></li>																											
 								<li ng-show="isAdmin()" ng-class="{ active: isActive('/products/create/')}"><a href="#/products/create/" ng-click="isCollapsed = true">Add Products</a></li>
 								<li ng-show="isAdmin()" ng-class="{ active: isActive('/hierarchy/create/')}"><a href="#/hierarchy/create/"ng-click="isCollapsed = true">Manage Hierarchies</a></li>
-								<li ng-show="isAuthenticated()" ng-class="{ active: isActive('/logout/')}"><a href="" ng-click="logout()" ng-click="isCollapsed = true">Logout</a></li>
+								<li ng-show="isAuthenticated()" ng-class="{ active: isActive('/logout/')}"><a href="" ng-click="logout() || (isCollapsed = true)" ng-click="isCollapsed = true">Logout</a></li>
 							</ul>
 						</div>
 					</div>
@@ -120,6 +120,9 @@
 				
 				
 			</div>
+			
+			
+			
 		</div><!--  end content -->
 		
 	

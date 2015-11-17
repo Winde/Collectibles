@@ -18,10 +18,10 @@
 		}
 				
 		$routeProvider
-		.when('/login/', {
-			templateUrl : '/app/templates/login/login.html',
-			secured: false
-		})
+		//.when('/login/', {
+		//	templateUrl : '/app/templates/login/login.html',
+		//	secured: false
+		//})
 		.when('/products/', {
 			templateUrl: '/app/templates/products/search.html',
 			secured: false,
@@ -42,7 +42,7 @@
 			resolve: { loggedIn: routerConfig.secured }
 		})
 		.otherwise({
-			redirectTo: '/login/'
+			redirectTo: '/products/'
 		});				
 	});
 	
