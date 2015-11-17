@@ -13,8 +13,11 @@
 					 
 				 } else {
 					 if (request && request && request.progressbar){
+						 console.log($rootScope.progressbar);
 						 if ($rootScope.progressbar && $rootScope.progressbar.complete){
-							 $rootScope.progressbar.complete();
+							 if ($rootScope.progressbar.status()>0 && $rootScope.progressbar.status()<100){
+								 $rootScope.progressbar.complete();
+							 }
 						 }
 		    			$rootScope.progressbar = ngProgressFactory.createInstance();
 		    			$rootScope.progressbar.setColor(factory.progressBarColor);

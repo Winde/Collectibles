@@ -45,21 +45,23 @@
 					</div>
 									
 					<div class="priceBlock">
-						<p ng-show="product.dollarPrice"><b>Price: </b></p>
-						<div class="blockContent">							
-							<p ng-if="product.dollarPrice" ng-repeat="(key, value) in product.dollarPrice">
-								<span ng-if="value">{{(value/100) | currency}}</span>
-								<span ng-if="key">({{key}})</span>
-							</p>
-							<p ng-if="product.lastPriceUpdate">Last updated: {{product.lastPriceUpdate | date:'yyyy-MM-dd HH:mm:ss'}}</p>
+						<div ng-show="product.dollarPrice && !isEmptyObject(product.dollarPrice)">
+							<p><b>Price: </b></p>
+							<div class="blockContent">							
+								<p ng-if="product.dollarPrice" ng-repeat="(key, value) in product.dollarPrice">
+									<span ng-if="value">{{(value/100) | currency}}</span>
+									<span ng-if="key">({{key}})</span>
+								</p>
+								<p ng-if="product.lastPriceUpdate">Last updated: {{product.lastPriceUpdate | date:'yyyy-MM-dd HH:mm:ss'}}</p>
+							</div>
 						</div>
 						<span class="btn btn-default" ng-if="editable && product && product.id && isAdmin()" ng-click="productCtrl.updatePrices(product.id)">Update prices</span>
 						
 					</div>
 					
 					
-					<div class="ratingsBlock">
-						<p ng-show="product.ratings"><b>Ratings: </b></p>
+					<div class="ratingsBlock" ng-show="product.ratings && !isEmptyObject(product.ratings)">
+						<p><b>Ratings: </b></p>
 						<div class="blockContent">							
 							<p ng-if="product.ratings" ng-repeat="(key, value) in product.ratings">
 								<span ng-if="key">{{key}}: </span>

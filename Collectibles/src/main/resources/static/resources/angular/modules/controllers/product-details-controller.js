@@ -76,6 +76,10 @@
 		
 		$scope.newProductAvailable = false;		
 		
+		$scope.isEmptyObject = function(obj){	    	
+	    	return angular.equals({}, obj);
+	    };
+		
 		if ($scope.product && $scope.product.images){
 			var image = null;
 			if ($scope.product.images && $scope.product.images.length){
