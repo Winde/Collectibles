@@ -17,7 +17,6 @@ public class ProductSearch implements SearchObject {
 	private Integer maxResults = null;
 	private Integer page = null;
 	private Boolean withPrice = null;
-	private Boolean withDriveThruRPGLink = null;
 	
 	public ProductSearch(){}
 
@@ -83,14 +82,6 @@ public class ProductSearch implements SearchObject {
 
 	public void setWithPrice(Boolean withPrice) {
 		this.withPrice = withPrice;
-	}
-
-	public Boolean getWithDriveThruRPGLink() {
-		return withDriveThruRPGLink;
-	}
-
-	public void setWithDriveThruRPGLink(Boolean withDriveThruRPGLink) {
-		this.withDriveThruRPGLink = withDriveThruRPGLink;
 	}
 	
 	public Boolean getOwned() {

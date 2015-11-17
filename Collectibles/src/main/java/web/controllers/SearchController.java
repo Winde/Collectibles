@@ -60,7 +60,6 @@ public class SearchController extends CollectiblesController{
 			Collection<String> categoryValuesIds, 
 			String withImagesString,
 			String withPriceString,
-			String withDriveThruLinkString,
 			String ownedString,
 			int page,
 			int maxResults) throws CollectiblesException {
@@ -109,14 +108,6 @@ public class SearchController extends CollectiblesController{
 			}
 			
 			searchObject.setWithPrice(withPrice);
-			
-			if (withDriveThruLinkString!=null && withDriveThruLinkString.equals("true")){
-				withDriveThruLink = Boolean.TRUE;
-			} else if (withDriveThruLinkString!=null && withDriveThruLinkString.equals("false")){
-				withDriveThruLink = Boolean.FALSE;
-			}
-			
-			searchObject.setWithDriveThruRPGLink(withDriveThruLink);
 			
 			HierarchyNode node = null;
 			if (hierarchy!=null && !"".equals(hierarchy.trim())){
@@ -203,10 +194,9 @@ public class SearchController extends CollectiblesController{
 			@RequestParam(required=false, name="search") String searchString,
 			@RequestParam(required=false, name="owned" ) String owned,
 			@RequestParam(required=false, name="withPrice") String withPrice,
-			@RequestParam(required=false, name="withDriveThruLink") String withDriveThruLink,
 			@RequestParam(required=true, name="page") int page,
 			@RequestParam(required=false, name="maxResults") int maxResults) throws CollectiblesException{	
-		ObjectList<SerializableProduct> objects = findProduct(null,searchString,null,withImagesString,withPrice,withDriveThruLink,owned,page,maxResults);
+		ObjectList<SerializableProduct> objects = findProduct(null,searchString,null,withImagesString,withPrice,owned,page,maxResults);
 		return objects;
 	}
 	
@@ -218,11 +208,10 @@ public class SearchController extends CollectiblesController{
 			@RequestParam(required=false, name="withImages") String withImagesString,
 			@RequestParam(required=false, name="owned" ) String owned,
 			@RequestParam(required=false, name="withPrice") String withPrice,
-			@RequestParam(required=false, name="withDriveThruLink") String withDriveThruLink,
 			@RequestParam(required=false, name="categoryValues" ) List<String> categories,
 			@RequestParam(required=true, name="page") int page,
 			@RequestParam(required=false, name="maxResults", defaultValue=defaultPaginationSize) int maxResults) throws CollectiblesException{					
-		ObjectList<SerializableProduct> objects = findProduct(hierarchy,searchString,categories,withImagesString,withPrice,withDriveThruLink,owned,page,maxResults);
+		ObjectList<SerializableProduct> objects = findProduct(hierarchy,searchString,categories,withImagesString,withPrice,owned,page,maxResults);
 		return objects;
 		
 	}
