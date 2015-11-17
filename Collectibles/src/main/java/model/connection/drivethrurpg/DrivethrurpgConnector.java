@@ -20,8 +20,7 @@ public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 	}
 	
 	@Override
-	public String getIdentifier() {
-		// TODO Auto-generated method stub
+	public String getIdentifier() { 
 		return IDENTIFIER;
 	}
 	
@@ -33,6 +32,11 @@ public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 	@Override
 	public boolean isApplicable(Product product) {
 		return product!=null && product.getName()!=null;
+	}
+
+	@Override
+	public boolean hasOwnReference() {
+		return false;
 	}
 	
 }

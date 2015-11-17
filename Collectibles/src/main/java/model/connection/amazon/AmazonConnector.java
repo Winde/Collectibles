@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class AmazonConnector extends AbstractProductInfoConnector {
 
-	private static final String IDENTIFIER = "Amazon";
-	
 	@Autowired
 	private AmazonItemLookupService itemLookup;
 	
@@ -21,7 +19,7 @@ public class AmazonConnector extends AbstractProductInfoConnector {
 
 	@Override
 	public String getIdentifier() {
-		return IDENTIFIER;
+		return itemLookup.getIdentifier();
 	}
 
 	public String toString(){
@@ -30,7 +28,12 @@ public class AmazonConnector extends AbstractProductInfoConnector {
 
 	@Override
 	public boolean isApplicable(Product product) {
-		return product!=null && product.getUniversalReference()!=null;
+		return product!=null && (product.getUniversalReference()!=null || (product.getConnectorReferences()!=null && product.getConnectorReferences().containsKey(this.getIdentifier())));
+	}
+
+	@Override
+	public boolean hasOwnReference() {
+		return true;
 	}
 
 }

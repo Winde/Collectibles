@@ -116,7 +116,7 @@ public class ProductController  extends CollectiblesController{
 			
 			
 			
-			return SerializableProduct.cloneProduct(product);			
+			return SerializableProduct.cloneProduct(product,connectorFactory.getConnectorNames(product));			
 		}
 	}
 	
@@ -224,7 +224,7 @@ public class ProductController  extends CollectiblesController{
 				product.setHierarchyPlacement(hierarchyNode);
 				this.validate(product);				
 				productRepository.save(product);
-				return SerializableProduct.cloneProduct(product);
+				return SerializableProduct.cloneProduct(product,connectorFactory.getConnectorNames(product));
 			} else {
 				throw new NotFoundException(new String[]{"hierarchy"});
 			}
@@ -282,7 +282,7 @@ public class ProductController  extends CollectiblesController{
 		product.addCategoryValue(categoryValue);
 		productRepository.save(product);		
 
-		return SerializableProduct.cloneProduct(product);
+		return SerializableProduct.cloneProduct(product,connectorFactory.getConnectorNames(product));
 	}
 	
 	@Secured(value = { "ROLE_ADMIN" })
@@ -320,7 +320,7 @@ public class ProductController  extends CollectiblesController{
 			
 			productRepository.save(product);
 			
-			return SerializableProduct.cloneProduct(product);			
+			return SerializableProduct.cloneProduct(product,connectorFactory.getConnectorNames(product));			
 		}			
 	}
 	
@@ -343,12 +343,7 @@ public class ProductController  extends CollectiblesController{
 				){								
 					product.setHierarchyPlacement(productInDb.getHierarchyPlacement());
 				} 	
-				
-				if (product.getUniversalReference()!=null && !product.getUniversalReference().equals(productInDb.getUniversalReference())){
-					if (product.getProcessedConnectors()!=null){
-						product.getProcessedConnectors().clear();
-					}
-				}
+								
 				product.setDollarPrice(productInDb.getDollarPrice());
 				product.setOwners(productInDb.getOwners());
 				product.setAuthors(productInDb.getAuthors());								
@@ -396,7 +391,7 @@ public class ProductController  extends CollectiblesController{
 				
 				Product result = productRepository.save(product);
 				
-				return SerializableProduct.cloneProduct(result);
+				return SerializableProduct.cloneProduct(product,connectorFactory.getConnectorNames(product));
 			} else {
 				throw new NotFoundException(new String[]{"product"});
 			}

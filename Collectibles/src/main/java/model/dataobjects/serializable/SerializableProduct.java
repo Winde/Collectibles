@@ -7,14 +7,21 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.persistence.Column;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import model.connection.AbstractProductInfoConnector;
+import model.connection.ProductInfoConnector;
+import model.connection.ProductInfoConnectorFactory;
 import model.dataobjects.Author;
 import model.dataobjects.Author.AuthorView;
 import model.dataobjects.CategoryValue;
@@ -31,13 +38,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
+
 public class SerializableProduct {
 
+	private static final Logger logger = LoggerFactory.getLogger(SerializableProduct.class);
 	
 	public interface ProductSimpleView  extends SimpleIdDaoView{};
 	public interface ProductComplexView extends ProductSimpleView,AuthorView {};
 	public interface ProductListView extends ObjectListView,ProductSimpleView,HierarchySimpleView,ImageSimpleView{};
-
 
 	@JsonView(SimpleIdDaoView.class)
 	public Long id;
@@ -73,10 +82,7 @@ public class SerializableProduct {
 			
 	@JsonView(ProductSimpleView.class)
 	private String universalReference = null;
-		
-	@JsonView(ProductSimpleView.class)
-	private String goodreadsReference = null;
-	
+
 	@JsonView(ProductComplexView.class)
 	private String amazonUrl = null;
 	
@@ -111,7 +117,11 @@ public class SerializableProduct {
 	@JsonIgnore
 	private User user;
 
+	@JsonView(ProductComplexView.class)
+	private List<String> connectorNames;
 	
+	@JsonView(ProductComplexView.class)
+	private Map<String,String> connectorReferences;
 	
 	public static Collection<SerializableProduct> cloneProduct(Collection<Product> products){
 		
@@ -135,6 +145,12 @@ public class SerializableProduct {
 		return result;
 	}
 	
+	public static SerializableProduct cloneProduct(Product product, List<String> connectorNames){
+		SerializableProduct result = cloneProduct(product);
+		result.setConnectorNames(connectorNames);
+		return result;
+	}
+	
 	public static SerializableProduct cloneProduct(Product product){
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		User user = null;
@@ -142,6 +158,9 @@ public class SerializableProduct {
 			user = new User();
 			user.setUsername(auth.getName());
 		}		
+		
+		
+		
 		return new SerializableProduct(product, user);
 	}
 	
@@ -247,8 +266,11 @@ public class SerializableProduct {
 		return universalReference;
 	}
 
-	public void setUniversalReference(String universalReference) {
+	public void setUniversalReference(String universalReference) {		
 		this.universalReference = universalReference;
+		if (this.universalReference!=null && ("".equals(this.universalReference.trim()))){
+			this.universalReference = null;
+		}
 	}
 
 	public String getAmazonUrl() {
@@ -331,20 +353,37 @@ public class SerializableProduct {
 		this.minPrice = minPrice;
 	}
 
-	public String getGoodreadsReference() {
-		return goodreadsReference;
-	}
-
-	public void setGoodreadsReference(String goodreadsReference) {
-		this.goodreadsReference = goodreadsReference;
-	}
-
 	public Date getLastPriceUpdate() {
 		return lastPriceUpdate;
 	}
 
 	public void setLastPriceUpdate(Date lastPriceUpdate) {
 		this.lastPriceUpdate = lastPriceUpdate;
+	}
+
+	public List<String> getConnectorNames() {
+		return connectorNames;
+	}
+
+	public void setConnectorNames(List<String> connectorNames) {
+		this.connectorNames = connectorNames;
+	}
+
+	public Map<String, String> getConnectorReferences() {
+		return connectorReferences;
+	}
+
+	public void setConnectorReferences(Map<String, String> connectorReferences) {
+		if (connectorReferences!=null){
+			Iterator<Entry<String, String>> iterator = connectorReferences.entrySet().iterator();
+			while (iterator.hasNext()){
+				Entry<String, String> entry = iterator.next();
+				if (entry!=null && (entry.getValue()==null || "".equals(entry.getValue().trim()))){
+					iterator.remove();
+				}
+			}			
+		}		
+		this.connectorReferences = connectorReferences;
 	}
 
 	public Product deserializeProduct(){

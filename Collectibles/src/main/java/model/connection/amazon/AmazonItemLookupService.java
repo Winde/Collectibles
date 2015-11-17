@@ -42,7 +42,7 @@ import org.w3c.dom.Document;
 public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 
 	private static final Logger logger = LoggerFactory.getLogger(AmazonItemLookupService.class);
-	
+	private static final String IDENTIFIER = "Amazon";	
 	
     private String AWS_ACCESS_KEY_ID = null;
     private String AWS_SECRET_KEY = null;
@@ -128,10 +128,17 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 
 	@Override
 	public Document fetchDocFromProduct(Product product) throws TooFastConnectionException, FileNotFoundException {
-		if (product.getUniversalReference()==null){
+		String reference = null;
+		if (product.getConnectorReferences()!=null && product.getConnectorReferences().get(this.getIdentifier())!=null){
+			reference = product.getConnectorReferences().get(this.getIdentifier());
+			if (reference==null){
+				reference = product.getUniversalReference();
+			}
+		}
+		if (reference == null){
 			return null;
 		}
-		String url = this.getMultipleUseUrl(product.getUniversalReference());
+		String url = this.getMultipleUseUrl(reference);
 		return this.fetchDocFromUrl(url);
 	}
 
@@ -195,4 +202,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	}
 
 
+	public String getIdentifier(){
+		return IDENTIFIER;
+	}
 }

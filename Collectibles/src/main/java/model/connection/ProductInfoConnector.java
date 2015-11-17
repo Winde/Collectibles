@@ -34,7 +34,7 @@ public interface ProductInfoConnector {
 	
 	public boolean checkIfAlreadyProcessed(Product product);
 
-	
+	public boolean hasOwnReference();
 
 	
 }

@@ -68,6 +68,17 @@
 			ng-model="product.universalReference"/>
 	</div>
 	
+	<div ng-if="product.connectorNames && product.connectorNames.length>0">
+		<div class="row">			
+			<div class="form-group col-lg-4 col-md-6 col-xs-12" ng-repeat="connector in product.connectorNames">
+				<label>{{connector}}</label>
+				<input class="form-control" ng-model="product.connectorReferences[connector]"/>
+			</div>			
+		</div>
+	</div>
+	
+	</div>
+	
 	<div class="form-group">
 		<label>DriveThruRPG url</label>
 		<input class="form-control"

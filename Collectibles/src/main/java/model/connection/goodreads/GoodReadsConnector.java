@@ -22,15 +22,13 @@ import org.w3c.dom.Document;
 
 @Component
 public class GoodReadsConnector extends AbstractProductInfoConnector{
-
-	private static final String IDENTIFIER = "Goodreads";
 	
 	@Autowired 
-	private GoodReadsItemLookupService lookUpService;
+	private GoodReadsItemLookupService itemLookup;
 	
 
 	public ProductInfoLookupService getImageLookupService(){
-		return lookUpService;
+		return itemLookup;
 	}
 
 	@Override
@@ -48,7 +46,7 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 	
 	@Override
 	public String getIdentifier() {
-		return IDENTIFIER;
+		return itemLookup.getIdentifier();
 	}
 
 	public String toString(){
@@ -57,7 +55,12 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 	
 	@Override
 	public boolean isApplicable(Product product) {
-		return product!=null && (product.getUniversalReference()!=null || product.getGoodreadsReference()!=null);
+		return product!=null && (product.getUniversalReference()!=null || (product.getConnectorReferences()!=null && product.getConnectorReferences().containsKey(this.getIdentifier())));
+	}
+
+	@Override
+	public boolean hasOwnReference() {
+		return true;
 	}
 	
 	

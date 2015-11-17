@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -16,29 +15,29 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.JoinColumn;
-
-import org.hibernate.annotations.BatchSize;
+import javax.persistence.Transient;
 
 import model.connection.ProductInfoConnector;
+import model.connection.ProductInfoConnectorFactory;
 import model.connection.TooFastConnectionException;
-import model.dataobjects.Author.AuthorView;
-import model.dataobjects.HierarchyNode.HierarchySimpleView;
-import model.dataobjects.Image.ImageSimpleView;
-import model.dataobjects.SimpleIdDao.SimpleIdDaoView;
-import model.dataobjects.supporting.ObjectList.ObjectListView;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.BatchSize;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity(name="Product")
 public class Product extends SimpleIdDao{
 
+	private static final Logger logger = LoggerFactory.getLogger(Product.class);
+	
 	private static final long MINIMUM_LENGTH_DESCRIPTION = 100;
 	
 	@ManyToOne	
@@ -75,10 +74,12 @@ public class Product extends SimpleIdDao{
 			
 	@Column(name="universal_reference")
 	private String universalReference = null;
-	
-	@Column(name="goodreads_reference")
-	private String goodreadsReference = null;
-	
+
+	@ElementCollection(fetch = FetchType.LAZY)
+	@CollectionTable(name="connector_references", joinColumns=@JoinColumn(name="id"))
+	@Column(name="connector_reference")	
+	private Map<String,String> connectorReferences;
+		
 	@Column(name="last_price_update")
 	private Date lastPriceUpdate = null;
 	
@@ -91,7 +92,6 @@ public class Product extends SimpleIdDao{
 	@Column(name="drivethrurpg_url")
 	private String drivethrurpgUrl = null;
 
-	
 	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.MERGE})
 	private Set<Author> authors;
 	
@@ -114,10 +114,11 @@ public class Product extends SimpleIdDao{
 	@Column(name="min_price")
 	private Long minPrice = null;	
 	
+
 	public Product(){
 		dollarPrice = new HashMap<>();
 	}
-
+	
 	public String getReference() {
 		return reference;
 	}
@@ -236,12 +237,15 @@ public class Product extends SimpleIdDao{
 	}
 
 	public void setUniversalReference(String universalReference) {
-		if (this.getUniversalReference()!=null && !this.getUniversalReference().equals(universalReference)){
-			if (this.getProcessedConnectors()!=null){
-				this.getProcessedConnectors().clear();
-			}
-		}
 		this.universalReference = universalReference;
+	}
+
+	public Map<String,String> getConnectorReferences() {
+		return connectorReferences;
+	}
+
+	public void setConnectorReferences(Map<String,String> connectorReferences) {
+		this.connectorReferences = connectorReferences;
 	}
 
 	public String getAmazonUrl() {
@@ -354,14 +358,6 @@ public class Product extends SimpleIdDao{
 		} else {
 			return true;
 		}
-	}
-
-	public String getGoodreadsReference() {
-		return goodreadsReference;
-	}
-
-	public void setGoodreadsReference(String goodreadsReference) {
-		this.goodreadsReference = goodreadsReference;
 	}
 
 	public synchronized boolean updateWithConnector(ProductInfoConnector connector) throws TooFastConnectionException {

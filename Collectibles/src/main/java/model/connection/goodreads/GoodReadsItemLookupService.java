@@ -26,6 +26,8 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 
 	private static final Logger logger = LoggerFactory.getLogger(GoodReadsItemLookupService.class);
 		
+	private static final String IDENTIFIER = "Goodreads";
+	
 	private String key = null;
 	private String entryPointQueryOne = null;
 	private String baseUrlSeries = null;
@@ -153,15 +155,20 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 
 	@Override
 	public Document fetchDocFromProduct(Product product) throws TooFastConnectionException {
-		if (product.getUniversalReference()==null && product.getGoodreadsReference()==null){
+		String reference = null;
+		if (product.getConnectorReferences()!=null && product.getConnectorReferences().get(this.getIdentifier())!=null){
+			reference = product.getConnectorReferences().get(this.getIdentifier());
+			if (reference==null){
+				reference = product.getUniversalReference();
+			}
+		}
+		if (reference == null){
 			return null;
 		}
 		String requestUrl = null;
-		if (product.getUniversalReference()!=null){
-			requestUrl = this.getLookupUrl(product.getUniversalReference());
-		} else {
-			requestUrl = this.getLookupUrl(product.getGoodreadsReference());
-		}
+		
+		requestUrl = this.getLookupUrl(reference);
+		
 		Document doc = null;
 		try{
 			doc = this.fetchDocFromUrl(requestUrl);
@@ -189,7 +196,9 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	}
 
 
-
+	public String getIdentifier() {
+		return IDENTIFIER;
+	}
 
 	
 	
