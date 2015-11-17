@@ -84,21 +84,9 @@ public class Product extends SimpleIdDao{
 	@Column(name="last_price_update")
 	private Date lastPriceUpdate = null;
 	
-	@Column(name="amazon_url")	
-	private String amazonUrl = null;
-	
-	@Column(name="goodreads_url")
-	private String goodreadsUrl = null;
-
-	@Column(name="drivethrurpg_url")
-	private String drivethrurpgUrl = null;
-
 	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.MERGE})
 	private Set<Author> authors;
-	
-	@Column(name="goodreads_related_link")
-	private String goodreadsRelatedLink;
-	
+
 	@Column(name="publisher")
 	private String publisher;
 	
@@ -259,14 +247,6 @@ public class Product extends SimpleIdDao{
 	public void setConnectorReferences(Map<String,String> connectorReferences) {
 		this.connectorReferences = connectorReferences;
 	}
-
-	public String getAmazonUrl() {
-		return amazonUrl;
-	}
-
-	public void setAmazonUrl(String amazonUrl) {
-		this.amazonUrl = amazonUrl;
-	}
 	
 	public Set<Author> getAuthors() {
 		return authors;
@@ -274,32 +254,6 @@ public class Product extends SimpleIdDao{
 
 	public void setAuthors(Set<Author> authors) {
 		this.authors = authors;
-	}
-
-	public String getGoodreadsRelatedLink() {
-		return goodreadsRelatedLink;
-	}
-
-	public void setGoodreadsRelatedLink(String goodreadsRelatedLink) {
-		this.goodreadsRelatedLink = goodreadsRelatedLink;
-	}
-
-	public String getGoodreadsUrl() {
-		return goodreadsUrl;
-	}
-
-	public void setGoodreadsUrl(String goodreadsUrl) {
-		this.goodreadsUrl = goodreadsUrl;
-	}
-	
-	
-
-	public String getDrivethrurpgUrl() {
-		return drivethrurpgUrl;
-	}
-
-	public void setDrivethrurpgUrl(String drivethrurpgUrl) {
-		this.drivethrurpgUrl = drivethrurpgUrl;
 	}
 
 	public String toString(){

@@ -35,10 +35,8 @@ public class ProductInfoConnectorFactory {
 		if (connectors!=null){
 			Iterator<ProductInfoConnector> iterator = connectors.iterator();
 			while (iterator.hasNext()){
-				ProductInfoConnector connector = iterator.next();
-				if (connector.hasOwnReference()){
-					result.add(connector.getIdentifier());
-				}
+				ProductInfoConnector connector = iterator.next();				
+				result.add(connector.getIdentifier());				
 			}
 		}
 		return result;

@@ -36,5 +36,7 @@ public interface ProductInfoConnector {
 
 	public boolean hasOwnReference();
 
+	public boolean canCreateLinks();
+
 	
 }

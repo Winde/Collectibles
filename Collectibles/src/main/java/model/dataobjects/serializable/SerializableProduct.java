@@ -79,21 +79,8 @@ public class SerializableProduct {
 	private String universalReference = null;
 
 	@JsonView(ProductComplexView.class)
-	private String amazonUrl = null;
-	
-	@JsonView(ProductComplexView.class)
-	private String goodreadsUrl = null;
-	
-	@JsonView(ProductComplexView.class)
-	private String drivethrurpgUrl = null;
-
-	
-	@JsonView(ProductComplexView.class)
 	private Set<Author> authors;
 	
-	@JsonView(ProductComplexView.class)
-	private String goodreadsRelatedLink;
-
 	@JsonView(ProductSimpleView.class)
 	private String publisher;
 	
@@ -113,7 +100,7 @@ public class SerializableProduct {
 	private User user;
 
 	@JsonView(ProductComplexView.class)
-	private List<String> connectorNames;
+	private Collection<ConnectorInfo> connectorInfo;
 	
 	@JsonView(ProductComplexView.class)
 	private Map<String,String> connectorReferences;
@@ -151,9 +138,9 @@ public class SerializableProduct {
 		return result;
 	}
 	
-	public static SerializableProduct cloneProduct(Product product, List<String> connectorNames){
+	public static SerializableProduct cloneProduct(Product product, Collection<ConnectorInfo> connectorInfo){
 		SerializableProduct result = cloneProduct(product);
-		result.setConnectorNames(connectorNames);
+		result.setConnectorInfo(connectorInfo);
 		return result;
 	}
 	
@@ -279,36 +266,12 @@ public class SerializableProduct {
 		}
 	}
 
-	public String getAmazonUrl() {
-		return amazonUrl;
-	}
-
-	public void setAmazonUrl(String amazonUrl) {
-		this.amazonUrl = amazonUrl;
-	}
-
-	public String getGoodreadsUrl() {
-		return goodreadsUrl;
-	}
-
-	public void setGoodreadsUrl(String goodreadsUrl) {
-		this.goodreadsUrl = goodreadsUrl;
-	}
-
 	public Set<Author> getAuthors() {
 		return authors;
 	}
 
 	public void setAuthors(Set<Author> authors) {
 		this.authors = authors;
-	}
-
-	public String getGoodreadsRelatedLink() {
-		return goodreadsRelatedLink;
-	}
-
-	public void setGoodreadsRelatedLink(String goodreadsRelatedLink) {
-		this.goodreadsRelatedLink = goodreadsRelatedLink;
 	}
 
 	public String getPublisher() {
@@ -335,14 +298,6 @@ public class SerializableProduct {
 		this.processedConnectors = processedConnectors;
 	}
 
-	public String getDrivethrurpgUrl() {
-		return drivethrurpgUrl;
-	}
-
-	public void setDrivethrurpgUrl(String drivethrurpgUrl) {
-		this.drivethrurpgUrl = drivethrurpgUrl;
-	}
-
 	public Map<String, Long> getDollarPrice() {
 		return dollarPrice;
 	}
@@ -367,12 +322,12 @@ public class SerializableProduct {
 		this.lastPriceUpdate = lastPriceUpdate;
 	}
 
-	public List<String> getConnectorNames() {
-		return connectorNames;
+	public Collection<ConnectorInfo> getConnectorInfo() {
+		return connectorInfo;
 	}
 
-	public void setConnectorNames(List<String> connectorNames) {
-		this.connectorNames = connectorNames;
+	public void setConnectorInfo(Collection<ConnectorInfo> connectorInfo) {
+		this.connectorInfo = connectorInfo;
 	}
 
 	public Map<String, String> getConnectorReferences() {

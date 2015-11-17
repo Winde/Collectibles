@@ -62,6 +62,11 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 	public boolean hasOwnReference() {
 		return true;
 	}
+
+	@Override
+	public boolean canCreateLinks() {
+		return true;
+	}
 	
 	
 }

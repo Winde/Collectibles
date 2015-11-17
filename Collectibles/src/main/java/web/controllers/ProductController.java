@@ -23,6 +23,7 @@ import model.dataobjects.HierarchyNode;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
 import model.dataobjects.User;
+import model.dataobjects.serializable.ConnectorInfo;
 import model.dataobjects.serializable.SerializableProduct;
 import model.persistence.AuthorRepository;
 import model.persistence.CategoryValueRepository;
@@ -115,7 +116,7 @@ public class ProductController  extends CollectiblesController{
 			
 			
 			
-			return SerializableProduct.cloneProduct(product,connectorFactory.getConnectorNames(product));			
+			return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));			
 		}
 	}
 	
@@ -222,7 +223,7 @@ public class ProductController  extends CollectiblesController{
 				product.setHierarchyPlacement(hierarchyNode);
 				this.validate(product);				
 				productRepository.save(product);
-				return SerializableProduct.cloneProduct(product,connectorFactory.getConnectorNames(product));
+				return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));
 			} else {
 				throw new NotFoundException(new String[]{"hierarchy"});
 			}
@@ -280,7 +281,7 @@ public class ProductController  extends CollectiblesController{
 		product.addCategoryValue(categoryValue);
 		productRepository.save(product);		
 
-		return SerializableProduct.cloneProduct(product,connectorFactory.getConnectorNames(product));
+		return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));
 	}
 	
 	@Secured(value = { "ROLE_ADMIN" })
@@ -318,7 +319,7 @@ public class ProductController  extends CollectiblesController{
 			
 			productRepository.save(product);
 			
-			return SerializableProduct.cloneProduct(product,connectorFactory.getConnectorNames(product));			
+			return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));			
 		}			
 	}
 	
@@ -389,7 +390,7 @@ public class ProductController  extends CollectiblesController{
 				
 				Product result = productRepository.save(product);
 				
-				return SerializableProduct.cloneProduct(result,connectorFactory.getConnectorNames(result));
+				return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
 			} else {
 				throw new NotFoundException(new String[]{"product"});
 			}

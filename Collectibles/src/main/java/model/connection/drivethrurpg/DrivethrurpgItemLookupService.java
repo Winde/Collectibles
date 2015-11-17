@@ -27,6 +27,9 @@ public class DrivethrurpgItemLookupService implements ProductInfoLookupService<D
 
 	private static final Logger logger = LoggerFactory.getLogger(DrivethrurpgItemLookupService.class);
 	
+	private static final String IDENTIFIER = "DrivethruRPG";
+
+	
 	private static final int MAXIMUM_DISTANCE_TO_CONSIDER_MULTIPLE_RESULTS = 8;		
 	private static final int MAXIMUM_DISTANCE_TO_CONSIDER_SINGLE_RESULTS = 15;
 	
@@ -156,8 +159,8 @@ public class DrivethrurpgItemLookupService implements ProductInfoLookupService<D
 	@Override
 	public DrivethrurpgData fetchDocFromProduct(Product product) throws TooFastConnectionException {
 		DrivethrurpgData data = new DrivethrurpgData();
-		if (product.getDrivethrurpgUrl()!=null && !"".equals(product.getDrivethrurpgUrl().trim())){
-			data.setLink(product.getDrivethrurpgUrl());
+		if (product.getExternalLinks()!=null && product.getExternalLinks().get(this.getIdentifier())!=null){
+			data.setLink(product.getExternalLinks().get(this.getIdentifier()));
 		} else {
 			data.setLink(this.fetchUrlFromProductName(product));
 		}
@@ -173,6 +176,10 @@ public class DrivethrurpgItemLookupService implements ProductInfoLookupService<D
 			}
 		}
 		return data;
+	}
+
+	public String getIdentifier() {
+		return IDENTIFIER;
 	}
 
 	@Override

@@ -39,4 +39,9 @@ public class BoardGameGeekConnector extends AbstractProductInfoConnector{
 		return "BoardGameGeekConnector";
 	}
 
+	@Override
+	public boolean canCreateLinks() {
+		return true;
+	}
+
 }

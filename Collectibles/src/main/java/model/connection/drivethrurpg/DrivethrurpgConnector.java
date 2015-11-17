@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 
-	private static final String IDENTIFIER = "DrivethruRPG";
 
 	@Autowired
 	private DrivethrurpgItemLookupService itemLookup;
@@ -21,7 +20,7 @@ public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 	
 	@Override
 	public String getIdentifier() { 
-		return IDENTIFIER;
+		return itemLookup.getIdentifier();
 	}
 	
 
@@ -31,12 +30,17 @@ public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 
 	@Override
 	public boolean isApplicable(Product product) {
-		return product!=null && product.getName()!=null;
+		return product!=null && (product.getName()!=null || (product.getExternalLinks()!=null && product.getExternalLinks().get(this.getIdentifier())!=null));
 	}
 
 	@Override
 	public boolean hasOwnReference() {
 		return false;
+	}
+
+	@Override
+	public boolean canCreateLinks() {		
+		return true;
 	}
 	
 }

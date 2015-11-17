@@ -36,4 +36,9 @@ public class AmazonConnector extends AbstractProductInfoConnector {
 		return true;
 	}
 
+	@Override
+	public boolean canCreateLinks() {
+		return true;
+	}
+
 }
