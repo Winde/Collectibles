@@ -1,36 +1,39 @@
 package model.connection;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import model.connection.amazon.AmazonConnector;
+import model.connection.boardgamegeek.BoardGameGeekConnector;
+import model.connection.boardgamegeek.BoardGameGeekLookupService;
 import model.connection.drivethrurpg.DrivethrurpgConnector;
 import model.connection.goodreads.GoodReadsConnector;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Product;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProductInfoConnectorFactory {
 
-	@Autowired
-	private AmazonConnector amazonConnector;
+	private static final Logger logger = LoggerFactory.getLogger(Product.class);	
 	
 	@Autowired
-	private GoodReadsConnector goodreadsConnector;
+	private Collection<ProductInfoConnector> connectors;
 	
-	@Autowired
-	private DrivethrurpgConnector drivethrurpgConnector;
-	
-	private List<String> getConnectorNamesFromMap( Map<String,ProductInfoConnector> connectors){
+	private List<String> getConnectorNames( Collection<ProductInfoConnector> connectors){
 		List<String> result = new ArrayList<>();
-		if (connectors!=null && connectors.values()!=null){
-			Iterator<ProductInfoConnector> iterator = connectors.values().iterator();
+		if (connectors!=null){
+			Iterator<ProductInfoConnector> iterator = connectors.iterator();
 			while (iterator.hasNext()){
 				ProductInfoConnector connector = iterator.next();
 				if (connector.hasOwnReference()){
@@ -41,45 +44,49 @@ public class ProductInfoConnectorFactory {
 		return result;
 	}
 	
-	public Map<String,ProductInfoConnector> getConnectors(){
-		Map<String,ProductInfoConnector> connectors = new HashMap<>();
-		
-		connectors.put(amazonConnector.getIdentifier(), amazonConnector);
-		connectors.put(goodreadsConnector.getIdentifier(), goodreadsConnector);
-		connectors.put(drivethrurpgConnector.getIdentifier(), drivethrurpgConnector);
-		
-		return connectors;		
+	public Collection<ProductInfoConnector> getConnectors(){
+		Collection<ProductInfoConnector> result = null;
+		if (connectors!=null){
+			result = new ArrayList(connectors);
+		}
+		return result;
 	}
 	
-	public Map<String,ProductInfoConnector> getConnectors(Product product){
-		Map<String,ProductInfoConnector> connectors = new HashMap<>();
-		
-		connectors.put(amazonConnector.getIdentifier(), amazonConnector);
-		connectors.put(goodreadsConnector.getIdentifier(), goodreadsConnector);
-		connectors.put(drivethrurpgConnector.getIdentifier(), drivethrurpgConnector);
-		
-		return connectors;		
+	public Collection<ProductInfoConnector> getConnectors(Product product){
+		return this.getConnectors(product.getHierarchyPlacement());		
 	}
 	
-	public Map<String,ProductInfoConnector> getConnectors(HierarchyNode node){
-		Map<String,ProductInfoConnector> connectors = new HashMap<>();
+	public Collection<ProductInfoConnector> getConnectors(HierarchyNode node){
+		Set<String> connectorIdentifiers = new HashSet<>();
+		HierarchyNode current = node;
+		connectorIdentifiers.addAll(current.getConnectorsNames());
+		while (current.getFather()!=null){
+			logger.info("Parsing connectors for: " + current.getName());
+			current = current.getFather();
+			connectorIdentifiers.addAll(current.getConnectorsNames());
+		}
 		
-		connectors.put(amazonConnector.getIdentifier(), amazonConnector);
-		connectors.put(goodreadsConnector.getIdentifier(), goodreadsConnector);
-		connectors.put(drivethrurpgConnector.getIdentifier(), drivethrurpgConnector);
-		
-		return connectors;		
+				
+		Set<ProductInfoConnector> result = new HashSet<>(); 
+		for (String identifier : connectorIdentifiers){
+			for (ProductInfoConnector connector: connectors) {
+				if (identifier.equals(connector.getIdentifier())){
+					result.add(connector);
+				}
+			}		
+		}
+		return result;
 	}
 	
 	public List<String> getConnectorNames(){
-		return getConnectorNamesFromMap(this.getConnectors());
+		return getConnectorNames(this.getConnectors());
 	}
 	
 	public List<String> getConnectorNames(Product product){
-		return getConnectorNamesFromMap(this.getConnectors(product));
+		return getConnectorNames(this.getConnectors(product));
 	}
 	
 	public List<String> getConnectorNames(HierarchyNode node){
-		return getConnectorNamesFromMap(this.getConnectors(node));
+		return getConnectorNames(this.getConnectors(node));
 	}
 }

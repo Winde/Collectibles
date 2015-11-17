@@ -78,6 +78,7 @@ public class Product extends SimpleIdDao{
 	@ElementCollection(fetch = FetchType.LAZY)
 	@CollectionTable(name="connector_references", joinColumns=@JoinColumn(name="id"))
 	@Column(name="connector_reference")	
+	@BatchSize(size = 50)
 	private Map<String,String> connectorReferences;
 		
 	@Column(name="last_price_update")

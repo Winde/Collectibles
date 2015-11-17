@@ -1,5 +1,6 @@
 package model.dataobjects.serializable;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +16,9 @@ import javax.persistence.Column;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -124,6 +128,10 @@ public class SerializableProduct {
 	private Map<String,String> connectorReferences;
 	
 	public static Collection<SerializableProduct> cloneProduct(Collection<Product> products){
+		return cloneProduct(products,null);
+	}
+	
+	public static Collection<SerializableProduct> cloneProduct(Collection<Product> products, String [] ignoreProperties){
 		
 		Collection<SerializableProduct> result = null;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -138,7 +146,7 @@ public class SerializableProduct {
 				result = new ArrayList<>();
 				while(iterator.hasNext()){
 					Product product = iterator.next();			
-					result.add(new SerializableProduct(product, user));
+					result.add(new SerializableProduct(product, user, ignoreProperties));
 				}
 			}
 		}
@@ -159,22 +167,22 @@ public class SerializableProduct {
 			user.setUsername(auth.getName());
 		}		
 		
-		
-		
-		return new SerializableProduct(product, user);
+		return new SerializableProduct(product, user,null);
 	}
 	
 	public SerializableProduct(){}
 	
-	public SerializableProduct(Product productToClone, User user) {
-		PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
-		try {
-			propertyUtilsBean.copyProperties(this, productToClone);			
-		} catch (IllegalAccessException | InvocationTargetException
-				| NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public SerializableProduct(Product productToClone, User user, String[] ignoreProperties) {
+		try {		
+			if (ignoreProperties!=null){
+				BeanUtils.copyProperties(productToClone, this, ignoreProperties);
+			}else {
+				BeanUtils.copyProperties(productToClone, this);
+			}
+		}catch (Exception ex){
+			ex.printStackTrace();
 		}
+
 		this.user = user;
 		if (user!=null){
 			this.owned = productToClone.getOwners()!=null && productToClone.getOwners().contains(user);

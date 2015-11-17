@@ -5,12 +5,17 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.BatchSize;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -52,7 +57,14 @@ public class HierarchyNode extends SimpleIdDao{
 	@Column(name="depth")
 	@JsonView(HierarchySimpleView.class)
 	private Integer depth;
-	
+		
+	@ElementCollection(fetch = FetchType.LAZY)
+	@CollectionTable(name="hierarchy_connectors", joinColumns=@JoinColumn(name="id"))
+	@Column(name="hierarchy_connectors")	
+	@JsonIgnore
+	@BatchSize(size = 50)
+	private Set<String> connectorsNames;
+		
 	public HierarchyNode(){
 		children = new TreeSet<>();
 		//categories = new TreeSet<>();
@@ -122,7 +134,15 @@ public class HierarchyNode extends SimpleIdDao{
 	public String getLineage() {
 		return lineage;
 	}
-	
+
+	public Set<String> getConnectorsNames() {
+		return connectorsNames;
+	}
+
+	public void setConnectorsNames(Set<String> connectorsNames) {
+		this.connectorsNames = connectorsNames;
+	}
+
 	public boolean updateLineage() {
 		if (this.getFather()!=null && this.getFather().getLineage()!=null && this.getId()!=null){
 			this.lineage = this.getFather().getLineage() + "-" + this.getId();

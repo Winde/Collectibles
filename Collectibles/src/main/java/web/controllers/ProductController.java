@@ -94,15 +94,14 @@ public class ProductController  extends CollectiblesController{
 				throw new NotFoundException();
 			}
 			
-			Map<String, ProductInfoConnector> connectors = connectorFactory.getConnectors();
+			Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(product);
 			if (connectors!=null) {
 				logger.info("Connectors: " + connectors);
-				Iterator<Entry<String, ProductInfoConnector>> iterator = connectors.entrySet().iterator();
+				Iterator<ProductInfoConnector> iterator = connectors.iterator();
 				while (iterator.hasNext()){
-					Entry<String, ProductInfoConnector> entry = iterator.next();
-					logger.info("Is "+entry.getKey()+" Processed? "+ (!(product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(entry.getKey()))));
-					if (product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(entry.getKey())){
-						ProductInfoConnector connector = entry.getValue();
+					ProductInfoConnector connector = iterator.next();
+					logger.info("Is "+connector.getIdentifier()+" Processed? "+ (!(product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(connector.getIdentifier()))));
+					if (product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(connector.getIdentifier())){						
 						if (connector!=null){
 							try {
 								connector.updateProductTransaction(product);
@@ -178,13 +177,12 @@ public class ProductController  extends CollectiblesController{
 						productRepository.save(products);
 								
 						
-						Map<String, ProductInfoConnector> connectors = connectorFactory.getConnectors();
+						Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(hierarchyNode);
 						logger.info("Connectors: " + connectors);
 						if (connectors!=null) {
-							Iterator<Entry<String, ProductInfoConnector>> iterator = connectors.entrySet().iterator();
+							Iterator<ProductInfoConnector> iterator = connectors.iterator();
 							while (iterator.hasNext()){
-								Entry<String, ProductInfoConnector> entry = iterator.next();
-								ProductInfoConnector connector = entry.getValue();
+								ProductInfoConnector connector = iterator.next();
 								if (connector!=null){
 									connector.processInBackground(products);
 								}
@@ -300,13 +298,13 @@ public class ProductController  extends CollectiblesController{
 			
 			product.setDollarPrice(null);
 			product.setMinPrice(null);
-			Map<String, ProductInfoConnector> connectors = connectorFactory.getConnectors();
+			
+			Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(product);
 			if (connectors!=null) {
 				logger.info("Connectors: " + connectors);
-				Iterator<Entry<String, ProductInfoConnector>> iterator = connectors.entrySet().iterator();
+				Iterator<ProductInfoConnector> iterator = connectors.iterator();
 				while (iterator.hasNext()){
-					Entry<String, ProductInfoConnector> entry = iterator.next();
-					ProductInfoConnector connector = entry.getValue();
+					ProductInfoConnector connector = iterator.next();
 					if (connector!=null){
 						try {
 							connector.updatePrice(product);
@@ -480,13 +478,12 @@ public class ProductController  extends CollectiblesController{
 	public Boolean reProcessAll(){
 		
 		List<Product> products = productRepository.findAll();
-		Map<String, ProductInfoConnector> connectors = connectorFactory.getConnectors();
+		Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors();
 		logger.info("Connectors: " + connectors);
 		if (connectors!=null) {
-			Iterator<Entry<String, ProductInfoConnector>> iterator = connectors.entrySet().iterator();
+			Iterator<ProductInfoConnector> iterator = connectors.iterator();
 			while (iterator.hasNext()){
-				Entry<String, ProductInfoConnector> entry = iterator.next();
-				ProductInfoConnector connector = entry.getValue();
+				ProductInfoConnector connector = iterator.next();
 				if (connector!=null){
 					connector.processInBackground(products);
 				}
@@ -506,13 +503,12 @@ public class ProductController  extends CollectiblesController{
 			product.setMinPrice(null);			
 		}
 		productRepository.save(products);
-		Map<String, ProductInfoConnector> connectors = connectorFactory.getConnectors();
+		Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors();
 		logger.info("Connectors: " + connectors);
 		if (connectors!=null) {
-			Iterator<Entry<String, ProductInfoConnector>> iterator = connectors.entrySet().iterator();
+			Iterator<ProductInfoConnector> iterator = connectors.iterator();
 			while (iterator.hasNext()){
-				Entry<String, ProductInfoConnector> entry = iterator.next();
-				ProductInfoConnector connector = entry.getValue();
+				ProductInfoConnector connector = iterator.next();
 				if (connector!=null){					
 					connector.processPricesInBackground(products);
 				}

@@ -1,5 +1,6 @@
 package web.controllers;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,6 +12,7 @@ import model.dataobjects.HierarchyNode;
 import model.dataobjects.Product;
 import model.dataobjects.User;
 import model.dataobjects.serializable.SerializableProduct;
+import model.dataobjects.serializable.SerializableProduct.ProductComplexView;
 import model.dataobjects.serializable.SerializableProduct.ProductListView;
 import model.dataobjects.supporting.ObjectList;
 import model.persistence.HierarchyRepository;
@@ -32,6 +34,8 @@ import web.supporting.error.exceptions.CollectiblesException;
 import web.supporting.error.exceptions.IncorrectParameterException;
 
 import com.fasterxml.jackson.annotation.JsonView;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 
 @RestController
@@ -160,13 +164,33 @@ public class SearchController extends CollectiblesController{
 			
 			ObjectList<SerializableProduct> result = null;
 
-			logger.info("Result: " + resultFromDB);
+			List<String> ignorePropertiesForSearch = new ArrayList<>();
+			
+			for(Field field  : SerializableProduct.class.getDeclaredFields())
+			{
+			    if (field.isAnnotationPresent(JsonView.class))
+			        {
+			    		JsonView annotation = field.getDeclaredAnnotation(JsonView.class);
+			    		Class<?>[] views = annotation.value();
+			    		List viewList = Arrays.asList(views);
+			    		
+			    		if (viewList!=null && viewList.contains(ProductComplexView.class)){
+			    			ignorePropertiesForSearch.add(field.getName());
+			    		}
+			        }
+			}
+			
+			
+			String [] ignorePropertiesForSearchArray = ignorePropertiesForSearch.toArray(new String[ignorePropertiesForSearch.size()]);
+			
+			logger.info("Ignore: " + ignorePropertiesForSearch );
+
 			if (resultFromDB!=null && resultFromDB.getObjects()!=null) {
 				logger.info("Result objects number: " + resultFromDB.getObjects().size());
 				result = new ObjectList<>();
 				result.setHasNext(resultFromDB.getHasNext());
 				result.setMaxResults(resultFromDB.getMaxResults());				
-				result.setObjects(SerializableProduct.cloneProduct(resultFromDB.getObjects()));				
+				result.setObjects(SerializableProduct.cloneProduct(resultFromDB.getObjects(),ignorePropertiesForSearchArray));				
 			}
 			
 			return result;
