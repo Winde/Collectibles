@@ -14,6 +14,7 @@
 	 'projectProgressBar',
 	 'ngFileUpload',
 	 'afkl.lazyImage',
+	 'monospaced.elastic',
 	 //'ngCookies',	 
 	 'ui.bootstrap',
 	 'login',
