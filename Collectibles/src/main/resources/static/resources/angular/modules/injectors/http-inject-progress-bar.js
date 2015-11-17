@@ -12,8 +12,7 @@
 				 if (request && request.nointercept){
 					 
 				 } else {
-					 if (request && request && request.progressbar){
-						 console.log($rootScope.progressbar);
+					 if (request && request && request.progressbar){						 
 						 if ($rootScope.progressbar && $rootScope.progressbar.complete){
 							 if ($rootScope.progressbar.status()>0 && $rootScope.progressbar.status()<100){
 								 $rootScope.progressbar.complete();

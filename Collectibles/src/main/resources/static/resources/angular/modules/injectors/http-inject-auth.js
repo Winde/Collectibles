@@ -2,8 +2,8 @@
 	
 
 	angular.module('login')
-	.factory('httpInjectAuth',['$q', 'Auth','Base64','$location',
-			 function httpInjectAuth($q, Auth, Base64, $location) {
+	.factory('httpInjectAuth',['$q', 'Message','Auth','Base64','$location',
+			 function httpInjectAuth($q, Message, Auth, Base64, $location) {
 			
 		    return {		    	
 		    	'request': function(request){		    		
@@ -37,7 +37,8 @@
 	        			switch (responseError.status) {
 				            case 403:				            	
 				            	Auth.logout();			            						            	
-				            	$location.path('/login/').replace();						            	
+				            	$location.path('/login/').replace();				            	
+				            	Message.alert("Your session has expired",true);
 				            break;	            
 			            }	        				        			
 			            //return $q.reject(responseError);		        				        					            

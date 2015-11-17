@@ -102,8 +102,8 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 
 	@Override
 	public String getPublisher(Document doc) throws TooFastConnectionException {
-		String publisher = super.getAttribute(doc, "/items/item/link[@type='boardgamepublisher']","value");		
-		return publisher;
+		//String publisher = super.getAttribute(doc, "/items/item/link[@type='boardgamepublisher']","value");		
+		return null;
 	}
 
 	@Override

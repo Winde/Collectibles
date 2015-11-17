@@ -124,8 +124,7 @@
 		
 		if ($scope.root == undefined || $scope.root == null){
 			Hierarchy.root()
-			.success(function(data){
-				console.log("OBTAINED HIERARCHY")
+			.success(function(data){				
 				$scope.root = { id: data.id };				
 				if ($scope.hierarchy == null || $scope.hierarchy == undefined){
 					$scope.hierarchy = { id: data.id };
@@ -136,8 +135,7 @@
 				
 				$scope.hierarchy = all;				
 				controller.setSearchParameters();	
-				
-				console.log($scope.hierarchy);
+								
 				
 				if (!angular.equals({}, controller.obtainSearchParameters())){
 					controller.search();
