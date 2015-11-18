@@ -392,7 +392,7 @@ public class ProductController  extends CollectiblesController{
 						User user = new User();
 						user.setUsername(auth.getName());
 						if (!serializableProduct.getOwnedAnotherLanguage()) {
-							product.getOwners().remove(user);
+							product.getOwnersOtherLanguage().remove(user);
 						} else {
 							user = userRepository.findOne(user.getUsername());
 							Set<User> owners = product.getOwnersOtherLanguage();

@@ -44,7 +44,8 @@ import configuration.security.jwt.TokenAuthenticationService;
 	"web.controllers",
 	"configuration",
 	"model.authentication",
-	"model.connection"	
+	"model.connection",
+	"model.dataobjects.events"
 })
 @EnableCaching
 @EnableJpaRepositories(basePackages = {"model.persistence"})

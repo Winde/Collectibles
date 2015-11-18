@@ -21,26 +21,23 @@
 				 return request;
 			 },
 	    	'response': function(response){
-	    		if (response && response.config && response.config.nointercept){
 	    		
-	    		} else {
-		    		if (response && response.config && response.config.progressbar){
-		    			if (response.config.progressBarInstance){		    				
-		    				response.config.progressBarInstance.complete();		    				
-		    			}
-		    		}
+	    		if (response && response.config && response.config.progressbar){
+	    			if (response.config.progressBarInstance){		    				
+	    				response.config.progressBarInstance.complete();		    				
+	    			}
 	    		}
+	    		
 	    		return response;
 	    	},
 			 'responseError': function(responseError){								
-	        	if (responseError && responseError.config && responseError.config.nointercept) {	        	
-	        	} else {		    	        		
-	        		if (responseError && responseError.config && responseError.config.progressbar){
-	        			if (response.config.progressBarInstance){		    				
-		    				response.config.progressBarInstance.complete();		    				
-		    			}
-		    		}	        		            
-	        	} 
+	        			    	        		
+        		if (responseError && responseError.config && responseError.config.progressbar){
+        			if (responseError.config.progressBarInstance){		    				
+        				responseError.config.progressBarInstance.complete();		    				
+	    			}
+	    		}	        		            
+	        	
 	        	return $q.reject(responseError);	        	
 			 }
 		  }

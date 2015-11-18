@@ -20,9 +20,13 @@
 		    		}		    		
 		    		return request;
 		    	},	
-		    	'response': function(response){		    				    	
-		    		if (response.headers && response.headers(Auth.getHeaderResponseParameter())){
-		    			Auth.setStoredSession(response.headers(Auth.getHeaderResponseParameter()))		    			
+		    	'response': function(response){		    	
+		    		if (response && response.config && response.config.nointercept) {	
+			    		
+		    		} else {
+		    			if (response.headers && response.headers(Auth.getHeaderResponseParameter())){
+			    			Auth.setStoredSession(response.headers(Auth.getHeaderResponseParameter()))		    			
+			    		}
 		    		}
 		    		
 		    		return response;

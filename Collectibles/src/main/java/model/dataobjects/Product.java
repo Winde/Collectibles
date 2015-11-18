@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.persistence.Basic;
@@ -14,17 +16,20 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Transient;
 
 import model.connection.ProductInfoConnector;
 import model.connection.ProductInfoConnectorFactory;
 import model.connection.TooFastConnectionException;
+import model.dataobjects.events.ProductSaveListener;
 
 import org.hibernate.annotations.BatchSize;
 import org.slf4j.Logger;
@@ -34,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity(name="Product")
+@EntityListeners(ProductSaveListener.class)
 public class Product extends SimpleIdDao{
 
 	private static final Logger logger = LoggerFactory.getLogger(Product.class);
@@ -113,7 +119,6 @@ public class Product extends SimpleIdDao{
 	
 	@Column(name="min_price")
 	private Long minPrice = null;	
-	
 
 	public Product(){
 		dollarPrice = new HashMap<>();

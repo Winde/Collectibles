@@ -335,15 +335,6 @@ public class SerializableProduct {
 	}
 
 	public void setConnectorReferences(Map<String, String> connectorReferences) {
-		if (connectorReferences!=null){
-			Iterator<Entry<String, String>> iterator = connectorReferences.entrySet().iterator();
-			while (iterator.hasNext()){
-				Entry<String, String> entry = iterator.next();
-				if (entry!=null && (entry.getValue()==null || "".equals(entry.getValue().trim()))){
-					iterator.remove();
-				}
-			}			
-		}		
 		this.connectorReferences = connectorReferences;
 	}
 
@@ -372,16 +363,7 @@ public class SerializableProduct {
 		return externalLinks;
 	}
 
-	public void setExternalLinks(Map<String, String> externalLinks) {
-		if (externalLinks!=null){
-			Iterator<Entry<String, String>> iterator = externalLinks.entrySet().iterator();
-			while (iterator.hasNext()){
-				Entry<String, String> entry = iterator.next();
-				if (entry!=null && (entry.getValue()==null || "".equals(entry.getValue().trim()))){
-					iterator.remove();
-				}
-			}			
-		}				
+	public void setExternalLinks(Map<String, String> externalLinks) {		
 		this.externalLinks = externalLinks;
 	}
 
