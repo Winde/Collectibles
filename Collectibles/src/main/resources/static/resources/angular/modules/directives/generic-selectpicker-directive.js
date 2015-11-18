@@ -37,15 +37,17 @@
                                 	
                                 	
                                 	if (element.attr("data-collection-name")){
+
                                 		if (scope[element.attr("data-collection-name")].length>$(element).find('option').length){
                                 			index = index +1;
                                 		}
-                                		
+
 	                                	var value = scope[element.attr("data-collection-name")][index];
-	                                		                                		                                	
+
 	                                	if (element.attr('data-collection-attribute')){
 	                                		value = value[element.attr('data-collection-attribute')];
 	                                	}
+
                                 	} else {
                                 		var value = $(element).val();
                                 	}
@@ -95,7 +97,7 @@
                                 });
                                 
                                 
-                                scope.$watchCollection(attrs.collectionName, function(newVal, oldVal) {                                	
+                                scope.$watchCollection(attrs.collectionName, function(newVal, oldVal) {                                
                                     $timeout(function() {                                          	                                        
                                         $(element).selectpicker("refresh");
                                     });

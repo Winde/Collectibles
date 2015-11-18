@@ -36,8 +36,11 @@
 	                    // app module and modules on which app depends on.		        		
 	        			switch (responseError.status) {
 				            case 403:				            	
-				            	Auth.logout();			            						            	
-				            	$location.path('/login/').replace();				            	
+				            	Auth.logout();						            	
+				            	if ($location.path()!='/products/'){
+				            		$location.path('/products/').replace();	
+				            	}
+				            				            	
 				            	Message.alert("Your session has expired",true);
 				            break;	            
 			            }	        				        			

@@ -62,6 +62,10 @@
 		this.setSearchParameters = function(){
 			var searchObject = controller.obtainSearchParameters();
 
+			if (searchObject.ownedBy){
+				searchObject.ownedBy = parseInt(searchObject.ownedBy);
+			}
+						
 			if (searchObject.hierarchy){			
 				var hierarchy = parseInt(searchObject.hierarchy)
 				if (!isNaN(hierarchy)){
@@ -87,7 +91,8 @@
 			if (searchObject.owned){	$scope.owned = searchObject.owned;
 			} else {	$scope.owned = "";}
 			
-			if (searchObject.ownedBy){	$scope.ownedBy = searchObject.ownedBy;
+			if (searchObject.ownedBy && !isNaN(searchObject.ownedBy)){					
+				$scope.ownedBy = searchObject.ownedBy;
 			} else {	$scope.ownedBy = "";}
 						
 			
@@ -134,8 +139,8 @@
 				$scope.products = [];
 			}
 		}
-		
-		if (!$scope.users) {
+		/*
+		if (!$scope.users && $scope.isAuthenticated()) {
 			User.all()
 			.success(function(data){
 				$scope.users = data;
@@ -145,9 +150,32 @@
 			})
 			.finally(function(data){
 				
-			});
-			
-		}
+			});		
+		}*/
+		
+		 $scope.$watch(
+             function( $scope ) {                 
+                 return( $scope.isAuthenticated() );
+             },
+             function( newValue ) {
+            	 if (newValue === true){
+	        		 if (!$scope.users && $scope.isAuthenticated()) {
+	        				User.all()
+	        				.success(function(data){
+	        					$scope.users = [];
+	        					$scope.users.push({id: "", contactName: "anyone"});	        					
+	        					$scope.users = $scope.users.concat(data);
+	        				})
+	        				.catch(function(data){
+	        					Message.alert("There was an error");
+	        				})
+	        				.finally(function(data){
+	        					
+	        				});		
+	        		  }
+            	 }
+             }
+         );
 		
 		
 		if ($scope.root == undefined || $scope.root == null){

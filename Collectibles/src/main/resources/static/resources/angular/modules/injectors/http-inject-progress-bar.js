@@ -13,14 +13,9 @@
 					 
 				 } else {
 					 if (request && request && request.progressbar){						 
-						 if ($rootScope.progressbar && $rootScope.progressbar.complete){
-							 if ($rootScope.progressbar.status()>0 && $rootScope.progressbar.status()<100){
-								 $rootScope.progressbar.complete();
-							 }
-						 }
-		    			$rootScope.progressbar = ngProgressFactory.createInstance();
-		    			$rootScope.progressbar.setColor(factory.progressBarColor);
-		    			$rootScope.progressbar.start();
+						request.progressBarInstance = ngProgressFactory.createInstance();
+						request.progressBarInstance.setColor(factory.progressBarColor);						
+						request.progressBarInstance.start();
 					 }
 				 }
 				 return request;
@@ -30,8 +25,8 @@
 	    		
 	    		} else {
 		    		if (response && response.config && response.config.progressbar){
-		    			if ($rootScope.progressbar){
-		    				$rootScope.progressbar.complete();
+		    			if (response.config.progressBarInstance){		    				
+		    				response.config.progressBarInstance.complete();		    				
 		    			}
 		    		}
 	    		}
