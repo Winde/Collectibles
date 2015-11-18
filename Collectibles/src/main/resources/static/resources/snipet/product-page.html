@@ -6,7 +6,7 @@
 		<button class="btn" ng-click="productCtrl.setEditable(false)" ng-show="productCtrl.isEditable()">STOP EDITING</button>
 	</div>
 
-	<ol class="breadcrumb product-crumb hidden-sm" ng-if="product.hierarchyPath">
+	<ol class="breadcrumb product-crumb hidden-sm hidden-xs" ng-if="product.hierarchyPath">
 	  <li ng-repeat="node in product.hierarchyPath"><a ng-href="#{{'/products/?hierarchy='+node.id}}">{{node.name}}</a> </li>
 	  <li class="active">{{product.name}}</li>	  	  
 	</ol>
