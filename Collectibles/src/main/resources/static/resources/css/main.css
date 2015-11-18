@@ -28,7 +28,8 @@
 }
 
 .optionsSearch.form-group {
-	margin-left: 10px;
+	/*margin-left: 10px;*/
+	margin-top: 10px;
 }
 /*
 .optionsSearch.form-group {
@@ -48,7 +49,8 @@
 }
 
 .productGrid .productListEntry{
-    padding: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     border: solid 1px #ccc;
     border-radius: 10px;
     margin-bottom: 12px;
@@ -186,6 +188,18 @@ select.ng-invalid,.ng-invalid.ng-dirty:not(.btn),.ng-invalid:not(.btn) {
     margin: auto;
     max-height: 175px;
 }
+.productGrid .productListEntry .imageContainer {
+    text-align: center;
+}
+
+.productGrid .productListEntry .imageContainer img{
+	max-height: 175px;
+	margin: 0 auto;
+}
+
+.productGrid .productListEntry .imageContainer  .afkl-img-ratio-1-1{
+	padding-bottom: 0px;
+} 
 
 .carousel {
 	margin-top: 10px;

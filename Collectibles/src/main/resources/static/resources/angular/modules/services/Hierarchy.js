@@ -7,8 +7,7 @@
 		
 		function addChildren(array, parent, children, maxDepth){
 			for (var j=0;j<children.length;j++){			
-				var depth = children[j].depth;
-				console.log("Depth = "+depth + "; MaxDepth="+maxDepth);
+				var depth = children[j].depth;				
 				if (maxDepth==undefined || depth<=maxDepth){
 					children[j].group = parent.name;
 					array.push(children[j]);

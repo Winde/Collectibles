@@ -1,5 +1,6 @@
 package model.persistence;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,6 +21,9 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ProductRepositoryImpl implements ProductRepositoryCustom{
 
@@ -94,7 +98,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 
 	@Override
 	public ObjectList<Product> searchProduct(ProductSearch search) {
-		
+
 		String hql = "";
 		
 		hql = hql + "select p from Product p LEFT JOIN p.images LEFT JOIN p.owners owners LEFT JOIN p.ownersOtherLanguage ownersOtherLanguage";
@@ -162,7 +166,33 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
 			hql = hql + "GROUP BY p having count(categoryValues)=:sizeCategoryValues "; 			
 		}
+		
+		if (search.getSortBy()!=null){
+			if (search.getSortBy().toLowerCase().equals("name")){
+				hql = hql + " ORDER BY p.name";
+			} else if (search.getSortBy().toLowerCase().equals("price")){
+				hql = hql + " ORDER BY p.minPrice";
+			} else {
+				hql = hql + " ORDER BY p.id";
+			}
+		} else {
+			hql = hql + " ORDER BY p.id";
+		}
+		
+		if (search.getSortOrder()!=null){
+			if ("asc".equals(search.getSortOrder().toLowerCase())){
+				hql = hql + " ASC";
+			} else if ("desc".equals(search.getSortOrder().toLowerCase())){
+				hql = hql + " DESC";
+			} else {
+				hql = hql + " DESC";
+			}
+		} else {
+			hql = hql + " DESC";
+		}
 			
+		logger.info("Executing HQL: "+ hql);
+		
 		TypedQuery<Product> query = entityManager.createQuery(hql, Product.class);
 		
 		if (search.getSearchTerm()!=null){ query.setParameter("search",search.getSearchTerm());}
@@ -178,7 +208,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		}
 		
 		
-		Set<Product> result = new HashSet<>();	
+		List<Product> result = new ArrayList<>();	
 		
 		
 		ObjectList<Product> wrapper = new ObjectList<Product>();
@@ -196,21 +226,21 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		}
 
 		List<Product> listFromDB = query.getResultList();
-		if (search.getMaxResults() !=null & search.getPage()!=null && (listFromDB.size() == search.getMaxResults()+1)){
-			listFromDB.remove(listFromDB.size()-1);
-			wrapper.setHasNext(true);
-		} else {
-			wrapper.setHasNext(false);
-		}
-		
-		
-		result.addAll(listFromDB);
-		
-		logger.info("Obtained "+ result.size() + " products");
-		
-		wrapper.setObjects(result);
-		if (search.getMaxResults()!=null && search.getPage()!=null) {
-			wrapper.setMaxResults(search.getMaxResults());	
+		if (listFromDB!=null){
+			if (search.getMaxResults() !=null & search.getPage()!=null && (listFromDB.size() == search.getMaxResults()+1)){
+				listFromDB.remove(listFromDB.size()-1);
+				wrapper.setHasNext(true);
+			} else {
+				wrapper.setHasNext(false);
+			}
+			
+			
+			logger.info("Obtained "+ listFromDB.size() + " products");
+			
+			wrapper.setObjects(listFromDB);
+			if (search.getMaxResults()!=null && search.getPage()!=null) {
+				wrapper.setMaxResults(search.getMaxResults());	
+			}
 		}
 		return wrapper;
 	}

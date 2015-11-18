@@ -17,6 +17,8 @@ public class ProductSearch implements SearchObject {
 	private Integer maxResults = null;
 	private Integer page = null;
 	private Boolean withPrice = null;
+	private String sortBy = null;
+	private String sortOrder = null;
 	
 	public ProductSearch(){}
 
@@ -92,6 +94,22 @@ public class ProductSearch implements SearchObject {
 		this.owned = owned;
 	}
 
+	public String getSortBy() {
+		return sortBy;
+	}
+
+	public void setSortBy(String sortBy) {
+		this.sortBy = sortBy;
+	}
+
+	public String getSortOrder() {
+		return sortOrder;
+	}
+
+	public void setSortOrder(String sortOrder) {
+		this.sortOrder = sortOrder;
+	}
+
 	@Override
 	public Collection<String> errors() {
 		Collection<String> errors = new ArrayList<>();
@@ -101,6 +119,8 @@ public class ProductSearch implements SearchObject {
 
 		return errors;
 	}
+
+	
 
 
 }

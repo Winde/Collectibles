@@ -43,6 +43,9 @@
 			
 			if ($scope.maxResults){ searchObject.maxResults = $scope.maxResults } else { $scope.maxResults = 0; searchObject.maxResults = 0; }
 			
+			if ($scope.sortBy){ searchObject.sortBy = $scope.sortBy; }
+			if ($scope.sortOrder){ searchObject.sortOrder = $scope.sortOrder; }
+			
 			if (newSearch){
 				searchObject.page = 0;
 				$scope.page = 0;
@@ -88,6 +91,14 @@
 			
 			if (searchObject.maxResults){	$scope.maxResults = searchObject.maxResults;
 			} else {	searchObject.maxResults = controller.defaultPaginationSize; $scope.maxResults= controller.defaultPaginationSize; }
+			
+			if (searchObject.sortBy){	$scope.sortBy = searchObject.sortBy;
+			} else {	searchObject.sortBy = ""; }
+			
+			if (searchObject.sortOrder){	$scope.sortOrder = searchObject.sortOrder;
+			} else {	searchObject.sortOrder = ""; }
+			
+
 		};
 				
 				

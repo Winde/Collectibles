@@ -32,6 +32,9 @@
 			return Auth.isAdmin();
 		}
 		
+		$scope.isLoggedIn = function(){
+			return Auth.isloggedIn();
+		}
 	
 		$scope.isActive = function (viewLocation) { 
 	        return viewLocation === $location.path();

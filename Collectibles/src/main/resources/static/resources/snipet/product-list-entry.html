@@ -5,11 +5,11 @@
 	
 	<div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
 		<div class="imageContainer">
-			<div class="squareImage">		
+			<div class="">		
 				<a ng-if="product.selectedImage.id" ng-href="#/product/{{product.id}}">
 					<div	afkl-lazy-image="/image/thumb/{{product.selectedImage.id}}"
 							class="afkl-img-ratio-1-1"
-							afkl-lazy-image-options="{'className': 'img-responsive img-thumbnail'}"></div>
+							afkl-lazy-image-options="{'className': 'img-responsive'}"></div>
 				<!--  	<img class="img-responsive img-thumbnail" ng-src="/image/thumb/{{product.selectedImage.id}}">-->
 				</a>		
 			</div>
@@ -21,8 +21,8 @@
 			<span class="btn btn-default" ng-if="product && product.id && isAdmin()" ng-click="productManagementCtrl.updatePrices(product.id)">Update price</span>
 		</h3>
 	</div>	
-	<div class="col-lg-1 col-md-5 col-sm-6 col-xs-6">
-		<h3 ng-if="editMode && isAdmin()">
+	<div class="col-lg-2 col-md-5 col-sm-6 col-xs-6">
+		<h3 ng-if="editMode && isLoggedIn()">
 			<span  
 					class="btn btn-default" 
 					ng-model="product.owned" 
@@ -33,7 +33,7 @@
 				Owned
 			</span>
 		</h3>
-		<h3 ng-if="editMode && isAdmin()">
+		<h3 ng-if="editMode && isLoggedIn()">
 			<span  
 					class="btn btn-default" 
 					ng-model="product.ownedAnotherLanguage" 
@@ -49,10 +49,10 @@
 				ng-model="product.owned" 
 				ng-change="productManagementCtrl.update(product)" />
  			-->		
-		<div ng-if="!editMode || !isAdmin()">
+		<div ng-if="!editMode || !isLoggedIn()">
 			<h3><span class="label label-default" ng-if="product.owned">Owned</span></h3>			
 		</div>
-		<div ng-if="!editMode || !isAdmin()">
+		<div ng-if="!editMode || !isLoggedIn()">
 			<h3><span class="label label-default" ng-if="product.ownedAnotherLanguage">Owned <i class="fa fa-globe"></i></span></h3>			
 		</div>
 	</div>	

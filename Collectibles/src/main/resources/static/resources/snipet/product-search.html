@@ -1,4 +1,4 @@
-<div ng-if="isAdmin()">
+<div ng-if="isAuthenticated()">
 		<button class="btn" ng-click="productListCtrl.toggleEditMode()" ng-show="!editMode">EDIT</button>
 		<button class="btn" ng-click="productListCtrl.toggleEditMode()" ng-show="editMode">STOP EDITING</button>
 </div>
@@ -38,54 +38,60 @@
 		
 	<ajax ng-show="processingSearch" ></ajax>
 	
-	<div class="form-group optionsSearch">
-		<span>Images:</span>		
-		<div class="btn-group">
+	
+	
+	<div class="row">
+		
+		<h4 class="col-xs-1"><span class="btn btn-primary disabled">Filter</span></h4>
+		
+		<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12">
 			
-			<label class="btn btn-default" uib-btn-radio="''" ng-model="withImages" ng-change="productListCtrl.updateSearch(true)">
-				<!-- <input type="radio"
-					ng-model="withImages"			
-					ng-change="pro1ductListCtrl.updateSearch(true)" value=""/>  -->Any
-			</label>
-			
-			<label class="btn btn-default" uib-btn-radio="'true'" ng-model="withImages" ng-change="productListCtrl.updateSearch(true)">
-				<!-- <input type="radio" 
-					ng-model="withImages"			
-					ng-change="productListCtrl.updateSearch(true)" value="true"/> -->With			
-			</label>		
-			
-			<label class="btn btn-default" uib-btn-radio="'false'" ng-model="withImages" ng-change="productListCtrl.updateSearch(true)">
-				<!-- <input type="radio" 
-					ng-model="withImages"			
-					ng-change="productListCtrl.updateSearch(true)" value="false" />-->Without
-			</label>		
+				
+			<div class="btn-group">
+				<label class="btn btn-default disabled">Images</label>		
+				<label class="btn btn-default" uib-btn-radio="''" ng-model="withImages" ng-change="productListCtrl.updateSearch(true)">
+					<!-- <input type="radio"
+						ng-model="withImages"			
+						ng-change="pro1ductListCtrl.updateSearch(true)" value=""/>  -->Any
+				</label>
+				
+				<label class="btn btn-default" uib-btn-radio="'true'" ng-model="withImages" ng-change="productListCtrl.updateSearch(true)">
+					<!-- <input type="radio" 
+						ng-model="withImages"			
+						ng-change="productListCtrl.updateSearch(true)" value="true"/> -->With			
+				</label>		
+				
+				<label class="btn btn-default" uib-btn-radio="'false'" ng-model="withImages" ng-change="productListCtrl.updateSearch(true)">
+					<!-- <input type="radio" 
+						ng-model="withImages"			
+						ng-change="productListCtrl.updateSearch(true)" value="false" />-->Without
+				</label>		
+			</div>
 		</div>
-	</div>
-	<div class="form-group optionsSearch" ng-show="isAuthenticated()">
-		<span>Owned:</span>
-		<div class="btn-group">				
-			<label class="btn btn-default" uib-btn-radio="''" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
-				<!-- <input type="radio" class="form-control"
-					ng-model="owned"			
-					ng-change="productListCtrl.updateSearch(true)" value=""/> -->Any
-			</label>		
-			<label class="btn btn-default" uib-btn-radio="'true'" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
-				<!-- <input type="radio"
-					ng-model="owned"			
-					ng-change="productListCtrl.updateSearch(true)" value="true"/> -->Yes
-					</label>				
-			<label class="btn btn-default" uib-btn-radio="'false'" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
-				<!-- <input type="radio" 
-					ng-model="owned"			
-					ng-change="productListCtrl.updateSearch(true)" value="false" /> -->No
-			</label>		
-		</div>
-	</div>		
-	<div class="adminSearchOptions">
-		<div class="form-group optionsSearch" ng-show="isAdmin()">
-				<span>Price:</span>		
-				<div class="btn-group">
+ 		<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12" ng-show="isAuthenticated()">			
+			<div class="btn-group">
+				<label class="btn btn-default disabled">Owned</label>								
+				<label class="btn btn-default" uib-btn-radio="''" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
+					<!-- <input type="radio" class="form-control"
+						ng-model="owned"			
+						ng-change="productListCtrl.updateSearch(true)" value=""/> -->Any
+				</label>		
+				<label class="btn btn-default" uib-btn-radio="'true'" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
+					<!-- <input type="radio"
+						ng-model="owned"			
+						ng-change="productListCtrl.updateSearch(true)" value="true"/> -->Yes
+						</label>				
+				<label class="btn btn-default" uib-btn-radio="'false'" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
+					<!-- <input type="radio" 
+						ng-model="owned"			
+						ng-change="productListCtrl.updateSearch(true)" value="false" /> -->No
+				</label>		
+			</div>
+		</div>		
+		<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12">
 					
+				<div class="btn-group">
+					<label class="btn btn-default disabled">Price</label>	
 					<label class="btn btn-default" uib-btn-radio="''" ng-model="withPrice" ng-change="productListCtrl.updateSearch(true)">
 						<!-- <input type="radio"
 							ng-model="withImages"			
@@ -104,8 +110,27 @@
 							ng-change="productListCtrl.updateSearch(true)" value="false" />-->Without
 					</label>		
 				</div>
-		</div>
+		</div>		
+	
+	</div>
+	
+	<div class="row">
 		
+		<h4 class="col-xs-1"><span class="btn btn-primary disabled">Sort</span></h4>
+	
+		<div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+			<div class="form-group optionsSearch btn-group ">			
+				<label class="btn btn-default disabled" >Sort by</label>
+		        <label class="btn btn-default" ng-model="sortBy" uib-btn-radio="'name'" ng-change="productListCtrl.updateSearch(true)">Name</label>
+		        <label class="btn btn-default" ng-model="sortBy" uib-btn-radio="'price'" ng-change="productListCtrl.updateSearch(true)">Price</label>	        	       
+		    </div>
+		    <div class="form-group optionsSearch btn-group">	    	
+		    	<label class="btn btn-default disabled" >Sort order</label>
+		        <label class="btn btn-default" ng-model="sortOrder" uib-btn-radio="'asc'" ng-change="productListCtrl.updateSearch(true)">Ascendent</label>
+		        <label class="btn btn-default" ng-model="sortOrder" uib-btn-radio="'desc'" ng-change="productListCtrl.updateSearch(true)">Descendent</label>
+		        
+		    </div>
+	    </div>
 	</div>
 </form>
 
@@ -128,7 +153,7 @@
 		<div class="col-lg-1 col-md-1 col-sm-2 col-xs-6"></div>
 	</div>
  	-->
-	<product-list-entry editMode="editMode" ng-repeat="product in products | orderBy:'releaseDate'"></product-list-entry>
+	<product-list-entry editMode="editMode" ng-repeat="product in products"></product-list-entry>
 </div>
 
 <div ng-if="products && products.length && products.length>0">
@@ -138,7 +163,7 @@
 	</ul>
 </div>
 
-<div ng-if="!products || !products.length || products.length <=0">
-	No results found
+<div class="noResultsSection" ng-if="!products || !products.length || products.length <=0">
+	<h3><span class="label label-warning">No results found</span></h3>
 </div>
 

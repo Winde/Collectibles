@@ -61,6 +61,8 @@ public class SearchController extends CollectiblesController{
 			String withImagesString,
 			String withPriceString,
 			String ownedString,
+			String sortBy,
+			String sortOrder,
 			int page,
 			int maxResults) throws CollectiblesException {
 
@@ -141,7 +143,14 @@ public class SearchController extends CollectiblesController{
 			}
 			
 			searchObject.setCategoryValues(categoryValues);
-						
+			
+
+			searchObject.setSortBy(sortBy);
+			searchObject.setSortOrder(sortOrder);
+			
+			logger.info("Sort by: " + sortBy);
+			logger.info("Sort Order: " + sortOrder);
+			
 			ObjectList<Product> resultFromDB = null;
 
 			Collection<String> errors = searchObject.errors();
@@ -150,8 +159,6 @@ public class SearchController extends CollectiblesController{
 			}else {
 				throw new IncorrectParameterException(errors);
 			}
-			
-			
 			
 			ObjectList<SerializableProduct> result = null;
 
@@ -194,9 +201,11 @@ public class SearchController extends CollectiblesController{
 			@RequestParam(required=false, name="search") String searchString,
 			@RequestParam(required=false, name="owned" ) String owned,
 			@RequestParam(required=false, name="withPrice") String withPrice,
+			@RequestParam(required=false, name="sortBy") String sortBy,
+			@RequestParam(required=false, name="sortOrder") String sortOrder,
 			@RequestParam(required=true, name="page") int page,
 			@RequestParam(required=false, name="maxResults") int maxResults) throws CollectiblesException{	
-		ObjectList<SerializableProduct> objects = findProduct(null,searchString,null,withImagesString,withPrice,owned,page,maxResults);
+		ObjectList<SerializableProduct> objects = findProduct(null,searchString,null,withImagesString,withPrice,owned,sortBy,sortOrder,page,maxResults);
 		return objects;
 	}
 	
@@ -209,9 +218,11 @@ public class SearchController extends CollectiblesController{
 			@RequestParam(required=false, name="owned" ) String owned,
 			@RequestParam(required=false, name="withPrice") String withPrice,
 			@RequestParam(required=false, name="categoryValues" ) List<String> categories,
+			@RequestParam(required=false, name="sortBy") String sortBy,
+			@RequestParam(required=false, name="sortOrder") String sortOrder,
 			@RequestParam(required=true, name="page") int page,
 			@RequestParam(required=false, name="maxResults", defaultValue=defaultPaginationSize) int maxResults) throws CollectiblesException{					
-		ObjectList<SerializableProduct> objects = findProduct(hierarchy,searchString,categories,withImagesString,withPrice,owned,page,maxResults);
+		ObjectList<SerializableProduct> objects = findProduct(hierarchy,searchString,categories,withImagesString,withPrice,owned,sortBy,sortOrder,page,maxResults);
 		return objects;
 		
 	}
