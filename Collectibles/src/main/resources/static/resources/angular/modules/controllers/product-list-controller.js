@@ -131,7 +131,9 @@
 				}				
 				var all = { id: data.id, name: "All", isRoot: true};
 				$scope.hierarchies.push(all);			
-				Hierarchy.calculateTree(data,$scope.hierarchies);
+				$scope.allHierarchies = [];
+				Hierarchy.calculateTree(data,$scope.hierarchies,3);
+				Hierarchy.calculateTree(data,$scope.allHierarchies);
 				
 				$scope.hierarchy = all;				
 				controller.setSearchParameters();	

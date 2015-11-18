@@ -25,7 +25,7 @@ public class Image extends SimpleIdDao{
 
 	private static final Logger logger = LoggerFactory.getLogger(Image.class);	
 	
-	private static final int thumbSize = 125;
+	private static final int thumbSize = 250;
 	
 	public interface ImageSimpleView{};
 	
@@ -118,7 +118,7 @@ public class Image extends SimpleIdDao{
 		return thumb;
 	}
 
-	private void createThumb(byte[] data) {
+	public void createThumb(byte[] data) {
 		InputStream in = new ByteArrayInputStream(data);
 		BufferedImage bimg = null;
 		try {
@@ -133,7 +133,7 @@ public class Image extends SimpleIdDao{
 	
 	private void createThumb(BufferedImage bimg) throws IOException {
 		logger.info("GENERATING THUMBNAIL");
-		BufferedImage thumb = Scalr.resize(bimg,  Scalr.Method.BALANCED, thumbSize);
+		BufferedImage thumb = Scalr.resize(bimg,  Scalr.Method.ULTRA_QUALITY, thumbSize);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ImageIO.write( thumb, "jpg", baos );
 		baos.flush();

@@ -1,9 +1,9 @@
 <div class="row productListEntry">
-	<div class="col-lg-3 col-md-2 col-sm-3 col-xs-12">
-		<a class="btn btn-primary product-name-btn" ng-href="#/product/{{product.id}}"><span>{{product.name}}</span></a>
-	</div>		
+	<div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+		<a class="btn btn-default btn-block product-name-btn" ng-href="#/product/{{product.id}}"><span>{{product.name}}</span></a>
+	</div>			
 	
-	<div class="col-lg-2 col-md-2 col-sm-3 col-xs-12">
+	<div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
 		<div class="imageContainer">
 			<div class="squareImage">		
 				<a ng-if="product.selectedImage.id" ng-href="#/product/{{product.id}}">
@@ -15,9 +15,15 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-lg-1 col-md-1 col-sm-2 col-xs-6">
-		<div ng-if="editMode && isAdmin()">
-			<button type="button" 
+	<div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
+		<h3><span class="label label-success" ng-if="product.minPrice">{{(product.minPrice/100) | currency}}</span></h3>		
+		<h3 ng-if="product && product.id && editMode && isAdmin()">
+			<span class="btn btn-default" ng-if="product && product.id && isAdmin()" ng-click="productManagementCtrl.updatePrices(product.id)">Update price</span>
+		</h3>
+	</div>	
+	<div class="col-lg-1 col-md-5 col-sm-6 col-xs-6">
+		<h3 ng-if="editMode && isAdmin()">
+			<span  
 					class="btn btn-default" 
 					ng-model="product.owned" 
 					uib-btn-checkbox 
@@ -25,63 +31,63 @@
 					btn-checkbox-false="false"
 					ng-change="update(product)">
 				Owned
-			</button>
-			<button type="button" 
+			</span>
+		</h3>
+		<h3 ng-if="editMode && isAdmin()">
+			<span  
 					class="btn btn-default" 
 					ng-model="product.ownedAnotherLanguage" 
 					uib-btn-checkbox 
 					btn-checkbox-true="true" 
 					btn-checkbox-false="false"
 					ng-change="update(product)">
-				Owned(non english)
-			</button>
-			
+				Owned <i class="fa fa-globe"></i>
+			</span>
+		</h3>	
 			<!-- 
 			<input type="checkbox" 
 				ng-model="product.owned" 
 				ng-change="productManagementCtrl.update(product)" />
- 			-->
+ 			-->		
+		<div ng-if="!editMode || !isAdmin()">
+			<h3><span class="label label-default" ng-if="product.owned">Owned</span></h3>			
 		</div>
 		<div ng-if="!editMode || !isAdmin()">
-			<span ng-if="product.owned">Owned</span>			
-		</div>
-		<div ng-if="!editMode || !isAdmin()">
-			<span ng-if="product.ownedAnotherLanguage">Owned(non english)</span>			
+			<h3><span class="label label-default" ng-if="product.ownedAnotherLanguage">Owned <i class="fa fa-globe"></i></span></h3>			
 		</div>
 	</div>	
-	<div class="col-lg-3 col-md-3 hidden-sm hidden-xs">		
-		<form ng-if="editMode && isAdmin()">
-			<div class="form-group">
-				<select class="form-control"	
-					selectpicker									
-					ng-model="product.hierarchyPlacement"										
-					data-collection-name="hierarchies"								
-					ng-options="item as item.name for item in (hierarchies|filter:{isRoot:'!'}) track by item.id"
-					ng-change="productManagementCtrl.update(product)" 					
-						options-class="{ 
-						root: isRoot == true,
-						depth0: depth == 0,
-						depth1: depth == 1,
-						depth2: depth == 2,
-						depth3: depth == 3,
-						depth4: depth == 4,
-						depth5: depth == 5,
-						depth6: depth == 6,
-						depth7: depth == 7,
-						element: isElement == true				
-					}">
-				</select>
-			</div>
-		</form>	
-		<div ng-if="!editMode || !isAdmin()">{{product.hierarchyPlacement.name}}</div>	 
+	<div class="col-lg-2 col-md-5 hidden-sm hidden-xs">		
+		<h3>
+			<form ng-if="editMode && isAdmin()">
+				<div class="form-group">
+					<select class="form-control"	
+						selectpicker									
+						ng-model="product.hierarchyPlacement"										
+						data-collection-name="allHierarchies"								
+						ng-options="item as item.name for item in (allHierarchies|filter:{isRoot:'!'}) track by item.id"
+						ng-change="productManagementCtrl.update(product)" 					
+							options-class="{ 
+							root: isRoot == true,
+							depth0: depth == 0,
+							depth1: depth == 1,
+							depth2: depth == 2,
+							depth3: depth == 3,
+							depth4: depth == 4,
+							depth5: depth == 5,
+							depth6: depth == 6,
+							depth7: depth == 7,
+							element: isElement == true				
+						}">
+					</select>
+				</div>
+			</form>
+		</h3>	
+		<div ng-if="!editMode || !isAdmin()">
+			<h3><span class="label label-default">{{product.hierarchyPlacement.name}}</span></h3>
+		</div>	 
 	</div>
-	<div class="col-lg-2 col-md-2 col-xs-2 col-xs-6">
-		<span ng-if="product.minPrice">{{(product.minPrice/100) | currency}}</span>		
-		<div ng-if="product && product.id && editMode && isAdmin()">
-			<span class="btn btn-default" ng-if="product && product.id && isAdmin()" ng-click="productManagementCtrl.updatePrices(product.id)">Update prices</span>
-		</div>
-	</div>
-	<div class="col-lg-1 col-md-1 col-sm-2 col-xs-12">
-		<a href ng-if="editMode && isAdmin()" class="btn btn-default" ng-click="remove(product)">Delete</a>
+
+	<div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+		<h3><a href ng-if="editMode && isAdmin()" class="btn btn-default btn-block" ng-click="remove(product)">Delete</a></h3>
 	</div>
 </div>

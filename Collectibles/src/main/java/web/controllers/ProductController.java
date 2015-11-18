@@ -383,8 +383,7 @@ public class ProductController  extends CollectiblesController{
 				product.setOwners(productInDb.getOwners());
 				product.setAuthors(productInDb.getAuthors());								
 				product.setCategoryValues(productInDb.getCategoryValues());
-				product.setImages(productInDb.getImages());							
-				product.setProcessedConnectors(productInDb.getProcessedConnectors());
+				product.setImages(productInDb.getImages());											
 				//product.setConnectorReferences(productInDb.getConnectorReferences());
 
 				if (serializableProduct.getOwnedAnotherLanguage()!=null){
@@ -434,6 +433,8 @@ public class ProductController  extends CollectiblesController{
 					result = productRepository.save(result);
 					result = this.scrapeProduct(result);
 					result.getProcessedConnectors();
+				} else {
+					product.setProcessedConnectors(productInDb.getProcessedConnectors());
 				}
 				
 				return SerializableProduct.cloneProduct(result,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
@@ -561,6 +562,22 @@ public class ProductController  extends CollectiblesController{
 				}
 			}				
 		}
+
+		return Boolean.TRUE;
+	}
+	
+	@Secured(value = { "ROLE_ADMIN" })
+	@RequestMapping(value="/product/all/update/thumb/", method = RequestMethod.POST)
+	public Boolean updateThumbAll(){
+		
+		Iterable<Image> images = imageRepository.findAll();
+		for (Image image: images){
+			if (image.getData()!=null){
+				image.createThumb(image.getData());
+				imageRepository.save(image);
+			}
+		}
+		
 
 		return Boolean.TRUE;
 	}

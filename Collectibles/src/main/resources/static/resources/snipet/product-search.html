@@ -118,7 +118,7 @@
 
 <div class="productGrid container-fluid" style="" ng-if="products && products.length && products.length>0" >
 
-	
+	<!-- 
 	<div class="row productListEntry rowTitles hidden-sm hidden-xs">
 		<div class="col-lg-3 col-md-2 col-sm-3 col-xs-12">Product Name</div>				
 		<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6">Image</div>
@@ -127,7 +127,7 @@
 		<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6">Price</div>
 		<div class="col-lg-1 col-md-1 col-sm-2 col-xs-6"></div>
 	</div>
-
+ 	-->
 	<product-list-entry editMode="editMode" ng-repeat="product in products | orderBy:'releaseDate'"></product-list-entry>
 </div>
 
