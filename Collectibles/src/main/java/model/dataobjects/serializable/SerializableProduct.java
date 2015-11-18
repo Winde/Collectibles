@@ -84,8 +84,8 @@ public class SerializableProduct {
 	@JsonView(ProductSimpleView.class)
 	private String publisher;
 	
-	@JsonView(ProductComplexView.class)
-	private Collection<String> processedConnectors;
+	//@JsonView(ProductComplexView.class)
+	//private Collection<String> processedConnectors;
 	
 	@JsonView(ProductComplexView.class)
 	private Map<String,Long> dollarPrice = null;
@@ -288,14 +288,6 @@ public class SerializableProduct {
 
 	public void setUser(User user) {
 		this.user = user;
-	}
-
-	public Collection<String> getProcessedConnectors() {
-		return processedConnectors;
-	}
-
-	public void setProcessedConnectors(Collection<String> processedConnectors) {
-		this.processedConnectors = processedConnectors;
 	}
 
 	public Map<String, Long> getDollarPrice() {

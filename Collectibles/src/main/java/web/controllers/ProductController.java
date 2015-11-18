@@ -383,7 +383,8 @@ public class ProductController  extends CollectiblesController{
 				product.setOwners(productInDb.getOwners());
 				product.setAuthors(productInDb.getAuthors());								
 				product.setCategoryValues(productInDb.getCategoryValues());
-				product.setImages(productInDb.getImages());											
+				product.setImages(productInDb.getImages());
+				product.setProcessedConnectors(productInDb.getProcessedConnectors());
 				//product.setConnectorReferences(productInDb.getConnectorReferences());
 
 				if (serializableProduct.getOwnedAnotherLanguage()!=null){
@@ -433,8 +434,6 @@ public class ProductController  extends CollectiblesController{
 					result = productRepository.save(result);
 					result = this.scrapeProduct(result);
 					result.getProcessedConnectors();
-				} else {
-					product.setProcessedConnectors(productInDb.getProcessedConnectors());
 				}
 				
 				return SerializableProduct.cloneProduct(result,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));

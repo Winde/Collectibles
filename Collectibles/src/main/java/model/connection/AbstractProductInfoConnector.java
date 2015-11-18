@@ -147,7 +147,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	}
 
 	public boolean checkIfAlreadyProcessed(Product product) {
-		return product!=null && (product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(this.getIdentifier()));
+		return product!=null && product.getProcessedConnectors()!=null && product.getProcessedConnectors().contains(this.getIdentifier());
 	}
 
 			
@@ -161,7 +161,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		ProductInfoLookupService itemLookup = this.getImageLookupService();		
 
 		if (this.isApplicable(product)){			
-			if (this.checkIfAlreadyProcessed(product)) {
+			if (!this.checkIfAlreadyProcessed(product)) {
 			
 				logger.info("Starting process "+this.getIdentifier()+" : " + product.getName());
 				
