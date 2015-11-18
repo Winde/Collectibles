@@ -86,13 +86,20 @@ public class SearchController extends CollectiblesController{
 			} else if (ownedString!=null && ownedString.equals("false")){
 				owned = Boolean.FALSE;
 			}
-			
-			searchObject.setOwned(owned);
-			if (ownedString!=null){
+						
+			if (owned!=null){
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();				
 				
 				User owner = userRepository.findOne(auth.getName());
-				searchObject.setOwner(owner);
+				if (owner!=null){
+					if (owned){ 
+						searchObject.addUsersWhoOwn(owner); 
+					} else {
+						searchObject.addUsersWhoDontOwn(owner); 
+					}
+				} else {
+					errorReturnNoResults = true;
+				}
 			}
 			
 			if (ownedByString!=null && !ownedByString.trim().equals("")){
@@ -104,14 +111,12 @@ public class SearchController extends CollectiblesController{
 				}
 				if (userId!=null){
 					User user = userRepository.findById(userId);				
-					if (searchObject.getOwner()!=null){
-						if (!searchObject.getOwner().equals(user) || searchObject.getOwned()==null || !searchObject.getOwned().equals(Boolean.TRUE)){
-							errorReturnNoResults = true;					
+					if (user!=null){
+						searchObject.addUsersWhoOwn(user);
+						if (searchObject.getUsersWhoDontOwn()!=null && searchObject.getUsersWhoDontOwn().contains(user)){
+							errorReturnNoResults = true;
 						}
-					}
-					searchObject.setOwner(user);
-					searchObject.setOwned(Boolean.TRUE);
-					if (user==null){
+					} else {
 						errorReturnNoResults = true;
 					}
 				}

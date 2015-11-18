@@ -2,6 +2,9 @@ package model.persistence.queryParameters;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
@@ -11,9 +14,9 @@ public class ProductSearch implements SearchObject {
 	private HierarchyNode hierarchy = null;	
 	private String searchTerm = null;	
 	private Collection<CategoryValue> categoryValues = null;	
-	private Boolean withImages = null;
-	private Boolean owned = null;
-	private User owner = null;
+	private Boolean withImages = null;	
+	private Set<User> usersWhoOwn = null;
+	private Set<User> usersWhoDontOwn = null;
 	private Integer maxResults = null;
 	private Integer page = null;
 	private Boolean withPrice = null;
@@ -54,14 +57,36 @@ public class ProductSearch implements SearchObject {
 		this.withImages = withImages;
 	}
 
-	public User getOwner() {
-		return owner;
+	public Set<User> getUsersWhoOwn() {
+		return usersWhoOwn;
 	}
 
-	public void setOwner(User owner) {
-		this.owner = owner;
+	public void setUsersWhoOwn(Set<User> usersWhoOwn) {
+		this.usersWhoOwn = usersWhoOwn;
 	}
 
+	public Set<User> getUsersWhoDontOwn() {
+		return usersWhoDontOwn;
+	}
+
+	public void setUsersWhoDontOwn(Set<User> usersWhoDontOwn) {
+		this.usersWhoDontOwn = usersWhoDontOwn;
+	}
+
+	public void addUsersWhoOwn(User user){
+		if (this.usersWhoOwn==null){
+			this.usersWhoOwn = new HashSet<>();
+		}
+		this.usersWhoOwn.add(user);
+	}
+	
+	public void addUsersWhoDontOwn(User user){
+		if (this.usersWhoDontOwn==null){
+			this.usersWhoDontOwn = new HashSet<>();
+		}
+		this.usersWhoDontOwn.add(user);
+	}
+	
 	public Integer getMaxResults() {
 		return maxResults;
 	}
@@ -84,14 +109,6 @@ public class ProductSearch implements SearchObject {
 
 	public void setWithPrice(Boolean withPrice) {
 		this.withPrice = withPrice;
-	}
-	
-	public Boolean getOwned() {
-		return owned;
-	}
-
-	public void setOwned(Boolean owned) {
-		this.owned = owned;
 	}
 
 	public String getSortBy() {

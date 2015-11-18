@@ -36,8 +36,8 @@
 	        	if (responseError && responseError.config && responseError.config.nointercept) {	        	
 	        	} else {		    	        		
 	        		if (responseError && responseError.config && responseError.config.progressbar){
-		        		if ($rootScope.progressbar){
-		        			$rootScope.progressbar.complete();
+	        			if (response.config.progressBarInstance){		    				
+		    				response.config.progressBarInstance.complete();		    				
 		    			}
 		    		}	        		            
 	        	} 

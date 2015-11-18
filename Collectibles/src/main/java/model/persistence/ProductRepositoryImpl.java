@@ -147,15 +147,20 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			needsAnd = true;
 		}
 		
-		if (search.getOwned()!=null && search.getOwner()!=null){
-			if (needsAnd){ hql = hql + " AND ";}
-			if (search.getOwned()){
-				hql = hql + "((:owned) IN owners OR (:owned) IN ownersOtherLanguage) ";
-			} else {
-				hql = hql + "((p.owners IS EMPTY OR (:owned) NOT IN owners) AND (p.ownersOtherLanguage IS EMPTY OR (:owned) NOT IN ownersOtherLanguage))";			
-			}
-			
-			needsAnd = true;
+		if (search.getUsersWhoOwn()!=null && search.getUsersWhoOwn().size()>0){			
+			for (int i=0;i<search.getUsersWhoOwn().size();i++){
+				if (needsAnd){ hql = hql + " AND ";}
+				hql = hql + "((:owners"+i+") IN elements(p.owners) OR (:owners"+i+") IN elements(p.ownersOtherLanguage)) ";
+				needsAnd = true;
+			}						
+		}
+		
+		if (search.getUsersWhoDontOwn()!=null && search.getUsersWhoDontOwn().size()>0){
+			for (int i=0;i<search.getUsersWhoDontOwn().size();i++){
+				if (needsAnd){ hql = hql + " AND ";}
+				hql = hql + "((p.owners IS EMPTY OR (:usersWhoDontOwn"+i+") NOT IN owners) AND (p.ownersOtherLanguage IS EMPTY OR (:usersWhoDontOwn"+i+") NOT IN ownersOtherLanguage))";
+				needsAnd = true;
+			}			
 		}
 		
 		if (search.getWithPrice()!=null){
@@ -206,13 +211,24 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 				query.setParameter("categoryValues", search.getCategoryValues()); 
 				query.setParameter("sizeCategoryValues",search.getCategoryValues().size());
 		}
-		if (search.getOwned()!=null && search.getOwner()!=null){
-			Set<User> setUsers = new HashSet<>();
-			setUsers.add(search.getOwner());
-			query.setParameter("owned",setUsers); 
+		if (search.getUsersWhoOwn()!=null && search.getUsersWhoOwn().size()>0){
+			//query.setParameter("usersWhoOwn",search.getUsersWhoOwn());
+			
+			int i=0;
+			for (User user: search.getUsersWhoOwn()){
+				query.setParameter("owners"+i,user);
+				i=i+1;
+			}
 		}
 		
-		
+		if (search.getUsersWhoDontOwn()!=null && search.getUsersWhoDontOwn().size()>0){
+			int i=0;
+			for (User user: search.getUsersWhoDontOwn()){
+				query.setParameter("usersWhoDontOwn"+i,user);
+				i=i+1;
+			}
+		}
+
 		List<Product> result = new ArrayList<>();	
 		
 		
