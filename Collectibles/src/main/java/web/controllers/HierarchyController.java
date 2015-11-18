@@ -27,7 +27,7 @@ public class HierarchyController extends CollectiblesController{
 	private HierarchyRepository hierarchyRepository;
 	
 	@JsonView(HierarchyTreeView.class)
-	@RequestMapping("/hierarchy/root/")
+	@RequestMapping(value="/hierarchy/root/", method = RequestMethod.GET)
 	public HierarchyNode hierarchyRoot() throws CollectiblesException{
 		HierarchyNode hierarchyNode = hierarchyRepository.findRoot();
 		if (hierarchyNode==null) {
@@ -37,7 +37,7 @@ public class HierarchyController extends CollectiblesController{
 		}
 	}
 	
-	@RequestMapping("/hierarchy/get/{id}")
+	@RequestMapping(value="/hierarchy/get/{id}", method = RequestMethod.GET)
 	public HierarchyNode subHierarchy(@PathVariable String id) throws CollectiblesException{
 		Long nodeId = this.getId(id);
 		

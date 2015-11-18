@@ -31,7 +31,7 @@ public class CategoryController extends CollectiblesController{
 	private CategoryRepository categoryRepository;
 	
 
-	@RequestMapping(value="/category/find/{id}")
+	@RequestMapping(value="/category/find/{id}", method = RequestMethod.GET)
 	public Category product(@PathVariable String id) throws CollectiblesException {
 		Long idLong = this.getId(id);
 		
@@ -47,7 +47,7 @@ public class CategoryController extends CollectiblesController{
 		}
 	}
 	
-	@RequestMapping("/category/by/hierarchy/{hierarchy}")
+	@RequestMapping(value="/category/by/hierarchy/{hierarchy}", method = RequestMethod.GET)
 	public Collection<Category> categories(@PathVariable String hierarchy) throws CollectiblesException{
 		
 		Long hierarchyId = this.getId(hierarchy);

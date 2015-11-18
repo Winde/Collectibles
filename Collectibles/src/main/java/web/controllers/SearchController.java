@@ -27,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -61,6 +62,7 @@ public class SearchController extends CollectiblesController{
 			String withImagesString,
 			String withPriceString,
 			String ownedString,
+			String ownedByString,
 			String sortBy,
 			String sortOrder,
 			int page,
@@ -68,9 +70,8 @@ public class SearchController extends CollectiblesController{
 
 			Boolean withImages = null;			
 			Boolean withPrice = null;
-			Boolean withDriveThruLink = null;
-			
-			
+
+			boolean errorReturnNoResults = false;
 			ProductSearch searchObject = new ProductSearch();
 			
 			searchObject.setSearchTerm(search);
@@ -93,6 +94,29 @@ public class SearchController extends CollectiblesController{
 				User owner = userRepository.findOne(auth.getName());
 				searchObject.setOwner(owner);
 			}
+			
+			if (ownedByString!=null && !ownedByString.trim().equals("")){
+				Long userId = null;
+				try {
+					userId = Long.parseLong(ownedByString);
+				}catch (Exception ex){
+					ex.printStackTrace();
+				}
+				if (userId!=null){
+					User user = userRepository.findById(userId);				
+					if (searchObject.getOwner()!=null){
+						if (!searchObject.getOwner().equals(user) || searchObject.getOwned()==null || !searchObject.getOwned().equals(Boolean.TRUE)){
+							errorReturnNoResults = true;					
+						}
+					}
+					searchObject.setOwner(user);
+					searchObject.setOwned(Boolean.TRUE);
+					if (user==null){
+						errorReturnNoResults = true;
+					}
+				}
+			}			
+		
 			
 			if (withImagesString!=null && withImagesString.equals("true")){
 				withImages = Boolean.TRUE;
@@ -153,11 +177,16 @@ public class SearchController extends CollectiblesController{
 			
 			ObjectList<Product> resultFromDB = null;
 
-			Collection<String> errors = searchObject.errors();
-			if (errors == null || errors.size()<=0){
-				resultFromDB = productRepository.searchProduct(searchObject);
-			}else {
-				throw new IncorrectParameterException(errors);
+			if (!errorReturnNoResults){
+				Collection<String> errors = searchObject.errors();
+				if (errors == null || errors.size()<=0){
+					resultFromDB = productRepository.searchProduct(searchObject);
+				}else {
+					throw new IncorrectParameterException(errors);
+				}
+			} else {
+				resultFromDB = new ObjectList<>();
+				resultFromDB.setObjects(new ArrayList<>());
 			}
 			
 			ObjectList<SerializableProduct> result = null;
@@ -195,34 +224,36 @@ public class SearchController extends CollectiblesController{
 	}
 		
 	@JsonView(model.dataobjects.serializable.SerializableProduct.ProductListView.class)	
-	@RequestMapping(value="/product/search")
+	@RequestMapping(value="/product/search", method = RequestMethod.GET)
 	public ObjectList<SerializableProduct> search(HttpServletRequest request, 			
 			@RequestParam(required=false, name="withImages") String withImagesString,
 			@RequestParam(required=false, name="search") String searchString,
 			@RequestParam(required=false, name="owned" ) String owned,
+			@RequestParam(required=false, name="ownedBy" ) String ownedBy,
 			@RequestParam(required=false, name="withPrice") String withPrice,
 			@RequestParam(required=false, name="sortBy") String sortBy,
 			@RequestParam(required=false, name="sortOrder") String sortOrder,
 			@RequestParam(required=true, name="page") int page,
 			@RequestParam(required=false, name="maxResults") int maxResults) throws CollectiblesException{	
-		ObjectList<SerializableProduct> objects = findProduct(null,searchString,null,withImagesString,withPrice,owned,sortBy,sortOrder,page,maxResults);
+		ObjectList<SerializableProduct> objects = findProduct(null,searchString,null,withImagesString,withPrice,owned,ownedBy,sortBy,sortOrder,page,maxResults);
 		return objects;
 	}
 	
 	@JsonView(ProductListView.class)
-	@RequestMapping(value="/product/search/{hierarchy}/")
+	@RequestMapping(value="/product/search/{hierarchy}/", method = RequestMethod.GET)
 	public ObjectList<SerializableProduct> searchCategory(HttpServletRequest request, 
 			@PathVariable String hierarchy, 
 			@RequestParam(required=false, name="search") String searchString,
 			@RequestParam(required=false, name="withImages") String withImagesString,
 			@RequestParam(required=false, name="owned" ) String owned,
+			@RequestParam(required=false, name="ownedBy" ) String ownedBy,
 			@RequestParam(required=false, name="withPrice") String withPrice,
 			@RequestParam(required=false, name="categoryValues" ) List<String> categories,
 			@RequestParam(required=false, name="sortBy") String sortBy,
 			@RequestParam(required=false, name="sortOrder") String sortOrder,
 			@RequestParam(required=true, name="page") int page,
 			@RequestParam(required=false, name="maxResults", defaultValue=defaultPaginationSize) int maxResults) throws CollectiblesException{					
-		ObjectList<SerializableProduct> objects = findProduct(hierarchy,searchString,categories,withImagesString,withPrice,owned,sortBy,sortOrder,page,maxResults);
+		ObjectList<SerializableProduct> objects = findProduct(hierarchy,searchString,categories,withImagesString,withPrice,owned,ownedBy,sortBy,sortOrder,page,maxResults);
 		return objects;
 		
 	}

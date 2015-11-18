@@ -68,26 +68,22 @@
 				</label>		
 			</div>
 		</div>
+		
  		<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12" ng-show="isAuthenticated()">			
 			<div class="btn-group">
-				<label class="btn btn-default disabled">Owned</label>								
+				<label class="btn btn-default disabled">Owned by me</label>								
 				<label class="btn btn-default" uib-btn-radio="''" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
-					<!-- <input type="radio" class="form-control"
-						ng-model="owned"			
-						ng-change="productListCtrl.updateSearch(true)" value=""/> -->Any
+					Any
 				</label>		
 				<label class="btn btn-default" uib-btn-radio="'true'" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
-					<!-- <input type="radio"
-						ng-model="owned"			
-						ng-change="productListCtrl.updateSearch(true)" value="true"/> -->Yes
-						</label>				
+					Yes
+				</label>				
 				<label class="btn btn-default" uib-btn-radio="'false'" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
-					<!-- <input type="radio" 
-						ng-model="owned"			
-						ng-change="productListCtrl.updateSearch(true)" value="false" /> -->No
+					No
 				</label>		
 			</div>
 		</div>		
+		
 		<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12">
 					
 				<div class="btn-group">
@@ -110,7 +106,19 @@
 							ng-change="productListCtrl.updateSearch(true)" value="false" />-->Without
 					</label>		
 				</div>
-		</div>		
+		</div>	
+		<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12" ng-show="isAuthenticated()">			
+				<select class="form-control"	
+				selectpicker	
+				ng-model="ownedBy"
+				data-collection-attribute="id"
+				data-collection-name="users"			 
+				ng-options="user.id as ('Owned by ' + user.contactName) for user in users" 
+				ng-change="productListCtrl.updateSearch(true)">		
+					<option value="">Owned by anyone</option>		
+				</select>
+		
+		</div>	
 	
 	</div>
 	

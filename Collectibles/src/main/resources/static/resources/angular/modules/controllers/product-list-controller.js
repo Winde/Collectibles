@@ -1,8 +1,8 @@
 (function(){
 	
 	angular.module('product')
-	.controller('ProductListController',['$scope','$filter','$location','Image','Product','Hierarchy','Message',
-	                                        function($scope,$filter,$location,Image,Product,Hierarchy,Message){
+	.controller('ProductListController',['$scope','$filter','$location','Image','Product','Hierarchy','User','Message',
+	                                        function($scope,$filter,$location,Image,Product,Hierarchy,User,Message){
 		var controller = this;
 				
 		$scope.editMode = false;
@@ -38,6 +38,7 @@
 			if ($scope.withDriveThruLink){ searchObject.withDriveThruLink = $scope.withDriveThruLink; }
 			
 			if ($scope.owned){ searchObject.owned = $scope.owned}
+			if ($scope.ownedBy){ searchObject.ownedBy = $scope.ownedBy}
 			
 			if ($scope.page){ searchObject.page = $scope.page } else { $scope.page = 0; searchObject.page = 0; }
 			
@@ -86,6 +87,10 @@
 			if (searchObject.owned){	$scope.owned = searchObject.owned;
 			} else {	$scope.owned = "";}
 			
+			if (searchObject.ownedBy){	$scope.ownedBy = searchObject.ownedBy;
+			} else {	$scope.ownedBy = "";}
+						
+			
 			if (searchObject.page){	$scope.page = searchObject.page;
 			} else {	searchObject.page = 0; $scope.page= 0; }
 			
@@ -130,7 +135,19 @@
 			}
 		}
 		
-		
+		if (!$scope.users) {
+			User.all()
+			.success(function(data){
+				$scope.users = data;
+			})
+			.catch(function(data){
+				Message.alert("There was an error");
+			})
+			.finally(function(data){
+				
+			});
+			
+		}
 		
 		
 		if ($scope.root == undefined || $scope.root == null){

@@ -99,6 +99,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 	@Override
 	public ObjectList<Product> searchProduct(ProductSearch search) {
 
+		ObjectList<Product> wrapper = new ObjectList<Product>();
+		
+		if (search==null){
+			return wrapper;
+		}
 		String hql = "";
 		
 		hql = hql + "select p from Product p LEFT JOIN p.images LEFT JOIN p.owners owners LEFT JOIN p.ownersOtherLanguage ownersOtherLanguage";
@@ -210,8 +215,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		
 		List<Product> result = new ArrayList<>();	
 		
-		
-		ObjectList<Product> wrapper = new ObjectList<Product>();
 		
 		if (search.getMaxResults()!=null && search.getPage()!=null) {
 			

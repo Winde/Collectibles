@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 
@@ -19,6 +20,13 @@ public class User {
 	@Id
 	@Column(name="username")
 	private String username;
+	
+	@GeneratedValue
+	@Column(name="unique_id", unique = true, nullable = false)
+	private Long id;
+	
+	@Column(name="contact_name", nullable = false)
+	private String contactName;
 	
 	@Column(name="password")
 	@JsonIgnore	
@@ -83,6 +91,24 @@ public class User {
 			return 0;
 		}
 	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getContactName() {
+		return contactName;
+	}
+
+	public void setContactName(String contactName) {
+		this.contactName = contactName;
+	}
+	
+	
 
 
 }

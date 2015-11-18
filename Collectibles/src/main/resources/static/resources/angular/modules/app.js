@@ -4,6 +4,7 @@
 	angular.module('product',[])	
 	angular.module('hierarchy',[]);
 	angular.module('image',[]);
+	angular.module('user',[]);
 	angular.module('generic-functionalities',[]);
 	angular.module('projectProgressBar',['ngProgress']);
 	
@@ -21,6 +22,7 @@
 	 'product',	 	 
 	 'hierarchy',
 	 'image', 	 
+	 'user',
 	 'generic-functionalities']);
 	
 	
