@@ -43,6 +43,8 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 			e.printStackTrace();
 		}
 		
+		logger.info("Fetching boardgamesgeek url to search by name: " +url);
+		
 		if (url!=null){
 			Document doc = null;
 			 try {
@@ -101,8 +103,7 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 		if (reference==null || "".equals(reference.trim())){
 			reference = product.getUniversalReference();
 		}
-		
-		
+
 		if (reference==null && product.getName()!=null){
 			reference = getIdFromName(product.getName());			
 		}

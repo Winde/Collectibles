@@ -48,8 +48,7 @@ public class ProductSaveListener implements PreInsertEventListener,PreUpdateEven
 	}
 
 	@Override
-	public boolean onPreUpdate(PreUpdateEvent event) {
-		System.out.println("EXECUTING EVENT");
+	public boolean onPreUpdate(PreUpdateEvent event) {		
 		Object entity = event.getEntity();
 		if (entity instanceof Product){
 			Product product = (Product) entity;

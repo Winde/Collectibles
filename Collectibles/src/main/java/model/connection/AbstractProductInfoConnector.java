@@ -336,7 +336,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					}
 					
 				} else {
-					logger.info(this.getIdentifier() + " o btained null doc for product: "+ product.getName());
+					logger.info(this.getIdentifier() + " o btainednull doc for product: "+ product.getName());
 				}
 				processed = true;
 			} else {
