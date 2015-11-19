@@ -57,8 +57,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 				try {
 					updated = connector.updatePrice(productInDb);
 				} catch (TooFastConnectionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("Too fast connection to: "+connector.getIdentifier() , e);
 				}
 				if (updated){
 					productRepository.save(productInDb);
@@ -97,8 +96,8 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					}
 				}
 			}
-		}catch (Exception ex){
-			ex.printStackTrace();
+		}catch (Exception e){
+			logger.error("Exception when updating price", e);
 			updated = false;			
 		}
 		
@@ -132,8 +131,8 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						imageRepository.delete(imagesRemove);
 						storeAfterSuccess(productInDb,productRepository);
 					}
-				}catch (Exception ex){
-					ex.printStackTrace();
+				}catch (Exception e){
+					logger.error("Exception when scraping", e);
 					updated = false;			
 				}
 				

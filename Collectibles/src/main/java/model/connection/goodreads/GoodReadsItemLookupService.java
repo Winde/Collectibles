@@ -29,6 +29,16 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 		
 	private static final String IDENTIFIER = "Goodreads";
 	
+	
+	private final String imageUrlDocPath = "/GoodreadsResponse/book/image_url";
+	private final String descriptionDocPath = "/GoodreadsResponse/book/description";
+	private final String publicationYearDocPath = "/GoodreadsResponse/book/work/original_publication_year";
+	private final String goodreadsLinkDocPath = "/GoodreadsResponse/book/url";
+	private final String authorDocPath = "/GoodreadsResponse/book/authors/author";
+	private final String goodreadsRelatedUrlDocPath = "/GoodreadsResponse/book/series_works/series_work/series/id";
+	private final String goodreadsPublisherDocPath = "/GoodreadsResponse/book/publisher";
+	private final String goodreadsReferenceDocPath = "/GoodreadsResponse/book/id";
+	
 	private String key = null;
 	private String entryPointQueryOne = null;
 	private String baseUrlSeries = null;
@@ -50,7 +60,7 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	}
 			
 	public String getImageUrl(Document doc){		
-		return this.getField(doc, "/GoodreadsResponse/book/image_url");		
+		return this.getField(doc, imageUrlDocPath);		
 	}
 	
 	public byte [] getImageData(Document doc) throws TooFastConnectionException{
@@ -63,27 +73,27 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	}
 	
 	public String getDescription(Document doc){
-		return this.getField(doc, "/GoodreadsResponse/book/description");		
+		return this.getField(doc, descriptionDocPath);		
 	}
 	
 	public Integer getPublicationYear(Document doc){
 		Integer result = null;
 		try{
-			result = Integer.parseInt(this.getField(doc, "/GoodreadsResponse/book/work/original_publication_year"));
-		}catch (Exception ex){
-			ex.printStackTrace();
+			result = Integer.parseInt(this.getField(doc, publicationYearDocPath));
+		}catch (Exception e){
+			logger.error("Publication year is not integer", e);
 		}
 		return result;
 	}
 	
 	@Override
 	 public String getExternalUrlLink(Document doc) throws TooFastConnectionException {
-		return this.getField(doc, "/GoodreadsResponse/book/url");
+		return this.getField(doc, goodreadsLinkDocPath);
 	}
 	
 	public Set<Author> getAuthors(Document doc){
 		Set<Author> authors = new HashSet<>();
-		NodeList authorNodes = this.getNodes(doc, "/GoodreadsResponse/book/authors/author");
+		NodeList authorNodes = this.getNodes(doc, authorDocPath);
 		if (authorNodes!=null && authorNodes.getLength()>0){
 			for (int i=0;i<authorNodes.getLength();i++){
 				Node node = authorNodes.item(i);
@@ -114,8 +124,7 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 					try {
 						byteImage = fetchImage(imageUrl);
 					} catch (TooFastConnectionException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						logger.error("Issue when fetching image", e);
 					}
 				}
 				if (imageUrl!=null){
@@ -141,7 +150,7 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	
 	public String getSeriesUrl(Document doc){
 		String url = null;		
-		String series = this.getField(doc, "/GoodreadsResponse/book/series_works/series_work/series/id");
+		String series = this.getField(doc, goodreadsRelatedUrlDocPath);
 		if (series !=null) {
 			url = baseUrlSeries + series;
 		}
@@ -150,7 +159,7 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	
 	@Override
 	public String getPublisher(Document doc) throws TooFastConnectionException {
-		return this.getField(doc, "/GoodreadsResponse/book/publisher");
+		return this.getField(doc, goodreadsPublisherDocPath);
 	}
 
 	@Override
@@ -174,8 +183,8 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 		Document doc = null;
 		try{
 			doc = this.fetchDocFromUrl(requestUrl);
-		}catch(FileNotFoundException ex){
-			ex.printStackTrace();
+		}catch(FileNotFoundException e){
+			logger.error("Issue when fetching doc", e);
 			return null;
 		}
 		return doc;
@@ -198,7 +207,7 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 
 	@Override
 	public String getReference(Document doc) throws TooFastConnectionException {
-		return super.getField(doc, "/GoodreadsResponse/book/id");
+		return super.getField(doc, goodreadsReferenceDocPath);
 	}
 
 	

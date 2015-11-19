@@ -17,7 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class JwtAuthenticationOnSuccess implements Filter {
 
-	private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationOnSuccess.class);
+	private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationOnSuccess.class);		
 	
 	private TokenAuthenticationService tokenAuthenticationService = null;
 

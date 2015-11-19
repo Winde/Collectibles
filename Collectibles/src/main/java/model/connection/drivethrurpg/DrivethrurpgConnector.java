@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 
-
+	private static final int SLEEP_BETWEEN_CALLS = 1400;	
+	
 	@Autowired
 	private DrivethrurpgItemLookupService itemLookup;
 	
@@ -43,4 +44,8 @@ public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 		return true;
 	}
 	
+	@Override
+	public Integer sleepBetweenCalls() {
+		return SLEEP_BETWEEN_CALLS;
+	}
 }

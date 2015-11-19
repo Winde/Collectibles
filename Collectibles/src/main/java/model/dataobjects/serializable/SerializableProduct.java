@@ -165,11 +165,11 @@ public class SerializableProduct {
 		try {		
 			if (ignoreProperties!=null){
 				BeanUtils.copyProperties(productToClone, this, ignoreProperties);
-			}else {
+			} else {
 				BeanUtils.copyProperties(productToClone, this);
 			}
-		}catch (Exception ex){
-			ex.printStackTrace();
+		}catch (Exception e){
+			logger.error("Exception when copying User to serializable", e);
 		}
 
 		this.user = user;
@@ -350,8 +350,7 @@ public class SerializableProduct {
 			propertyUtilsBean.copyProperties(product, this);
 		} catch (IllegalAccessException | InvocationTargetException
 				| NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Exception when deserializing Product into DAO", e);
 		}
 		return product;
 	}

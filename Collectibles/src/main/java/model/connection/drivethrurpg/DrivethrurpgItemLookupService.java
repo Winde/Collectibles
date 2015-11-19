@@ -122,8 +122,7 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Issue when fetching info for drivethrurpg from product name", e);
 		}
 		return link;
 	
@@ -144,8 +143,7 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 					data.setDoc(doc);
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error("Issue when fetching product page from drivethrurpg", e);
 			}
 		}
 		return data;
@@ -213,7 +211,9 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 				priceText = priceText.trim();					
 				try{
 					priceLong = Long.parseLong(priceText.replaceAll("\\.", ""));				
-				}catch(Exception ex){ex.printStackTrace();}
+				}catch(Exception e){					
+					logger.error("Price "+priceText+" is not long?", e);					
+				}
 			}
 		}
 				

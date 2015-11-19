@@ -48,24 +48,52 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	private static final Logger logger = LoggerFactory.getLogger(AmazonItemLookupService.class);
 	private static final String IDENTIFIER = "Amazon";	
 	
-    private String AWS_ACCESS_KEY_ID = null;
-    private String AWS_SECRET_KEY = null;
-    private String ENDPOINT = null;
-    private String ASSOCIATE_TAG = null;
-        
-    @Autowired
-    public AmazonItemLookupService(
-    		@Value("${AWS_ACCESS_KEY_ID}")String AWS_ACCESS_KEY_ID,
-    		@Value("${AWS_SECRET_KEY}")String AWS_SECRET_KEY,
-    		@Value("${ENDPOINT}") String ENDPOINT,
-    		@Value("${ASSOCIATE_TAG}")String ASSOCIATE_TAG){
+	private String AWS_ACCESS_KEY_ID = null;
+	private String AWS_SECRET_KEY = null;
+	private String PROTOCOL = null;
+	private String ENDPOINT = null;
+	private String ASSOCIATE_TAG = null;
+	private String VERSION = null;
+	private String SERVICE = null;
 
-    	this.AWS_SECRET_KEY = AWS_SECRET_KEY;
-    	this.AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID;    	    
-    	this.ENDPOINT = ENDPOINT;
-	    this.ASSOCIATE_TAG = ASSOCIATE_TAG;
-    }    
-  
+	private final String externalLinkUrlDocPath = "/ItemLookupResponse/Items/Item/DetailPageURL";
+	private final String descriptionDocPath = "/ItemLookupResponse/Items/Item/EditorialReviews/EditorialReview/Content";
+	private final String imageUrlDocPath = "/ItemLookupResponse/Items/Item/LargeImage/URL";
+	private final String publisherDocPath = "/ItemLookupResponse/Items/Item/ItemAttributes/Publisher";
+	private final String dollarPriceNewPath = "/ItemLookupResponse/Items/Item/OfferSummary/LowestNewPrice/Amount";
+	private final String dollarPriceUsedPath = "/ItemLookupResponse/Items/Item/OfferSummary/LowestUsedPrice/Amount";
+	private final String amazonReferencePath = "/ItemLookupResponse/Items/Item/ASIN";
+	
+	private final int sleepTimeBetwenCheckByNameAndCheckById = 500;
+	
+	
+	private void sleepDueToAmazonMaxChecksPerMinute(){
+		try {
+			Thread.sleep(sleepTimeBetwenCheckByNameAndCheckById);
+		} catch (InterruptedException e) {					
+			logger.error("Buffer sleep interrupted", e);
+		}
+	}
+	
+	@Autowired
+	public AmazonItemLookupService(
+			@Value("${AWS_ACCESS_KEY_ID}")String AWS_ACCESS_KEY_ID,
+			@Value("${AWS_SECRET_KEY}")String AWS_SECRET_KEY,
+			@Value("${PROTOCOL}") String PROTOCOL,
+			@Value("${ENDPOINT}") String ENDPOINT,
+			@Value("${ASSOCIATE_TAG}")String ASSOCIATE_TAG,
+			@Value("${SERVICE_VERSION}") String VERSION,
+			@Value("${SERVICE}") String SERVICE ){
+
+		this.AWS_SECRET_KEY = AWS_SECRET_KEY;
+		this.AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID;
+		this.PROTOCOL  = PROTOCOL;
+		this.ENDPOINT = ENDPOINT;
+		this.ASSOCIATE_TAG = ASSOCIATE_TAG;
+		this.VERSION = VERSION;
+		this.SERVICE = SERVICE;
+	}    
+
 	private String getReferenceByName(String name) {
 		String reference = null;
 		String url = this.getSearchByName(name);
@@ -73,9 +101,8 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 			Document doc = null;
 			try {
 				doc = super.fetchDocFromUrl(url);
-			} catch (FileNotFoundException | TooFastConnectionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (FileNotFoundException | TooFastConnectionException e) {				
+				logger.error("Issue connecting to Amazon by searching by name", e);
 			}
 			if (doc!=null){
 				NodeList nodes = super.getNodes(doc, "/ItemSearchResponse/Items/Item/ItemAttributes/Title");
@@ -109,110 +136,110 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		
 	}
     
-    private String getSearchByNameUrl(String service,String operation,String responseGroup, String title){
-    	/*
-         * Set up the signed requests helper 
-         */
-        SignedRequestsHelper helper;
-        try {
-            helper = SignedRequestsHelper.getInstance(ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+	private String getSearchByNameUrl(String operation,String searchIndex, String responseGroup, String title){
+		/*
+		Set up the signed requests helper 
+		 */
+		SignedRequestsHelper helper;
+		try {
+			helper = SignedRequestsHelper.getInstance(PROTOCOL,ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY);
+		} catch (Exception e) {
+			logger.error("Can't create Amazon signer helper", e);
+			return null;
+		}
         
-        String requestUrl = null;
+		String requestUrl = null;
 
-        /* The helper can sign requests in two forms - map form and string form */
+		/* The helper can sign requests in two forms - map form and string form */
         
-        /*
-         * Here is an example in map form, where the request parameters are stored in a map.
-         */        
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("Service", service);
-        params.put("Version", "2009-03-31");
-        params.put("Operation", operation);
-        params.put("Keywords", title);
-        params.put("SearchIndex", "All");        
-        params.put("ResponseGroup", responseGroup);
-        params.put("AssociateTag", ASSOCIATE_TAG);
+		/*
+		 * Here is an example in map form, where the request parameters are stored in a map.
+		 */        
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("Service", SERVICE);
+		params.put("Version", VERSION);
+		params.put("Operation", operation);
+		params.put("Keywords", title);
+		params.put("SearchIndex", searchIndex);        
+		params.put("ResponseGroup", responseGroup);
+		params.put("AssociateTag", ASSOCIATE_TAG);
 
-        requestUrl = helper.sign(params);
+		requestUrl = helper.sign(params);
         
-        return requestUrl;
-    	
-    }
-    
-    private String getUrl(String service,String operation,String responseGroup, String id){
-    	/*
-         * Set up the signed requests helper 
-         */
-        SignedRequestsHelper helper;
-        try {
-            helper = SignedRequestsHelper.getInstance(ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        
-        String requestUrl = null;
+		return requestUrl;
 
-        /* The helper can sign requests in two forms - map form and string form */
-        
-        /*
-         * Here is an example in map form, where the request parameters are stored in a map.
-         */        
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("Service", "service");
-        params.put("Version", "2009-03-31");
-        params.put("Operation", operation);
-        params.put("ItemId", id);
-        params.put("ResponseGroup", responseGroup);
-        params.put("AssociateTag", ASSOCIATE_TAG);
-
-        requestUrl = helper.sign(params);
-        
-        return requestUrl;
-    }
-    
-    public String getMultipleUseUrl(String id) {
-    	String url = getUrl("AWSECommerceService","ItemLookup","Large",id);
-    	logger.info("Amazon url for fetch data: " + url);
-    	return url;
-    }
-    
-    public String getSearchByName(String name) {
-    	String url = getSearchByNameUrl("AWSECommerceService","ItemSearch","Small",name);
-    	logger.info("Amazon url for fetch data by name: " + url);
-    	return url;
-    }
-
-	@Override
-    public String getExternalUrlLink(Document doc){
-    	return this.getField(doc, "/ItemLookupResponse/Items/Item/DetailPageURL");		    	
 	}
     
-    public String getDescription(Document doc ) throws TooFastConnectionException{
-    	return this.getField(doc, "/ItemLookupResponse/Items/Item/EditorialReviews/EditorialReview/Content");
+	private String getUrl(String operation,String responseGroup, String id){
+		/*
+		 * Set up the signed requests helper 
+		 */
+		SignedRequestsHelper helper;
+		try {
+			helper = SignedRequestsHelper.getInstance(PROTOCOL,ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY);
+		} catch (Exception e) {
+			logger.error("Can't create Amazon signer helper", e);
+			return null;
+		}
+
+		String requestUrl = null;
+
+		/* The helper can sign requests in two forms - map form and string form */
+        
+		/*
+		 * Here is an example in map form, where the request parameters are stored in a map.
+		 */        
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("Service", SERVICE);
+		params.put("Version", VERSION);
+		params.put("Operation", operation);
+		params.put("ItemId", id);
+		params.put("ResponseGroup", responseGroup);
+		params.put("AssociateTag", ASSOCIATE_TAG);
+
+		requestUrl = helper.sign(params);
+        
+		return requestUrl;
     }
     
-    private String parseImageUrl(Document doc) throws TooFastConnectionException{
-    	return this.getField(doc, "/ItemLookupResponse/Items/Item/LargeImage/URL");       
-    }        
+	public String getMultipleUseUrl(String id) {
+		String url = getUrl("ItemLookup","Large",id);
+		logger.info("Amazon url for fetch data: " + url);
+		return url;
+	}
+	
+	public String getSearchByName(String name) {
+		String url = getSearchByNameUrl("ItemSearch","All","Small",name);
+		logger.info("Amazon url for fetch data by name: " + url);
+		return url;
+	}
+
+	@Override
+	public String getExternalUrlLink(Document doc){
+		return this.getField(doc, externalLinkUrlDocPath);		    	
+	}
+    
+	public String getDescription(Document doc ) throws TooFastConnectionException{
+		return this.getField(doc, descriptionDocPath);
+	}
+    
+	private String parseImageUrl(Document doc) throws TooFastConnectionException{
+		return this.getField(doc, imageUrlDocPath);       
+	}
     
 	@Override
 	public String getPublisher(Document doc) throws TooFastConnectionException {
-		return this.getField(doc, "/ItemLookupResponse/Items/Item/ItemAttributes/Publisher");
+		return this.getField(doc, publisherDocPath);
 	}
     
-    public byte[] getImageData(Document doc) throws TooFastConnectionException{
-    	byte [] data = null;
-    	String url = parseImageUrl(doc);
-    	if (url!=null){
-    		data = fetchImage(url);
-    	}
-    	return data;
-    }
+	public byte[] getImageData(Document doc) throws TooFastConnectionException{
+		byte [] data = null;
+		String url = parseImageUrl(doc);
+		if (url!=null){
+			data = fetchImage(url);
+		}
+		return data;
+	}
 
 	@Override
 	public Document fetchDocFromProduct(Product product) throws TooFastConnectionException, FileNotFoundException {
@@ -227,12 +254,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		if (reference==null){			
 			reference = this.getReferenceByName(product.getName());
 			if (reference!=null){
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				sleepDueToAmazonMaxChecksPerMinute();
 			}
 		}
 		
@@ -242,9 +264,6 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		String url = this.getMultipleUseUrl(reference);
 		return this.fetchDocFromUrl(url);
 	}
-
-
-
 
 	@Override
 	public Integer getPublicationYear(Document doc)
@@ -266,15 +285,17 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	@Override
 	public Map<String, Long> getDollarPrice(Document doc) throws TooFastConnectionException {
 		Map<String,Long> result = null;
-		String newField = this.getField(doc, "/ItemLookupResponse/Items/Item/OfferSummary/LowestNewPrice/Amount");
-		String usedField = this.getField(doc, "/ItemLookupResponse/Items/Item/OfferSummary/LowestUsedPrice/Amount");
+		String newField = this.getField(doc, dollarPriceNewPath);
+		String usedField = this.getField(doc, dollarPriceUsedPath);
 		if (newField!=null || usedField!=null){
 			result = new HashMap<>();
 			if (newField!=null){
 				Long newPrice = null;
 				try {
 					newPrice = Long.parseLong(newField);
-				}catch(Exception ex) {ex.printStackTrace();}
+				}catch(Exception e) {
+					logger.error("Amazon price is not long? ", e);
+				}
 				if (newPrice!=null){
 					result.put("New", newPrice);
 				}
@@ -283,7 +304,9 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 				Long usedPrice = null;
 				try {
 					usedPrice = Long.parseLong(usedField);
-				}catch(Exception ex) {ex.printStackTrace();}
+				}catch(Exception e) {
+					logger.error("Amazon price is not long? ", e);
+				}
 				if (usedPrice!=null){
 					result.put("Used", usedPrice);
 				}
@@ -304,7 +327,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 
 	@Override
 	public String getReference(Document doc) throws TooFastConnectionException {
-		return super.getField(doc, "/ItemLookupResponse/Items/Item/ASIN");
+		return super.getField(doc, amazonReferencePath);
 	}
 
 }

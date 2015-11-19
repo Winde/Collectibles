@@ -1,11 +1,17 @@
 package model.dataobjects.serializable;
 
+import model.connection.ProductInfoLookupServiceXML;
 import model.dataobjects.User;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
 public class SerializableUser {
 
+	private static final Logger logger = LoggerFactory.getLogger(SerializableUser.class);	
+	
+	
 	private Long id = null;
 	private String contactName = null;
 	
@@ -22,8 +28,8 @@ public class SerializableUser {
 			}else {
 				BeanUtils.copyProperties(userToClone, this);
 			}
-		}catch (Exception ex){
-			ex.printStackTrace();
+		}catch (Exception e){
+			logger.error("Exception when copying User to serializable", e);
 		}
 	}
 

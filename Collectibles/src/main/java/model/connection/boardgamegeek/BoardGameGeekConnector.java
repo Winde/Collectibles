@@ -10,7 +10,8 @@ import model.dataobjects.Product;
 @Component
 public class BoardGameGeekConnector extends AbstractProductInfoConnector{
 
-
+	private static final int SLEEP_BETWEEN_CALLS = 1400;	
+	
 	@Autowired
 	private BoardGameGeekLookupService lookupService;
 	
@@ -46,6 +47,11 @@ public class BoardGameGeekConnector extends AbstractProductInfoConnector{
 	@Override
 	public boolean canCreateLinks() {
 		return true;
+	}
+
+	@Override
+	public Integer sleepBetweenCalls() {
+		return SLEEP_BETWEEN_CALLS;
 	}
 
 }

@@ -4,9 +4,12 @@ import java.util.Collection;
 
 import javax.servlet.http.HttpServletResponse;
 
+import model.connection.AbstractProductInfoConnector;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.validator.DaoValidator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,11 +27,13 @@ public abstract class CollectiblesController {
 	private static final String headerForDisableHttpAuthPopup = "WWW-Authenticate";
 	private static final String headerValueForDisableHttpAuthPopup = "FormBased";
 	
+	private static final Logger logger = LoggerFactory.getLogger(AbstractProductInfoConnector.class);
+	
 	
 	@ExceptionHandler(Exception.class)
 	@ResponseBody
 	public ErrorCode error(Exception ex,final HttpServletResponse response){
-		ex.printStackTrace();
+		logger.error("Generic unhandled Controller level exception", ex);
 		ErrorCode errorCode = new ErrorCode(new GenericException());		
 		response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR  );
 		return errorCode;
@@ -37,7 +42,7 @@ public abstract class CollectiblesController {
 	@ExceptionHandler(AccessDeniedException.class)
 	@ResponseBody
 	public ErrorCode accessDenied(Exception ex,final HttpServletResponse response){
-		ex.printStackTrace();
+		logger.error("Access denied", ex);
 		ErrorCode errorCode = new ErrorCode(new GenericException());		
 		response.setStatus( HttpServletResponse.SC_FORBIDDEN  );
 		response.setHeader(headerForDisableHttpAuthPopup, headerValueForDisableHttpAuthPopup);

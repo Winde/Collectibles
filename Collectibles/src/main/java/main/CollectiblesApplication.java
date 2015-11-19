@@ -52,6 +52,7 @@ import configuration.security.jwt.TokenAuthenticationService;
 @EntityScan("model.dataobjects")
 @PropertySource("classpath:amazon.properties")
 @PropertySource("classpath:goodreads.properties")
+@PropertySource("classpath:boardgamegeek.properties")
 @EnableTransactionManagement
 public class CollectiblesApplication {
 

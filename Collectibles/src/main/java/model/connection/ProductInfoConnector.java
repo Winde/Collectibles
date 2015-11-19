@@ -38,5 +38,5 @@ public interface ProductInfoConnector {
 
 	public boolean canCreateLinks();
 
-	
+	public Integer sleepBetweenCalls();
 }

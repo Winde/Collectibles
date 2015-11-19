@@ -110,8 +110,8 @@ public class SearchController extends CollectiblesController{
 				Long userId = null;
 				try {
 					userId = Long.parseLong(ownedByString);
-				}catch (Exception ex){
-					ex.printStackTrace();
+				}catch (Exception e){
+					logger.error("Exception reading user id as long for search", e);
 				}
 				if (userId!=null){
 					User user = userRepository.findById(userId);				
@@ -132,8 +132,8 @@ public class SearchController extends CollectiblesController{
 				Long userId = null;
 				try {
 					userId = Long.parseLong(wishedByString);
-				}catch (Exception ex){
-					ex.printStackTrace();
+				}catch (Exception e){
+					logger.error("Exception reading user id as long for search", e);
 				}
 				if (userId!=null){
 					User user = userRepository.findById(userId);				

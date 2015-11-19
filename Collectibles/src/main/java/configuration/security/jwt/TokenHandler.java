@@ -19,7 +19,8 @@ import org.slf4j.LoggerFactory;
 
 public class TokenHandler {
 
-	private static final Logger logger = LoggerFactory.getLogger(TokenHandler.class);
+
+	private static final Logger logger = LoggerFactory.getLogger(StatelessLoginFilter.class);		
 		
 	private static final String CIPHER_NAME = "AES/ECB/PKCS5Padding";
 	private static final String KEY_CIPHER = "AES";
@@ -64,13 +65,9 @@ public class TokenHandler {
 			resultBytes = cipher.doFinal(toProcess.getBytes());
 			if (resultBytes != null){
 				result = new String(resultBytes, "UTF-8");
-			}
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			}		
+		} catch (Exception e) {
+			logger.error("Issue with token cipher", e);			
 		}
 		return result;
 	}
@@ -132,12 +129,9 @@ public class TokenHandler {
 					}
 				} else{
 					logger.info("Invalid hash received");
-				}
-			} catch (IllegalArgumentException e) {
-				//log tampering attempt here
-				e.printStackTrace();
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				}			
+			} catch (Exception e) {
+				logger.error("Issue when parsing token", e);				
 			}
 		}
 		return null;

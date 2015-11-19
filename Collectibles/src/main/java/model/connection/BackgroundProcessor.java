@@ -15,6 +15,8 @@ public class BackgroundProcessor extends Thread{
 
 	private static final Logger logger = LoggerFactory.getLogger(BackgroundProcessor.class);
 		
+	private static final Integer SLEEP_IF_WE_DETECT_TOO_FAST = 2500;
+	
 	private ProductRepository productRepository = null;
 	private ImageRepository imageRepository = null;
 	private AuthorRepository authorRepository = null;
@@ -28,8 +30,7 @@ public class BackgroundProcessor extends Thread{
 		this.authorRepository = authorRepository;
 		this.connector = connector;		
 	}
-	
-	
+		
 	public ProductRepository getProductRepository() {
 		return productRepository;
 	}
@@ -47,8 +48,7 @@ public class BackgroundProcessor extends Thread{
 	}
 		
 	protected boolean  doOne(Product product) throws TooFastConnectionException{
-		return product.updateWithConnector(getConnector());
-		//getConnector().updateProductTransaction(product, getProductRepository(), getImageRepository(), getAuthorRepository());				
+		return product.updateWithConnector(getConnector());				
 	}
 	
 	
@@ -57,6 +57,16 @@ public class BackgroundProcessor extends Thread{
 		return this.authorRepository;
 	}
 
+	private void additionalSleepIfWeDetectTooFast(){
+		if (SLEEP_IF_WE_DETECT_TOO_FAST!=null){
+			try {
+				Thread.sleep(SLEEP_IF_WE_DETECT_TOO_FAST);
+			} catch (InterruptedException e) {
+				logger.error("Exception when sleeping after too fast connection", e);
+			}
+		}
+	}
+	
 	public void run(){
 				
 		logger.info("Background Process Started");
@@ -77,20 +87,17 @@ public class BackgroundProcessor extends Thread{
 		    				logger.info(getConnector().getIdentifier()+" percentage completed: " + String.format("%.2f", percentage) + "%");
 			    		}
 			    		if (updated){
-		    				Thread.sleep(1400);
+			    			Integer sleep = connector.sleepBetweenCalls();
+			    			if (sleep!=null){
+			    				Thread.sleep(sleep);
+			    			}
 		    			} 
 		    			
 		    			
 			    	}catch(TooFastConnectionException ex){
-			    		try {
-							Thread.sleep(2500);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+			    		additionalSleepIfWeDetectTooFast();
 			    	} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+			    		logger.error("Exception when sleeping after too fast connection", e);
 					}						
 			    }	 
 		    }

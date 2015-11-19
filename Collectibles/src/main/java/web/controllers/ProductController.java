@@ -95,7 +95,7 @@ public class ProductController  extends CollectiblesController{
 						try {
 							connector.updateProductTransaction(product);
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error("Exception when scraping product", e);
 						}
 					}
 				}
@@ -221,8 +221,7 @@ public class ProductController  extends CollectiblesController{
 						
 						return SerializableProduct.cloneProduct(products);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						logger.error("Exception when scraping uploading CSV", e);
 						throw new IncorrectParameterException(new String[]{"file"});
 					}
 					
@@ -342,7 +341,7 @@ public class ProductController  extends CollectiblesController{
 						try {
 							connector.updatePrice(product);
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error("Exception when scraping product price", e);
 						}
 					}
 					
@@ -496,7 +495,7 @@ public class ProductController  extends CollectiblesController{
 					try {
 						image.setData(file.getBytes());
 					} catch (IOException e) {
-						e.printStackTrace();
+						logger.error("Exception reading image bytes", e);
 						throw new IncorrectParameterException(new String[]{"images[" + j + "]"});				
 					}
 					images.add(image);

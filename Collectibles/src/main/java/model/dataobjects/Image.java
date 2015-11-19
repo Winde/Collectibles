@@ -75,8 +75,8 @@ public class Image extends SimpleIdDao{
 				this.createThumb(bimg);
 			}
 			in.close();	
-		}catch (Exception ex){
-			ex.printStackTrace();
+		}catch (Exception e){
+			logger.error("Exception when reading image data", e);
 		}		
 		this.data = data;
 	}
@@ -125,8 +125,7 @@ public class Image extends SimpleIdDao{
 			bimg = ImageIO.read(in);
 			createThumb(bimg);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Exception when creating thumb", e);
 		}
 				
 	}

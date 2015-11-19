@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TokenAuthenticationService {
 
-	private static final Logger logger = LoggerFactory.getLogger(TokenAuthenticationService.class);
+	private static final Logger logger = LoggerFactory.getLogger(StatelessLoginFilter.class);		
 		
 	private static final String AUTH_HEADER_NAME = "X-AUTH-TOKEN";
 	private static final long TEN_DAYS = 1000 * 60 * 60 * 24 * 10;
@@ -30,7 +30,7 @@ public class TokenAuthenticationService {
 		try {
 			tokenHandler = new TokenHandler(DatatypeConverter.parseBase64Binary(secret),cryptKey.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {			
-			e.printStackTrace();
+			logger.error("Unable to create token", e);			
 		}
 	}
  

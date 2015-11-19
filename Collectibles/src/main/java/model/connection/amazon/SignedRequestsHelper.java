@@ -73,6 +73,7 @@ public class SignedRequestsHelper {
     private static final String REQUEST_METHOD = "GET";
 
     private String endpoint = null;
+    private String protocol = null;
     private String awsAccessKeyId = null;
     private String awsSecretKey = null;
 
@@ -87,6 +88,7 @@ public class SignedRequestsHelper {
      * @param awsSecretKey      Your AWS Secret Key
      */
     public static SignedRequestsHelper getInstance(
+    		String protocol,
             String endpoint, 
             String awsAccessKeyId, 
             String awsSecretKey
@@ -94,12 +96,15 @@ public class SignedRequestsHelper {
     {
         if (null == endpoint || endpoint.length() == 0)
             { throw new IllegalArgumentException("endpoint is null or empty"); }
+        if (null == protocol || protocol.length() == 0)
+        	{ throw new IllegalArgumentException("protocol is null or empty"); }
         if (null == awsAccessKeyId || awsAccessKeyId.length() == 0) 
             { throw new IllegalArgumentException("awsAccessKeyId is null or empty"); }
         if (null == awsSecretKey || awsSecretKey.length() == 0)   
             { throw new IllegalArgumentException("awsSecretKey is null or empty"); }
         
         SignedRequestsHelper instance = new SignedRequestsHelper();
+        instance.protocol = protocol.toLowerCase();
         instance.endpoint = endpoint.toLowerCase();
         instance.awsAccessKeyId = awsAccessKeyId;
         instance.awsSecretKey = awsSecretKey;
@@ -147,8 +152,7 @@ public class SignedRequestsHelper {
         String sig = this.percentEncodeRfc3986(hmac);
 
         // construct the URL
-        String url = 
-            "http://" + this.endpoint + REQUEST_URI + "?" + canonicalQS + "&Signature=" + sig;
+        String url = this.protocol + this.endpoint + REQUEST_URI + "?" + canonicalQS + "&Signature=" + sig;
 
         return url;
     }
@@ -225,8 +229,8 @@ public class SignedRequestsHelper {
                 buffer.append("&");
             }
         }
-        String cannoical = buffer.toString();
-        return cannoical;
+        String cannonical = buffer.toString();
+        return cannonical;
     }
 
     /**

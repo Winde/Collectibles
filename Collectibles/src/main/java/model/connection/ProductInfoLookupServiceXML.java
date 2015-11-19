@@ -37,7 +37,7 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
 			try {
 				imageURL = new URL(url);
 			} catch (MalformedURLException e) {				
-				e.printStackTrace();				
+				logger.error("Malformed URL", e);				
 			}
 			if (imageURL!=null) {
 			    BufferedImage originalImage = null;
@@ -47,7 +47,7 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
 		    		if (ioe.getMessage()!=null && ioe.getMessage().contains("HTTP response code: 503")){
 		    			throw new TooFastConnectionException();	
 		    		} 
-		    		ioe.printStackTrace();		        	
+		    		logger.error("Exception when obtaining image", ioe);		        	
 				}
 				if (originalImage!=null){	
 					boolean writeError = false;
@@ -55,7 +55,7 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
 					try {
 						ImageIO.write(originalImage, "jpg", baos );
 					} catch (IOException e) {				
-						e.printStackTrace();	
+						logger.error("Exception when writing image", e);
 						writeError = true;
 					}
 					if (!writeError){
@@ -74,21 +74,21 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
         DocumentBuilder db = null;
 		try {
 			db = dbf.newDocumentBuilder();
-		} catch (ParserConfigurationException e1) {
-			e1.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			logger.error("Exception for document parser", e);
 			return null;
 		}
         Document doc = null;
         try {
         	doc = db.parse(requestUrl);
         } catch (IOException ioe) {
-    		ioe.printStackTrace();
+        	logger.error("Exception reaching out to XML through internet", ioe);
     		if (ioe.getMessage()!=null && ioe.getMessage().contains("HTTP response code: 503")){    			
     			throw new TooFastConnectionException();    				
     		}    		
         	return null;
         } catch (SAXException saxe) {
-        	saxe.printStackTrace();
+        	logger.error("SAXE exception", saxe);
 			return null;
 		}
         return doc;
@@ -102,11 +102,8 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
 			if (nodes!=null && nodes.getLength()>0){
 				field = nodes.item(0).getTextContent();
 			}
-		} catch (XPathExpressionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception ex){
-			ex.printStackTrace();
+		} catch (Exception e){
+			logger.error("Exception obtaining field from XPath", e);
 		}
 		
 		return field;
@@ -118,11 +115,10 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
 		try {
 			nodes = (NodeList)xPath.evaluate(xpath, doc.getDocumentElement(),XPathConstants.NODESET);
 			
-		} catch (XPathExpressionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception ex){
-			ex.printStackTrace();
+		} catch (XPathExpressionException e) {			
+			logger.error("Exception obtaining field from XPath", e);
+		} catch (Exception e){
+			logger.error("Generic Exception obtaining field from XPath", e);
 		}
 		
 		return nodes;
@@ -141,10 +137,9 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
 				}
 			}
 		} catch (XPathExpressionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception ex){
-			ex.printStackTrace();
+			logger.error("Exception obtaining field from XPath", e);
+		} catch (Exception e){
+			logger.error("Generic Exception obtaining field from XPath", e);
 		}
 		
 		return fields;
@@ -178,8 +173,7 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
 				}
 			}
 		} catch (XPathExpressionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Exception obtaining attribute from XPath", e);
 		}
 		
 		return result;

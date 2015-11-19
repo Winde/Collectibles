@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import model.connection.ProductInfoLookupServiceXML;
 import model.dataobjects.User;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -19,8 +22,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class UserDetailsImpl implements UserDetails{
 
-
-	
+	private static final Logger logger = LoggerFactory.getLogger(UserDetailsImpl.class);	
+		
 	/**
 	 * 
 	 */
@@ -77,12 +80,8 @@ public class UserDetailsImpl implements UserDetails{
 		UserDetailsImpl result = null;
 		try {
 			result = objectMapper.readValue(json, UserDetailsImpl.class);
-		} catch (JsonParseException e) {
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error("Issue when parsing user from JSON", e);
 		}
 		
 		return result;
@@ -96,7 +95,7 @@ public class UserDetailsImpl implements UserDetails{
 			try {
 				result = mapper.writeValueAsBytes(userDetails);
 			} catch (JsonProcessingException e) {
-				e.printStackTrace();
+				logger.error("Issue when serializing user to JSON", e);
 			}
 		}
 		return result;
