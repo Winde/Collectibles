@@ -22,7 +22,7 @@ public class UserController extends CollectiblesController{
 	@Autowired
 	private UserRepository userRepository;
 		
-	@Secured(value = { "ROLE_USER" })
+	//@Secured(value = { "ROLE_USER" })
 	@RequestMapping(value="/users/list/", method = RequestMethod.GET)
 	public Collection<SerializableUser> listUsers() throws CollectiblesException{					
 		

@@ -159,7 +159,21 @@
 				
 			});		
 		}*/
+		//code to obtain users
+		User.all()
+		.success(function(data){
+			$scope.users = [];
+			$scope.users.push({id: "", contactName: "anyone"});	        					
+			$scope.users = $scope.users.concat(data);
+		})
+		.catch(function(data){
+			Message.alert("There was an error");
+		})
+		.finally(function(data){
+			
+		});	
 		
+		/*
 		 $scope.$watch(
              function( $scope ) {                 
                  return( $scope.isAuthenticated() );
@@ -167,23 +181,12 @@
              function( newValue ) {
             	 if (newValue === true){
 	        		 if (!$scope.users && $scope.isAuthenticated()) {
-	        				User.all()
-	        				.success(function(data){
-	        					$scope.users = [];
-	        					$scope.users.push({id: "", contactName: "anyone"});	        					
-	        					$scope.users = $scope.users.concat(data);
-	        				})
-	        				.catch(function(data){
-	        					Message.alert("There was an error");
-	        				})
-	        				.finally(function(data){
-	        					
-	        				});		
+	        				//Insert here code to obtain users if we decide to only provide to authenticated
 	        		  }
             	 }
              }
          );
-		
+		*/
 		
 		if ($scope.root == undefined || $scope.root == null){
 			Hierarchy.root()

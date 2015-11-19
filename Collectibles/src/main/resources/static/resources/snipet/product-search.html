@@ -106,8 +106,10 @@
 							ng-change="productListCtrl.updateSearch(true)" value="false" />-->Without
 					</label>		
 				</div>
-		</div>	
-		<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12" ng-show="isAuthenticated()">			
+		</div>
+	</div>	
+	<div class="row">		
+		<div class="form-group optionsSearch col-lg-4 col-md-4 col-sm-12 col-xs-12">			
 				<select class="form-control"	
 				selectpicker	
 				ng-model="ownedBy"
@@ -118,7 +120,7 @@
 				</select>
 		
 		</div>	
-		<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12" ng-show="isAuthenticated()">			
+		<div class="form-group optionsSearch col-lg-4 col-md-4 col-sm-12 col-xs-12">			
 				<select class="form-control"	
 				selectpicker	
 				ng-model="wishedBy"
@@ -127,8 +129,7 @@
 				ng-options="user.id as (user.id == '' ? 'Wishlist: Any' : 'In wishlist for ' + user.contactName) for user in users" 
 				ng-change="productListCtrl.updateSearch(true)">			
 				</select>		
-		</div>	
-	
+		</div>			
 	</div>
 	
 	<div class="row">
