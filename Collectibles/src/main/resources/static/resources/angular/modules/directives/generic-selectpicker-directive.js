@@ -25,9 +25,7 @@
                                 $(element).selectpicker();
                                 
                                 $(element).on('change', function() {
-                                	
-                                	
-                                	
+                                	                                	                                	
                                 	var thereIsEmptyOption = $(element).find('option:not([label])').length!=0;
                                                                     	
                                 	var index = parseInt($(element).parent().find('.bootstrap-select li.selected').attr('data-original-index'));
@@ -98,13 +96,13 @@
                                 
                                 
                                 scope.$watchCollection(attrs.collectionName, function(newVal, oldVal) {                                
-                                    $timeout(function() {                                          	                                        
+                                    $timeout(function() {                                    	
                                         $(element).selectpicker("refresh");
                                     });
                                 });
 
-                                ngModel.$render = function() {
-                                   $(element).selectpicker("val", ngModel.$viewValue || "");
+                                ngModel.$render = function() {                                	
+                                	$(element).selectpicker("val", ngModel.$viewValue || "");
                                 };
 
                                 ngModel.$viewValue = element.val();

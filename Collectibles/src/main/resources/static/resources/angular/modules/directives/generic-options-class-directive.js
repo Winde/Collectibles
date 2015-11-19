@@ -39,14 +39,18 @@
 	                        } 
 	                        	                        
 	                        var option = elem.find('option')[index];
-	                        	                        
+	                        
+	                        var classesString = "";
+	                        
 	                        // now loop through the key/value pairs in the mapping object
 	                        // and apply the classes that evaluated to be truthy.
 	                        angular.forEach(classes, function (add, className) {
 	                            if (add) {
-	                                angular.element(option).addClass(className);
+	                            	classesString= classesString + " " + className;	                                
 	                            }
 	                        });
+	                        $(angular.element(option)).removeClass();	                        
+	                        angular.element(option).addClass(classesString);
 	                    });	                    
 	                    //if ($(elem).is('.selectpicker')){	                    	
 	                    //	$(elem).selectpicker('refresh');

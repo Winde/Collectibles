@@ -124,6 +124,16 @@
 		
 			if (searchObject.hierarchy || (searchObject.searchTerm && searchObject.searchTerm!="" && searchObject.searchTerm.length>2) ){
 				$scope.processingSearch = true;
+				if (searchObject.hierarchy!=null){
+					var hierarchyId = parseInt(searchObject.hierarchy);
+					if (hierarchyId!=null && !isNaN(hierarchyId)){
+						$scope.hierarchies.length = 0;						
+						$scope.hierarchies =[];
+						var all = { id: $scope.root.id, name: "All", isRoot: true};
+						$scope.hierarchies.push(all);
+						Hierarchy.calculateTreeFromSelection($scope.root,$scope.hierarchies,hierarchyId,3);
+					}						
+				}
 				Product.search(searchObject)
 				.success(function(data){ 
 					if (data && data.objects){
@@ -134,7 +144,10 @@
 					}
 					if (data && data.hasNext!=null){
 						$scope.hasNext = data.hasNext;
-					}
+					}	
+					setTimeout(function () {
+				        window.scrollTo(0, $('.productGrid') - 100)
+				    }, 20);
 				})
 				.catch(function(data){
 					Message.alert("There was an error");
@@ -191,19 +204,46 @@
 		if ($scope.root == undefined || $scope.root == null){
 			Hierarchy.root()
 			.success(function(data){				
-				$scope.root = { id: data.id };				
+				$scope.root = data;				
 				if ($scope.hierarchy == null || $scope.hierarchy == undefined){
 					$scope.hierarchy = { id: data.id };
 				}				
 				var all = { id: data.id, name: "All", isRoot: true};
 				$scope.hierarchies.push(all);			
 				$scope.allHierarchies = [];
+				
+				var searchParameters = controller.obtainSearchParameters();
+				var hierarchyId = null;				
+				if (searchParameters && searchParameters.hierarchy){
+					hierarchyId = parseInt(searchParameters.hierarchy);					
+				}
+				/*
+				if (hierarchyId && !isNaN(hierarchyId)){
+					Hierarchy.calculateTreeFromSelection(data,$scope.hierarchies,hierarchyId,3);	
+				} else {
+					Hierarchy.calculateTree(data,$scope.hierarchies,3);
+				}
+				*/
 				Hierarchy.calculateTree(data,$scope.hierarchies,3);
+				
 				Hierarchy.calculateTree(data,$scope.allHierarchies);
 				
 				$scope.hierarchy = all;				
 				controller.setSearchParameters();	
-								
+				
+				/*
+				$scope.hierarchyChildren = []
+				
+				if ($scope.hierarchy && $scope.hierarchy.id && $scope.allHierarchies && $scope.allHierarchies.length){
+					for (var i=0;i<$scope.allHierarchies.length;i++){
+						if ($scope.hierarchy.id  && $scope.allHierarchies[i].id && $scope.hierarchy.id == $scope.allHierarchies[i].id){
+							if ($scope.allHierarchies[i].children){
+								$scope.hierarchyChildren = $scope.allHierarchies[i].children;
+							}
+						}
+					}		
+				}
+				*/								
 				
 				if (!angular.equals({}, controller.obtainSearchParameters())){
 					controller.search();
@@ -223,6 +263,12 @@
 		}
 		
 
+		$scope.selectHierarchy = function(hierarchy){
+			$scope.hierarchy = hierarchy;
+			//controller.setSearchParameters();
+			controller.updateSearch(true);
+		}
+		
 		this.update = function(product) {			
 			
 			Product.modify(product)

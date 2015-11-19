@@ -89,15 +89,16 @@
 							depth4: depth == 4,
 							depth5: depth == 5,
 							depth6: depth == 6,
-							depth7: depth == 7,
-							element: isElement == true				
+							depth7: depth == 7			
 						}">
 					</select>
 				</div>
 			</form>
 		</h3>	
 		<div ng-if="!editMode || !isAdmin()">
-			<h3><span class="label label-default">{{product.hierarchyPlacement.name}}</span></h3>
+			<h3>
+				<a class="btn label label-default" ng-click="selectHierarchy(product.hierarchyPlacement)">{{product.hierarchyPlacement.name}}</a>
+			</h3>
 		</div>	 
 	</div>
 
