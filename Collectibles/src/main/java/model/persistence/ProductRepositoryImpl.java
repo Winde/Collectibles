@@ -168,7 +168,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		if (search.getUsersWhoDontOwn()!=null && search.getUsersWhoDontOwn().size()>0){
 			for (int i=0;i<search.getUsersWhoDontOwn().size();i++){
 				if (needsAnd){ hql = hql + " AND ";}
-				hql = hql + "((p.owners IS EMPTY OR (:usersWhoDontOwn"+i+") NOT IN owners) AND (p.ownersOtherLanguage IS EMPTY OR (:usersWhoDontOwn"+i+") NOT IN ownersOtherLanguage))";
+				hql = hql + "((p.owners IS EMPTY OR (:usersWhoDontOwn"+i+") NOT IN elements(p.owners)) AND (p.ownersOtherLanguage IS EMPTY OR (:usersWhoDontOwn"+i+") NOT IN elements(p.ownersOtherLanguage)))";
 				needsAnd = true;
 			}			
 		}
