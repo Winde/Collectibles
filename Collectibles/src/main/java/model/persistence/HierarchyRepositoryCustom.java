@@ -1,5 +1,7 @@
 package model.persistence;
 
+import java.security.InvalidParameterException;
+
 import javax.transaction.Transactional;
 
 import org.springframework.cache.annotation.CacheEvict;
@@ -29,5 +31,5 @@ public interface HierarchyRepositoryCustom {
 
 	@Transactional
 	@CacheEvict(value="root", allEntries=true)
-	public void deleteCascade(Long id);
+	public void deleteCascade(Long id) throws InvalidParameterException;
 }

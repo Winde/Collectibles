@@ -1,5 +1,6 @@
 package model.persistence;
 
+import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.List;
 
@@ -54,10 +55,12 @@ public class HierarchyRepositoryImpl implements HierarchyRepositoryCustom{
 	}
 	
 	@Override
-	public void deleteCascade(Long id){		
+	public void deleteCascade(Long id) throws InvalidParameterException{		
 		HierarchyNode node = hierarchyRepository.findOne(id);
-		if (node!=null){
+		if (node!=null && node.getFather()!=null){
 			this.deleteCascade(node);
+		} else if (node.getFather()==null){
+			throw new InvalidParameterException("Can't delete root");
 		}
 	}
 	

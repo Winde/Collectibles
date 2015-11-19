@@ -1,16 +1,16 @@
 (function(){
 
 	angular.module('login')	
-	.factory('Auth', function HierarchyFactory(Base64,Message,$injector,$location){
-		this.authenticated = false;
-		this.session = null;		
+	.factory('Auth', function HierarchyFactory(Base64,Message,$injector,$location){	
 		var factory = this;
 		
 		this.headerWithSessionRequest = "X-AUTH-TOKEN";
 		this.headerWithSessionResponse = "X-AUTH-TOKEN";
 		var localStorageKeyForSession = "X-AUTH-TOKEN";
 		
-		
+		this.isAuthenticated = function(){
+			return factory.getStoredSession()!=null;
+		}
 		
 		this.getStoredSession = function() {
 			return localStorage.getItem(localStorageKeyForSession);			
@@ -40,11 +40,7 @@
 		this.removeRoles = function(){
 			localStorage.removeItem("roles");
 		}
-		
-		if (this.getStoredSession()!=null){
-			this.authenticated = true;
-		}
-		
+	
 		return {
 			getRoles: function(){
 				return factory.getRoles();
@@ -69,22 +65,19 @@
 			},						
 			checkSessionIsSet: function(){
 				var storedSession = factory.getStoredSession();				
-				if (factory.getStoredSession()!=null){
-					$injector.invoke(function($http){
-						
+				if (storedSession!=null && storedSession!=undefined){
+					$injector.invoke(function($http){						
 						headers = {};
-						headers[factory.headerWithSessionRequest] = factory.getStoredSession();
+						headers[factory.headerWithSessionRequest] = storedSession;
 						$http({
 							url: '/checksession', 
 							method: 'POST', 
-							nointercept: true, 
+							nointercept: true,
 							headers: headers				
 						})
-						.success(function(data ,status,headers){		
-							factory.authenticated = true;							
+						.success(function(data ,status,headers){							
 						})
-						.catch(function(){
-							factory.authenticated = false;
+						.catch(function(){							
 							factory.removeStoredSession();
 							factory.removeRoles();
 						})
@@ -107,8 +100,7 @@
 						factory.setStoredSession(headers(factory.headerWithSessionResponse));
 						if (data!=null && data!=undefined){
 							factory.setRoles(JSON.stringify(data));
-						}
-						factory.authenticated = true;
+						}						
 						callbackSuccess();
 						//$location.path("/products/").replace();						
 					})
@@ -129,16 +121,15 @@
 				});
 				
 			},
-			logout: function(){				
-				factory.authenticated = false;
+			logout: function(){								
 				factory.removeStoredSession();
 				factory.removeRoles();
 			},
 			isloggedIn: function(){
-				return factory.authenticated;
+				return factory.isAuthenticated();
 			},
 			isAdmin: function(){
-				if (factory.authenticated){
+				if (factory.isAuthenticated()){
 					var roles = factory.getRoles();
 					if (roles!=null && roles!=undefined){
 						return (roles.indexOf("ROLE_ADMIN")>=0)

@@ -14,6 +14,7 @@
 			    			var session = Auth.getSession();
 			    			if (session!=null){
 			    				request.headers[Auth.getHeaderRequestParameter()] = session;
+			    				console.log("Injecting token expires "+ JSON.parse(atob(session.split(".")[0])).expires);
 			    			}
 			    		}			 			    		
 			    		request.headers['X-Requested-With'] = 'XMLHttpRequest';		    	

@@ -18,7 +18,9 @@
 					Hierarchy.root()
 					.success(function(data){	
 						$scope.hierarchies =[];
-						Hierarchy.calculateTree(data,$scope.hierarchies);			
+						Hierarchy.calculateTree(data,$scope.hierarchies);
+						data.isRoot = true;
+						$scope.hierarchies.unshift(data);
 					})
 					.catch(function(){	
 						Message.alert("There was an error");
