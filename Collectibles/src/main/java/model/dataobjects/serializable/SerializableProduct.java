@@ -235,7 +235,7 @@ public class SerializableProduct {
 	public void setImages(List<Image> images) {
 		this.images = images;
 	}
-
+  
 	public Boolean getOwned() {
 		return owned;
 	}
