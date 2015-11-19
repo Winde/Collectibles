@@ -10,13 +10,17 @@ import org.hibernate.event.spi.PreInsertEvent;
 import org.hibernate.event.spi.PreInsertEventListener;
 import org.hibernate.event.spi.PreUpdateEvent;
 import org.hibernate.event.spi.PreUpdateEventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import model.dataobjects.Product;
 
 @Component
 public class ProductSaveListener implements PreInsertEventListener,PreUpdateEventListener {
-
+	
+	private static final Logger logger = LoggerFactory.getLogger(ProductSaveListener.class);
+	
 	private <E> void cleanMap(Map<E,String> map) {
 		Iterator<Entry<E, String>> iterator = map.entrySet().iterator();
 		while (iterator.hasNext()){
@@ -33,7 +37,7 @@ public class ProductSaveListener implements PreInsertEventListener,PreUpdateEven
 			this.cleanMap(product.getConnectorReferences());	
 		}
 		if (product.getExternalLinks()!=null){
-			this.cleanMap(product.getConnectorReferences());	
+			this.cleanMap(product.getExternalLinks());	
 		}		
 	}
 
@@ -50,6 +54,7 @@ public class ProductSaveListener implements PreInsertEventListener,PreUpdateEven
 	@Override
 	public boolean onPreUpdate(PreUpdateEvent event) {		
 		Object entity = event.getEntity();
+		logger.info("Executing save product: " + entity);
 		if (entity instanceof Product){
 			Product product = (Product) entity;
 			this.cleanUp(product);

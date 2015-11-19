@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -102,11 +103,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		ObjectList<Product> wrapper = new ObjectList<Product>();
 		
 		if (search==null){
+			logger.info("Search object is null");
 			return wrapper;
 		}
 		String hql = "";
 		
-		hql = hql + "select p from Product p LEFT JOIN p.images LEFT JOIN p.owners owners LEFT JOIN p.ownersOtherLanguage ownersOtherLanguage";
+		hql = hql + "select distinct p from Product p LEFT JOIN p.images LEFT JOIN p.owners owners LEFT JOIN p.ownersOtherLanguage ownersOtherLanguage LEFT JOIN p.wishers wishers";
 		//hql = hql + "select p from Product p LEFT JOIN FETCH p.images LEFT JOIN FETCH p.owners owners";
 		
 		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
@@ -145,6 +147,14 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 				hql = hql + "(p.images IS EMPTY ) ";
 			}
 			needsAnd = true;
+		}
+		
+		if (search.getWishers()!=null && search.getWishers().size()>0){			
+			for (int i=0;i<search.getWishers().size();i++){
+				if (needsAnd){ hql = hql + " AND ";}
+				hql = hql + "((:wishers"+i+") IN elements(p.wishers)) ";
+				needsAnd = true;
+			}						
 		}
 		
 		if (search.getUsersWhoOwn()!=null && search.getUsersWhoOwn().size()>0){			
@@ -211,9 +221,14 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 				query.setParameter("categoryValues", search.getCategoryValues()); 
 				query.setParameter("sizeCategoryValues",search.getCategoryValues().size());
 		}
-		if (search.getUsersWhoOwn()!=null && search.getUsersWhoOwn().size()>0){
-			//query.setParameter("usersWhoOwn",search.getUsersWhoOwn());
-			
+		if (search.getWishers()!=null && search.getWishers().size()>0){			
+			int i=0;
+			for (User user: search.getWishers()){
+				query.setParameter("wishers"+i,user);
+				i=i+1;
+			}
+		}
+		if (search.getUsersWhoOwn()!=null && search.getUsersWhoOwn().size()>0){			
 			int i=0;
 			for (User user: search.getUsersWhoOwn()){
 				query.setParameter("owners"+i,user);
@@ -229,7 +244,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			}
 		}
 
-		List<Product> result = new ArrayList<>();	
+			
 		
 		
 		if (search.getMaxResults()!=null && search.getPage()!=null) {
@@ -245,7 +260,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		}
 
 		List<Product> listFromDB = query.getResultList();
+				
 		if (listFromDB!=null){
+			
+			
+			
 			if (search.getMaxResults() !=null & search.getPage()!=null && (listFromDB.size() == search.getMaxResults()+1)){
 				listFromDB.remove(listFromDB.size()-1);
 				wrapper.setHasNext(true);
@@ -255,6 +274,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			
 			
 			logger.info("Obtained "+ listFromDB.size() + " products");
+			
+			//Set<Product> result = new LinkedHashSet<>(listFromDB);
 			
 			wrapper.setObjects(listFromDB);
 			if (search.getMaxResults()!=null && search.getPage()!=null) {

@@ -124,7 +124,7 @@ public class TokenHandler {
 						logger.info("User is valid, still valid for " + ((user.getExpires() -new Date().getTime() )/1000) + " seconds");						
 						return user;
 					} else {
-						logger.info("Token was: " + token);
+						//logger.info("Token was: " + token);
 						logger.info("User is null?: " + (user==null) );
 						logger.info("CurrentTime: " + new Date().getTime() );
 						logger.info("ExpirationTime: " +  user.getExpires());

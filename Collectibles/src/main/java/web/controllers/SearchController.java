@@ -63,6 +63,7 @@ public class SearchController extends CollectiblesController{
 			String withPriceString,
 			String ownedString,
 			String ownedByString,
+			String wishedByString,
 			String sortBy,
 			String sortOrder,
 			int page,
@@ -89,8 +90,11 @@ public class SearchController extends CollectiblesController{
 						
 			if (owned!=null){
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();				
+				User owner = null;
+				if (auth!=null){
+					owner = userRepository.findOne(auth.getName());
+				}
 				
-				User owner = userRepository.findOne(auth.getName());
 				if (owner!=null){
 					if (owned){ 
 						searchObject.addUsersWhoOwn(owner); 
@@ -98,7 +102,7 @@ public class SearchController extends CollectiblesController{
 						searchObject.addUsersWhoDontOwn(owner); 
 					}
 				} else {
-					errorReturnNoResults = true;
+					logger.info("Skipping owned parameter due to user probably has been logged out");					
 				}
 			}
 			
@@ -114,13 +118,33 @@ public class SearchController extends CollectiblesController{
 					if (user!=null){
 						searchObject.addUsersWhoOwn(user);
 						if (searchObject.getUsersWhoDontOwn()!=null && searchObject.getUsersWhoDontOwn().contains(user)){
+							logger.info("Setting error due to search for who owns and doesnt own");
 							errorReturnNoResults = true;
 						}
 					} else {
+						logger.info("Setting error due to user not existing");
 						errorReturnNoResults = true;
 					}
 				}
-			}			
+			}
+			
+			if (wishedByString!=null && !wishedByString.trim().equals("")){
+				Long userId = null;
+				try {
+					userId = Long.parseLong(wishedByString);
+				}catch (Exception ex){
+					ex.printStackTrace();
+				}
+				if (userId!=null){
+					User user = userRepository.findById(userId);				
+					if (user!=null){
+						searchObject.addWisher(user);
+					} else {
+						logger.info("Setting error due to user not existing");
+						errorReturnNoResults = true;
+					}
+				}
+			}
 		
 			
 			if (withImagesString!=null && withImagesString.equals("true")){
@@ -184,6 +208,7 @@ public class SearchController extends CollectiblesController{
 
 			if (!errorReturnNoResults){
 				Collection<String> errors = searchObject.errors();
+				logger.info("Errors in search: " + errors );
 				if (errors == null || errors.size()<=0){
 					resultFromDB = productRepository.searchProduct(searchObject);
 				}else {
@@ -235,12 +260,13 @@ public class SearchController extends CollectiblesController{
 			@RequestParam(required=false, name="search") String searchString,
 			@RequestParam(required=false, name="owned" ) String owned,
 			@RequestParam(required=false, name="ownedBy" ) String ownedBy,
+			@RequestParam(required=false, name="wishedBy" ) String wishedBy,
 			@RequestParam(required=false, name="withPrice") String withPrice,
 			@RequestParam(required=false, name="sortBy") String sortBy,
 			@RequestParam(required=false, name="sortOrder") String sortOrder,
 			@RequestParam(required=true, name="page") int page,
 			@RequestParam(required=false, name="maxResults") int maxResults) throws CollectiblesException{	
-		ObjectList<SerializableProduct> objects = findProduct(null,searchString,null,withImagesString,withPrice,owned,ownedBy,sortBy,sortOrder,page,maxResults);
+		ObjectList<SerializableProduct> objects = findProduct(null,searchString,null,withImagesString,withPrice,owned,ownedBy,wishedBy,sortBy,sortOrder,page,maxResults);
 		return objects;
 	}
 	
@@ -252,13 +278,14 @@ public class SearchController extends CollectiblesController{
 			@RequestParam(required=false, name="withImages") String withImagesString,
 			@RequestParam(required=false, name="owned" ) String owned,
 			@RequestParam(required=false, name="ownedBy" ) String ownedBy,
+			@RequestParam(required=false, name="wishedBy" ) String wishedBy,
 			@RequestParam(required=false, name="withPrice") String withPrice,
 			@RequestParam(required=false, name="categoryValues" ) List<String> categories,
 			@RequestParam(required=false, name="sortBy") String sortBy,
 			@RequestParam(required=false, name="sortOrder") String sortOrder,
 			@RequestParam(required=true, name="page") int page,
 			@RequestParam(required=false, name="maxResults", defaultValue=defaultPaginationSize) int maxResults) throws CollectiblesException{					
-		ObjectList<SerializableProduct> objects = findProduct(hierarchy,searchString,categories,withImagesString,withPrice,owned,ownedBy,sortBy,sortOrder,page,maxResults);
+		ObjectList<SerializableProduct> objects = findProduct(hierarchy,searchString,categories,withImagesString,withPrice,owned,ownedBy,wishedBy,sortBy,sortOrder,page,maxResults);
 		return objects;
 		
 	}

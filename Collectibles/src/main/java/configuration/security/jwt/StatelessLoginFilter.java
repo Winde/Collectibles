@@ -28,8 +28,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 	private TokenAuthenticationService tokenAuthenticationService = null;
 
 	public StatelessLoginFilter(String urlMapping, TokenAuthenticationService tokenAuthenticationService,
-            UserDetailsServiceImpl userDetailsService, AuthenticationManager authManager) {
-        
+            UserDetailsServiceImpl userDetailsService, AuthenticationManager authManager) {        
 		super(new AntPathRequestMatcher(urlMapping));
         this.userDetailsService = userDetailsService;
         this.tokenAuthenticationService = tokenAuthenticationService;

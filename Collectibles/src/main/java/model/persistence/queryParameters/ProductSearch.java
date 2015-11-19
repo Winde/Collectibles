@@ -17,6 +17,7 @@ public class ProductSearch implements SearchObject {
 	private Boolean withImages = null;	
 	private Set<User> usersWhoOwn = null;
 	private Set<User> usersWhoDontOwn = null;
+	private Set<User> wishers = null;
 	private Integer maxResults = null;
 	private Integer page = null;
 	private Boolean withPrice = null;
@@ -126,6 +127,21 @@ public class ProductSearch implements SearchObject {
 	public void setSortOrder(String sortOrder) {
 		this.sortOrder = sortOrder;
 	}
+	
+	public Set<User> getWishers() {
+		return wishers;
+	}
+
+	public void setWishers(Set<User> wishers) {
+		this.wishers = wishers;
+	}
+	
+	public void addWisher(User user) {
+		if (this.wishers==null){
+			this.wishers = new HashSet<>();
+		}
+		this.wishers.add(user);		
+	}
 
 	@Override
 	public Collection<String> errors() {
@@ -136,6 +152,8 @@ public class ProductSearch implements SearchObject {
 
 		return errors;
 	}
+
+
 
 	
 

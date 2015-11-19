@@ -10,11 +10,14 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class JwtAuthenticationOnSuccess implements Filter {
 
+	private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationOnSuccess.class);
 	
 	private TokenAuthenticationService tokenAuthenticationService = null;
 
@@ -38,7 +41,8 @@ public class JwtAuthenticationOnSuccess implements Filter {
 		if (authentication instanceof UserAuthentication) {
 			UserAuthentication userAuth = (UserAuthentication) authentication;
 			UserDetailsImpl details = userAuth.getDetails();
-			if (details!=null){							
+			if (details!=null){
+				logger.info("Adding token for user "+ userAuth + " to response, INTENDED AFTER AUTH!!!");
 				tokenAuthenticationService.addAuthentication(httpResponse, userAuth);
 			}
 		}

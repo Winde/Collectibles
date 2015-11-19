@@ -75,6 +75,10 @@ public class Product extends SimpleIdDao{
 	@BatchSize(size = 50)
 	private Set<User> ownersOtherLanguage = null;
 	
+	@ManyToMany(fetch=FetchType.LAZY)	
+	@BatchSize(size = 50)
+	private Set<User> wishers = null;	
+	
 	@Column(name="release_date")
 	private Date releaseDate = null;
 			
@@ -363,7 +367,13 @@ public class Product extends SimpleIdDao{
 		this.externalLinks = externalLinks;
 	}
 
-	
-	
+	public Set<User> getWishers() {
+		return wishers;
+	}
+
+	public void setWishers(Set<User> wishers) {
+		this.wishers = wishers;
+	}
+
 }
 

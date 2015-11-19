@@ -43,6 +43,17 @@
 					ng-change="update(product)">
 				Owned <i class="fa fa-globe"></i>
 			</span>
+		</h3>
+		<h3 ng-if="editMode && isLoggedIn()">
+			<span  
+					class="btn btn-default" 
+					ng-model="product.wished" 
+					uib-btn-checkbox 
+					btn-checkbox-true="true" 
+					btn-checkbox-false="false"
+					ng-change="update(product)">
+				In wishlist
+			</span>
 		</h3>	
 			<!-- 
 			<input type="checkbox" 
@@ -54,6 +65,9 @@
 		</div>
 		<div ng-if="!editMode || !isLoggedIn()">
 			<h3><span class="label label-default" ng-if="product.ownedAnotherLanguage">Owned <i class="fa fa-globe"></i></span></h3>			
+		</div>
+		<div ng-if="!editMode || !isLoggedIn()">
+			<h3><span class="label label-default" ng-if="product.wished">In wishlist</span></h3>			
 		</div>
 	</div>	
 	<div class="col-lg-2 col-md-5 hidden-sm hidden-xs">		

@@ -86,6 +86,7 @@
 						.catch(function(){
 							factory.authenticated = false;
 							factory.removeStoredSession();
+							factory.removeRoles();
 						})
 					});
 				} else {

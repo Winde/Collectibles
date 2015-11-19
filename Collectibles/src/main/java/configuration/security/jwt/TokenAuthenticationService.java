@@ -39,15 +39,22 @@ public class TokenAuthenticationService {
 		user.setExpires(System.currentTimeMillis() + THIRTY_MINUTES);
 		
 		logger.info("Setting authentication for user, expires: " + user.getExpires() );
-		response.addHeader(AUTH_HEADER_NAME, tokenHandler.createTokenForUser(user));
+		String token = tokenHandler.createTokenForUser(user);
+		//logger.info("Setting token:" + token);
+		response.addHeader(AUTH_HEADER_NAME, token);
 	}
  
 	public Authentication getAuthentication(HttpServletRequest request) {
 		final String token = request.getHeader(AUTH_HEADER_NAME);
 		
+		//logger.info("Obtained token: " + token);
+		
 		if (token != null) {
 			final UserDetailsImpl user = tokenHandler.parseUserFromToken(token);
+			logger.info("Parsed user: " + user);
 			if (user != null) {
+				logger.info("Parsed user expires: " + user.getExpires());
+				
 				if (user.getExpires()!=null){
 					logger.info("Obtaining authentication for user, expires: " + user.getExpires() );
 				}

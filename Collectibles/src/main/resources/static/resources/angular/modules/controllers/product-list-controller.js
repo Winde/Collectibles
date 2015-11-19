@@ -39,6 +39,7 @@
 			
 			if ($scope.owned){ searchObject.owned = $scope.owned}
 			if ($scope.ownedBy){ searchObject.ownedBy = $scope.ownedBy}
+			if ($scope.wishedBy){ searchObject.wishedBy = $scope.wishedBy}
 			
 			if ($scope.page){ searchObject.page = $scope.page } else { $scope.page = 0; searchObject.page = 0; }
 			
@@ -64,6 +65,9 @@
 
 			if (searchObject.ownedBy){
 				searchObject.ownedBy = parseInt(searchObject.ownedBy);
+			}
+			if (searchObject.wishedBy){
+				searchObject.wishedBy = parseInt(searchObject.wishedBy);
 			}
 						
 			if (searchObject.hierarchy){			
@@ -94,7 +98,10 @@
 			if (searchObject.ownedBy && !isNaN(searchObject.ownedBy)){					
 				$scope.ownedBy = searchObject.ownedBy;
 			} else {	$scope.ownedBy = "";}
-						
+			
+			if (searchObject.wishedBy && !isNaN(searchObject.wishedBy)){					
+				$scope.wishedBy = searchObject.wishedBy;
+			} else {	$scope.wishedBy = "";}
 			
 			if (searchObject.page){	$scope.page = searchObject.page;
 			} else {	searchObject.page = 0; $scope.page= 0; }
