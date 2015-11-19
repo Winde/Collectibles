@@ -10,6 +10,14 @@
 				var current = children[j];
 				var depth = current.depth;					
 				
+				var optionalLineageParent = null;
+				if (optionalToAddChildren && optionalToAddChildren.lineage){
+					var lastIndexOfSeparator = optionalToAddChildren.lineage.lastIndexOf("-");
+					if (lastIndexOfSeparator>0){
+						optionalLineageParent = optionalToAddChildren.lineage.substr(0,lastIndexOfSeparator);	
+					}					
+				}
+				
 				if (	
 						//If we are still below the default depth
 						(maxDepth==undefined || depth<=maxDepth) ||
@@ -18,16 +26,19 @@
 						(current && optionalToAddChildren && current.lineage && optionalToAddChildren.lineage && optionalToAddChildren.lineage.indexOf(current.lineage)==0) ||
 						
 						//We also add the children of our target node
-						(optionalToAddChildren && parent && (parent == optionalToAddChildren))
+						(optionalToAddChildren && parent && (parent == optionalToAddChildren)) ||
+						
+						//We also would prefer to see the siblings
+						(optionalToAddChildren && optionalToAddChildren.depth && optionalLineageParent && current && current.lineage && current.lineage.indexOf(optionalLineageParent)==0 && (depth == optionalToAddChildren.depth))
 					){
-					current.group = parent.name;
-					array.push(current);
-					if (current.children!=null && current.children.length > 0) {				
-						current.isGroup = true;						
-						addChildren(array, current, current.children, maxDepth, optionalToAddChildren);
-					} else {
-						current.isElement = true;
-					}
+						current.group = parent.name;
+						array.push(current);
+						if (current.children!=null && current.children.length > 0) {				
+							current.isGroup = true;						
+							addChildren(array, current, current.children, maxDepth, optionalToAddChildren);
+						} else {
+							current.isElement = true;
+						}
 				}
 			}			
 		}
