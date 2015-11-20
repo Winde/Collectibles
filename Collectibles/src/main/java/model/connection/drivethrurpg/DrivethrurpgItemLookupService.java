@@ -3,6 +3,7 @@ package model.connection.drivethrurpg;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,7 +132,11 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 	@Override
 	public DrivethrurpgData fetchDocFromProduct(Product product) throws TooFastConnectionException {
 		DrivethrurpgData data = new DrivethrurpgData();
-		if (product.getExternalLinks()!=null && product.getExternalLinks().get(this.getIdentifier())!=null){
+		String link = null;
+		if (product.getExternalLinks()!=null){
+			link = product.getExternalLinks().get(this.getIdentifier());
+		}
+		if (link!=null && !"".equals(link.trim())){
 			data.setLink(product.getExternalLinks().get(this.getIdentifier()));
 		} else {
 			data.setLink(this.fetchUrlFromProductName(product));
@@ -141,11 +146,14 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 				Document doc = Jsoup.connect(data.getLink()).get();
 				if (doc!=null){
 					data.setDoc(doc);
+				} else {
+					data = null;
 				}
 			} catch (IOException e) {
 				logger.error("Issue when fetching product page from drivethrurpg", e);
 			}
 		}
+		
 		return data;
 	}
 
@@ -154,7 +162,7 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 	}
 
 	@Override
-	public byte[] getImageData(DrivethrurpgData doc) throws TooFastConnectionException {
+	public byte[] getMainImageData(DrivethrurpgData doc) throws TooFastConnectionException {
 		return null;
 	}
 
@@ -164,7 +172,7 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 	}
 
 	@Override
-	public Integer getPublicationYear(DrivethrurpgData doc) throws TooFastConnectionException {
+	public Date getPublicationDate(DrivethrurpgData doc) throws TooFastConnectionException {
 		return null;
 	}
 
@@ -331,6 +339,19 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 	@Override
 	public String getReference(DrivethrurpgData doc)
 			throws TooFastConnectionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<byte[]> getAdditionalImageData(DrivethrurpgData doc)
+			throws TooFastConnectionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getName(DrivethrurpgData doc) throws TooFastConnectionException {
 		// TODO Auto-generated method stub
 		return null;
 	}

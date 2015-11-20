@@ -1,44 +1,39 @@
-package model.connection.boardgamegeek;
+package model.connection.steam;
 
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import model.connection.AbstractProductInfoConnector;
 import model.connection.ProductInfoLookupService;
 import model.connection.TooFastConnectionException;
 import model.dataobjects.Product;
 
-@Component
-public class BoardGameGeekConnector extends AbstractProductInfoConnector{
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-	private static final int SLEEP_BETWEEN_CALLS = 1400;	
+@Component
+public class SteamConnector extends AbstractProductInfoConnector{
+
+	private static final int SLEEP_BETWEEN_CALLS = 1800;	
 	
 	@Autowired
-	private BoardGameGeekLookupService lookupService;
+	private SteamItemLookupService itemLookUp;
 	
 	@Override
 	public ProductInfoLookupService getImageLookupService() {
-		return lookupService;
+		return itemLookUp;
 	}
-
-
+	
 	@Override
 	public boolean isApplicable(Product product) {
-		String reference = lookupService.getReferenceFromProduct(product);
+		String reference = itemLookUp.getReferenceFromProduct(product);
 		String name = product.getName();
+		
 		return ((name!=null && !"".equals(name.trim())) || (reference!=null && !"".equals(reference.trim())));	
 	}
 
 	@Override
 	public boolean hasOwnReference() {
 		return true;
-	}
-	
-	@Override
-	public String toString(){
-		return "BoardGameGeekConnector";
 	}
 
 	@Override
@@ -54,14 +49,12 @@ public class BoardGameGeekConnector extends AbstractProductInfoConnector{
 	@Override
 	public List<String> getOwnedReferences(String userId)
 			throws TooFastConnectionException {
-		// TODO Auto-generated method stub
-		return null;
+		return itemLookUp.getOwnedReferences(userId);
 	}
 
-
 	@Override
-	public boolean supportsPrices() { 
-		return false;
+	public boolean supportsPrices() {
+		return true;
 	}
 
 }

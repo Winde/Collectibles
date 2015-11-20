@@ -1,7 +1,9 @@
 package model.connection.goodreads;
 
 import java.io.FileNotFoundException;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,7 +65,7 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 		return this.getField(doc, imageUrlDocPath);		
 	}
 	
-	public byte [] getImageData(Document doc) throws TooFastConnectionException{
+	public byte [] getMainImageData(Document doc) throws TooFastConnectionException{
 		byte [] data = null;
 		String url = this.getImageUrl(doc);
 		if (url!=null && url.indexOf("/nophoto/")<0){
@@ -76,10 +78,14 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 		return this.getField(doc, descriptionDocPath);		
 	}
 	
-	public Integer getPublicationYear(Document doc){
-		Integer result = null;
+	public Date getPublicationDate(Document doc){
+		Date result = null;
+		Integer year = null;
 		try{
-			result = Integer.parseInt(this.getField(doc, publicationYearDocPath));
+			year = Integer.parseInt(this.getField(doc, publicationYearDocPath));
+			if (year!=null){
+				result = super.getDateFromYear(year);
+			}
 		}catch (Exception e){
 			logger.error("Publication year is not integer", e);
 		}
@@ -164,16 +170,7 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 
 	@Override
 	public Document fetchDocFromProduct(Product product) throws TooFastConnectionException {
-		String reference = null;
-		if (product.getConnectorReferences()!=null && product.getConnectorReferences().get(this.getIdentifier())!=null){
-			reference = product.getConnectorReferences().get(this.getIdentifier());		
-		}
-		if (reference==null || "".equals(reference.trim())){
-			reference = product.getUniversalReference();
-		}
-		if (reference == null){
-			return null;
-		}
+		String reference = getReferenceFromProduct(product);
 		String requestUrl = null;
 		
 		
@@ -208,6 +205,19 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	@Override
 	public String getReference(Document doc) throws TooFastConnectionException {
 		return super.getField(doc, goodreadsReferenceDocPath);
+	}
+
+	@Override
+	public List<byte[]> getAdditionalImageData(Document doc)
+			throws TooFastConnectionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getName(Document doc) throws TooFastConnectionException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

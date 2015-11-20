@@ -30,44 +30,6 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
 
 	private static final Logger logger = LoggerFactory.getLogger(ProductInfoLookupServiceXML.class);	
 	
-	protected byte[] fetchImage(String url) throws TooFastConnectionException {
-		byte[] imageInByte = null;
-		if (url!=null){
-			URL imageURL = null;	
-			try {
-				imageURL = new URL(url);
-			} catch (MalformedURLException e) {				
-				logger.error("Malformed URL", e);				
-			}
-			if (imageURL!=null) {
-			    BufferedImage originalImage = null;
-				try {
-					originalImage = ImageIO.read(imageURL);
-				 } catch (IOException ioe) {	    		
-		    		if (ioe.getMessage()!=null && ioe.getMessage().contains("HTTP response code: 503")){
-		    			throw new TooFastConnectionException();	
-		    		} 
-		    		logger.error("Exception when obtaining image", ioe);		        	
-				}
-				if (originalImage!=null){	
-					boolean writeError = false;
-				    ByteArrayOutputStream baos=new ByteArrayOutputStream();				
-					try {
-						ImageIO.write(originalImage, "jpg", baos );
-					} catch (IOException e) {				
-						logger.error("Exception when writing image", e);
-						writeError = true;
-					}
-					if (!writeError){
-						imageInByte=baos.toByteArray();
-					}
-				}
-			}
-		}
-		 
-		return imageInByte;
-	}
-	
 	protected Document fetchDocFromUrl(String requestUrl) throws TooFastConnectionException,FileNotFoundException {
     	
     	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

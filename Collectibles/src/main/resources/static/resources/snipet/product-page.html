@@ -55,7 +55,7 @@
 								<p ng-if="product.lastPriceUpdate">Last updated: {{product.lastPriceUpdate | date:'yyyy-MM-dd HH:mm:ss'}}</p>
 							</div>
 						</div>
-						<span class="btn btn-default" ng-if="editable && product && product.id && isAdmin()" ng-click="productCtrl.updatePrices(product.id)">Update prices</span>
+						<span class="btn btn-default" ng-if="product && product.id && isLoggedIn()" ng-click="productCtrl.updatePrices(product.id)">Update prices</span>
 						
 					</div>
 					

@@ -40,7 +40,6 @@ public interface ProductRepositoryCustom {
 	@Transactional
 	public boolean mergeAndSaveProductWithoutImages(Product product, Collection<Image> image);
 
-
-	
+	public Collection<Product> findByConnectorReference(String connector, String reference);
 
 }

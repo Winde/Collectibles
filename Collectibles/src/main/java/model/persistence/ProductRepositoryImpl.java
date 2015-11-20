@@ -1,12 +1,8 @@
 package model.persistence;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -18,13 +14,9 @@ import model.dataobjects.User;
 import model.dataobjects.supporting.ObjectList;
 import model.persistence.queryParameters.ProductSearch;
 
-import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ProductRepositoryImpl implements ProductRepositoryCustom{
 
@@ -316,6 +308,21 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		}		
 		return false;
 		
+	}
+
+	@Override
+	public Collection<Product> findByConnectorReference(String connector, String reference) {
+ 
+		String hql = "";
+		
+		hql = "select distinct p from Product p "
+				+ "WHERE p.connectorReferences[:connector] = :reference ";				
+				
+		
+		TypedQuery<Product> query = entityManager.createQuery(hql, Product.class);
+		query.setParameter("reference", reference);
+		query.setParameter("connector", connector);
+		return query.getResultList();
 	}
 
 

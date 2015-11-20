@@ -21,7 +21,7 @@
 		
 		this.updatePrices = function(id){
 			Product.updatePrice(id)
-			.success(function(data){
+			.success(function(data){			
 				$scope.product = Product.prepareProduct(data);				
 			})
 			.catch(function(){	

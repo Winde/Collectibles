@@ -50,6 +50,46 @@ public class ProductInfoConnectorFactory {
 		return result;
 	}
 	
+	public ProductInfoConnector getConnector(String connectorName) {
+		if (connectorName!=null && connectors!=null && connectors.size()>0){
+			for (ProductInfoConnector connector: connectors){
+				if (connectorName.equals(connector.getIdentifier())){
+					return connector;
+				}
+			}
+		}
+		return null;
+	}
+	
+	private void filterSupportPrices(Collection<ProductInfoConnector> collection){		
+		if (collection!=null){
+			Iterator<ProductInfoConnector> iterator = collection.iterator();
+			while (iterator.hasNext()){
+				ProductInfoConnector connector = iterator.next();
+				if (!connector.supportsPrices()){
+					iterator.remove();
+				}
+			}
+		}		
+	}
+	
+	public Collection<ProductInfoConnector> getConnectors(boolean supportsPrices) {
+		Collection<ProductInfoConnector> allConnectors= this.getConnectors();
+		if (supportsPrices){
+			filterSupportPrices(allConnectors);
+		}
+		return null;
+	}
+
+	
+	public Collection<ProductInfoConnector> getConnectors(Product product, boolean supportsPrices){
+		Collection<ProductInfoConnector> connectorsForProduct = this.getConnectors(product.getHierarchyPlacement());
+		if (supportsPrices){
+			filterSupportPrices(connectorsForProduct);
+		}
+		return connectorsForProduct;
+	}
+	
 	public Collection<ProductInfoConnector> getConnectors(Product product){
 		return this.getConnectors(product.getHierarchyPlacement());		
 	}
@@ -87,4 +127,7 @@ public class ProductInfoConnectorFactory {
 	public List<String> getConnectorNames(HierarchyNode node){
 		return getConnectorNames(this.getConnectors(node));
 	}
+
+
+	
 }

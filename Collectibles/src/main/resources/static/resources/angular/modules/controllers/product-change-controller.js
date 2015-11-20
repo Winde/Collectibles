@@ -32,9 +32,8 @@
 		this.refreshScrape = function(){
 			if ($scope.product!=null && $scope.product.id!=null){
 				Product.refresh($scope.product)
-				.success(function(data){					
-					$scope.product = Product.prepareProduct(data);					
-					Message.success("Products has been refreshed");			
+				.success(function(data,responseCode){					
+					$scope.product = Product.prepareProduct(data);														
 				})
 				.catch(function(){
 					Message.alert("There was an error");
@@ -96,6 +95,18 @@
 				});
 			} 
 		};
+		
+		this.pullProduct = function(id){
+			Product.one(id)
+			.success(function(data){
+				$scope.product = Product.prepareProduct(data);
+			})
+			.catch(function(){	
+				Message.alert("There was an error");
+			})
+			.finally(function(){			
+			});
+		}
 		
 		this.uploadImage = function(file){
 			

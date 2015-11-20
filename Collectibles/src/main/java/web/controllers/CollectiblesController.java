@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import model.connection.AbstractProductInfoConnector;
 import model.dataobjects.CategoryValue;
+import model.dataobjects.serializable.ConnectorInfo;
+import model.dataobjects.serializable.SerializableProduct;
 import model.dataobjects.validator.DaoValidator;
 
 import org.slf4j.Logger;
@@ -20,6 +22,7 @@ import web.supporting.error.ErrorCode;
 import web.supporting.error.exceptions.CollectiblesException;
 import web.supporting.error.exceptions.GenericException;
 import web.supporting.error.exceptions.IncorrectParameterException;
+import web.supporting.error.exceptions.NotEnoughTimeToParseException;
 import web.supporting.error.exceptions.NotFoundException;
 
 public abstract class CollectiblesController {
@@ -28,8 +31,7 @@ public abstract class CollectiblesController {
 	private static final String headerValueForDisableHttpAuthPopup = "FormBased";
 	
 	private static final Logger logger = LoggerFactory.getLogger(AbstractProductInfoConnector.class);
-	
-	
+		
 	@ExceptionHandler(Exception.class)
 	@ResponseBody
 	public ErrorCode error(Exception ex,final HttpServletResponse response){
@@ -63,6 +65,14 @@ public abstract class CollectiblesController {
 		ErrorCode errorCode = new ErrorCode(ex);		
 		response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR  );
 		return errorCode;
+	}
+	
+	@ExceptionHandler(NotEnoughTimeToParseException.class)
+	@ResponseBody
+	public SerializableProduct error(NotEnoughTimeToParseException ex,final HttpServletResponse response){
+		logger.error("Interrupted request without finished parsing");
+		response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+		return ex.getProduct();
 	}
 	
 	protected void validate(Object dataobject) throws IncorrectParameterException{

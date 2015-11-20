@@ -9,12 +9,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.Future;
 
+import javax.persistence.EntityManager;
+
+import model.connection.BackgroundProcessOwnItems;
 import model.connection.ProductInfoConnector;
 import model.connection.ProductInfoConnectorFactory;
 import model.dataobjects.Category;
@@ -23,6 +24,7 @@ import model.dataobjects.HierarchyNode;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
 import model.dataobjects.User;
+import model.dataobjects.inmemory.ScrapeRequest;
 import model.dataobjects.serializable.ConnectorInfo;
 import model.dataobjects.serializable.SerializableProduct;
 import model.persistence.AuthorRepository;
@@ -30,6 +32,7 @@ import model.persistence.CategoryValueRepository;
 import model.persistence.HierarchyRepository;
 import model.persistence.ImageRepository;
 import model.persistence.ProductRepository;
+import model.persistence.ScrapeRequestRepository;
 import model.persistence.UserRepository;
 
 import org.apache.commons.csv.CSVFormat;
@@ -46,13 +49,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import web.supporting.error.exceptions.CollectiblesException;
 import web.supporting.error.exceptions.IncorrectParameterException;
+import web.supporting.error.exceptions.NotEnoughTimeToParseException;
 import web.supporting.error.exceptions.NotFoundException;
 
 
@@ -80,28 +83,98 @@ public class ProductController  extends CollectiblesController{
 	private UserRepository userRepository;
 
 	@Autowired
+	private ScrapeRequestRepository scrapeRequestRepository;
+
+	@Autowired
+	private EntityManager entityManager;
+	
+	@Autowired
+	private BackgroundProcessOwnItems processOwnershipItems;
+	
+	@Autowired
 	private ProductInfoConnectorFactory connectorFactory;
 	
-	private Product scrapeProduct(Product product){
-		Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(product);
+	private static final int MAX_PARSE_CHECKS = 6;//6;
+	private static final int MILISECONDS_BETWEEN_PARSE_CHECKS = 900; 
+	
+	private Product checkProduct(Product product, List<Long> requestIds) throws NotEnoughTimeToParseException{
+		int checks = 0;
+		while(checks<MAX_PARSE_CHECKS && requestIds != null && requestIds.size()>0){
+			
+			Iterable<ScrapeRequest> requests = scrapeRequestRepository.findAll(requestIds);			
+			if (requests.iterator()==null || !requests.iterator().hasNext()){				
+				requestIds.clear();
+			} else {
+				logger.info("Still have requests, for example:" + requests.iterator().next());
+			}
+			try {
+				Thread.sleep(MILISECONDS_BETWEEN_PARSE_CHECKS);
+			} catch (InterruptedException e) {
+				logger.error("Interrupted", e);
+			}
+			checks++; 
+		}
+		
+		logger.info("Out of the loop in "+checks +" checks");		
+		logger.info("Stopped WAITING!!");
+		
+		entityManager.detach(product);
+		Product result = productRepository.findOne(product.getId());
+		
+		if (checks>=MAX_PARSE_CHECKS){
+			SerializableProduct serializableProduct = SerializableProduct.cloneProduct(result,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
+			throw new NotEnoughTimeToParseException(serializableProduct);
+			
+		} else {
+			return result;
+		}
+		
+	}
+		
+	private ScrapeRequest createScrapeForProduct(String username, Product product,String connector, boolean  liveRequest,boolean onlyTransient){
+		ScrapeRequest scrape = new ScrapeRequest();		
+		scrape.setProductId(product.getId());
+		scrape.setOnlyTransient(onlyTransient);
+		scrape.setLiveRequest(liveRequest);
+		scrape.setConnector(connector);
+		scrape.setUserId(username);
+		scrape.setRequestTime(new Date());
+		return scrape;
+	}
+	
+	private List<Long> scrapeProduct(String username, Product product, boolean liveRequest, boolean onlyTransient){
+		Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(product,onlyTransient);
+		List<ScrapeRequest> requests = new ArrayList<>();
 		if (connectors!=null) {
 			logger.info("Connectors: " + connectors);
-			Iterator<ProductInfoConnector> iterator = connectors.iterator();
-			while (iterator.hasNext()){
-				ProductInfoConnector connector = iterator.next();
-				logger.info("Is "+connector.getIdentifier()+" Processed? "+ (!(product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(connector.getIdentifier()))));
-				if (product.getProcessedConnectors()==null || !product.getProcessedConnectors().contains(connector.getIdentifier())){						
-					if (connector!=null){
-						try {
-							connector.updateProductTransaction(product);
-						} catch (Exception e) {
-							logger.error("Exception when scraping product", e);
-						}
-					}
+			ScrapeRequest scrape = null;
+			for (ProductInfoConnector connector: connectors) {					
+							
+				List<ScrapeRequest> scrapes = scrapeRequestRepository.findByProductIdAndConnector(product.getId(), connector.getIdentifier());
+				if (scrapes==null || scrapes.size()==0){					
+					scrape = createScrapeForProduct(username, product, connector.getIdentifier(), liveRequest, onlyTransient);
+					scrape = scrapeRequestRepository.save(scrape);
+					requests.add(scrape);
+				} else {
+					
+					for (ScrapeRequest request: requests){							
+						request.setOnlyTransient(onlyTransient);
+						request.setLiveRequest(liveRequest);							
+					}						
+					scrapeRequestRepository.save(requests);											
+					requests.addAll(scrapes);
 				}
-			}				
+				
+			}									
 		}
-		return product;
+		
+		List<Long> requestIds = new ArrayList<>();
+		if (requests!=null){			
+			for (ScrapeRequest request: requests){
+				requestIds.add(request.getId());
+			}
+		}
+		return requestIds;		
 	}
 	
 	@RequestMapping(value="/product/find/{id}", method = RequestMethod.GET)
@@ -115,15 +188,17 @@ public class ProductController  extends CollectiblesController{
 			if (product==null){
 				throw new NotFoundException();
 			}
-			this.scrapeProduct(product);
 			
 			return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));			
 		}
 	}
 	
+	@Secured(value = { "ROLE_USER" })
 	@RequestMapping(value="/product/refresh/{id}", method = RequestMethod.PUT)
-	public SerializableProduct productRefresh(@PathVariable String id) throws CollectiblesException {
+	public SerializableProduct productRefresh(@PathVariable String id) throws CollectiblesException, NotEnoughTimeToParseException {
 		Long idLong = this.getId(id);
+		
+		
 		
 		if (idLong==null){
 			throw new IncorrectParameterException(new String[]{"id"});
@@ -132,17 +207,17 @@ public class ProductController  extends CollectiblesController{
 			if (product==null){
 				throw new NotFoundException();
 			}
-			
-			product.setProcessedConnectors(null);
-			
-			this.scrapeProduct(product);
-			
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth!=null){
+				List<Long> requestIds = this.scrapeProduct(auth.getName(),product,true,false);
+				product = checkProduct(product, requestIds);
+			}
 			return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));			
 		}
 	}
 	
 	@RequestMapping(value="/product/refresh/", method = RequestMethod.PUT)
-	public SerializableProduct productSaveAndRefresh(@RequestBody SerializableProduct product) throws CollectiblesException {
+	public SerializableProduct productSaveAndRefresh(@RequestBody SerializableProduct product) throws CollectiblesException, NotEnoughTimeToParseException {
 		SerializableProduct result = this.modifyProductScrapeOption(product,true);
 							
 		return result;
@@ -151,7 +226,7 @@ public class ProductController  extends CollectiblesController{
 	
 	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/create/from/file/{hierarchy}", method = RequestMethod.POST)
-	public Collection<SerializableProduct> addProductsFromFile(
+	public Boolean addProductsFromFile(
 			@PathVariable String hierarchy,
 			@RequestPart("file") MultipartFile file) throws CollectiblesException {
 		Long hierarchyId = this.getId(hierarchy);
@@ -205,21 +280,26 @@ public class ProductController  extends CollectiblesController{
 																		
 						//productRepository.saveWithImages(products,images);
 						productRepository.save(products);
-								
-						
-						Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(hierarchyNode);
-						logger.info("Connectors: " + connectors);
-						if (connectors!=null) {
-							Iterator<ProductInfoConnector> iterator = connectors.iterator();
-							while (iterator.hasNext()){
-								ProductInfoConnector connector = iterator.next();
-								if (connector!=null){
-									connector.processInBackground(products);
+						Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+						if (auth!=null){
+							String username = null;						
+							username = auth.getName();
+							Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(hierarchyNode);						
+							List<ScrapeRequest> scrapeRequests = new ArrayList<>();
+							if (connectors!=null){							
+								for (ProductInfoConnector connector: connectors){
+									for (Product product : products){
+										ScrapeRequest scrape = createScrapeForProduct(username, product, connector.getIdentifier(), false, false);
+										scrapeRequests.add(scrape);
+										
+									}
 								}
-							}				
+							}
+							scrapeRequestRepository.save(scrapeRequests);
 						}
 						
-						return SerializableProduct.cloneProduct(products);
+						
+						return Boolean.TRUE;
 					} catch (IOException e) {
 						logger.error("Exception when scraping uploading CSV", e);
 						throw new IncorrectParameterException(new String[]{"file"});
@@ -252,8 +332,11 @@ public class ProductController  extends CollectiblesController{
 				this.validate(product);				
 				Product result = productRepository.save(product);
 				
-				this.scrapeProduct(result);
-				
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				if (auth!=null){
+					String username = auth.getName();
+					this.scrapeProduct(username,result,true,false);
+				}
 				return SerializableProduct.cloneProduct(result,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
 			} else {
 				throw new NotFoundException(new String[]{"hierarchy"});
@@ -315,9 +398,9 @@ public class ProductController  extends CollectiblesController{
 		return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));
 	}
 	
-	@Secured(value = { "ROLE_ADMIN" })
+	@Secured(value = { "ROLE_USER" })
 	@RequestMapping(value="/product/update/price/{id}", method = RequestMethod.PUT)
-	public SerializableProduct updatePrice(@PathVariable String id) throws CollectiblesException {		
+	public SerializableProduct updatePrice(@PathVariable String id) throws CollectiblesException, NotEnoughTimeToParseException {		
 		Long idLong = this.getId(id);
 		
 		if (idLong==null){
@@ -327,43 +410,26 @@ public class ProductController  extends CollectiblesController{
 			if (product==null){
 				throw new NotFoundException();
 			}
-			
-			product.setDollarPrice(null);
-			product.setMinPrice(null);
-			
-			Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(product);
-			if (connectors!=null) {
-				logger.info("Connectors: " + connectors);
-				Iterator<ProductInfoConnector> iterator = connectors.iterator();
-				while (iterator.hasNext()){
-					ProductInfoConnector connector = iterator.next();
-					if (connector!=null){
-						try {
-							connector.updatePrice(product);
-						} catch (Exception e) {
-							logger.error("Exception when scraping product price", e);
-						}
-					}
-					
-				}				
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth!=null){
+				String username = null;
+				List<Long> requestIds = this.scrapeProduct(username, product,true,true);
+				product = checkProduct(product, requestIds);
 			}
-			
-			productRepository.save(product);
-			
 			return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));			
 		}			
 	}
 	
 	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/modify/", method = RequestMethod.PUT)
-	public SerializableProduct modifyProductDefault(@RequestBody SerializableProduct serializableProduct)throws CollectiblesException {
+	public SerializableProduct modifyProductDefault(@RequestBody SerializableProduct serializableProduct)throws CollectiblesException, NotEnoughTimeToParseException {
 		return modifyProductScrapeOption(serializableProduct,false);
 	}
 	
-	public SerializableProduct modifyProductScrapeOption(SerializableProduct serializableProduct, boolean scrape) throws CollectiblesException {		
+	public SerializableProduct modifyProductScrapeOption(SerializableProduct serializableProduct, boolean scrape) throws CollectiblesException, NotEnoughTimeToParseException {		
 		Product product = null;
 		if (serializableProduct !=null) { product = serializableProduct.deserializeProduct(); }
-		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		this.validate(product);
 		
 		if (product.getId()!=null){
@@ -389,7 +455,6 @@ public class ProductController  extends CollectiblesController{
 				//product.setConnectorReferences(productInDb.getConnectorReferences());
 
 				if (serializableProduct.getWished()!=null){
-					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 					if (auth!=null){
 						User user = new User();
 						user.setUsername(auth.getName());
@@ -410,7 +475,7 @@ public class ProductController  extends CollectiblesController{
 				}
 				
 				if (serializableProduct.getOwnedAnotherLanguage()!=null){
-					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+					
 					if (auth!=null){
 						User user = new User();
 						user.setUsername(auth.getName());
@@ -431,7 +496,6 @@ public class ProductController  extends CollectiblesController{
 				}
 				
 				if (serializableProduct.getOwned()!=null){
-					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 					if (auth!=null){
 						User user = new User();
 						user.setUsername(auth.getName());
@@ -454,13 +518,17 @@ public class ProductController  extends CollectiblesController{
 
 				Product result = productRepository.save(product);
 				
-				
-				if (scrape){
-					result.setProcessedConnectors(null);
-					result = productRepository.save(result);
-					result = this.scrapeProduct(result);
-					result.getProcessedConnectors();
+				List<Long> requesIds = null;
+				if (scrape){					
+					if (auth!=null){
+						String username = auth.getName();
+						requesIds = this.scrapeProduct(username,result,true,false);
+						result = checkProduct(result, requesIds);
+					}
 				}
+				
+				logger.info("DESCRIPTION: " + result.getDescription());
+				
 				
 				return SerializableProduct.cloneProduct(result,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
 			} else {
@@ -546,48 +614,96 @@ public class ProductController  extends CollectiblesController{
 		
 	}
 	
+	
+	@Secured(value = { "ROLE_ADMIN" })
+	@RequestMapping(value="/product/create/from/{connectorName}/user/{userId}/tohierarchy/{hierarchy}", method = RequestMethod.POST)
+	public Boolean reProcessAll(
+			@PathVariable String userId,
+			@PathVariable String connectorName,
+			@PathVariable String hierarchy) throws CollectiblesException{
+		Future<Boolean> result = null;
+		
+		Long hierarchyId = super.getId(hierarchy);
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = null;
+		if (auth!=null){
+			logger.info("Searching for user: " + auth.getPrincipal());
+			user = userRepository.findOne((String) auth.getPrincipal());
+			logger.info("Found user: " + user);
+		}
+		if (user!=null){
+			if (hierarchyId!=null){
+				logger.info("Searching for hierarchy: " + hierarchyId);
+				HierarchyNode hierarchyNode = hierarchyRepository.findOne(hierarchyId);
+				logger.info("Found hierarchy: " + hierarchyNode);
+				if (hierarchyNode!=null){								
+					ProductInfoConnector connector = connectorFactory.getConnector(connectorName);
+					if (connector!=null){						
+						result = processOwnershipItems.run(user, hierarchyNode, userId, productRepository, imageRepository, authorRepository, connector);												
+					} else {
+						throw new IncorrectParameterException(new String[]{"connector"});
+					}
+				}else {
+					throw new NotFoundException(new String[]{"hierarchy"});
+				}
+			} else {
+				throw new IncorrectParameterException(new String[]{"hierarchy"});
+			}
+		} else {
+			throw new NotFoundException(new String[]{"user"});
+		}
+				
+		return Boolean.TRUE;
+	}
+	
 	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/all/reprocess/", method = RequestMethod.POST)
 	public Boolean reProcessAll(){
-		
-		List<Product> products = productRepository.findAll();
-		Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors();
-		logger.info("Connectors: " + connectors);
-		if (connectors!=null) {
-			Iterator<ProductInfoConnector> iterator = connectors.iterator();
-			while (iterator.hasNext()){
-				ProductInfoConnector connector = iterator.next();
-				if (connector!=null){
-					connector.processInBackground(products);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth!=null){
+			String username = auth.getName();
+			List<Product> products = productRepository.findAll();
+			Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors();						
+			List<ScrapeRequest> scrapeRequests = new ArrayList<>();
+			if (connectors!=null){							
+				for (ProductInfoConnector connector: connectors){
+					for (Product product : products){
+						ScrapeRequest scrape = createScrapeForProduct(username,product, connector.getIdentifier(), false, false);
+						scrapeRequests.add(scrape);
+						
+					}
 				}
-			}				
+			}
+			scrapeRequestRepository.save(scrapeRequests);
 		}
-
 		return Boolean.TRUE;
 	}
 	
 	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/all/update/prices/", method = RequestMethod.POST)
 	public Boolean updatePricessAll(){
-		
-		List<Product> products = productRepository.findAll();
-		for (Product product: products){
-			product.setDollarPrice(null);
-			product.setMinPrice(null);			
-		}
-		productRepository.save(products);
-		Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors();
-		logger.info("Connectors: " + connectors);
-		if (connectors!=null) {
-			Iterator<ProductInfoConnector> iterator = connectors.iterator();
-			while (iterator.hasNext()){
-				ProductInfoConnector connector = iterator.next();
-				if (connector!=null){					
-					connector.processPricesInBackground(products);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth!=null){
+			String username = auth.getName();
+			List<Product> products = productRepository.findAll();
+			for (Product product: products){
+				product.setDollarPrice(null);
+				product.setMinPrice(null);			
+			}
+			productRepository.save(products);
+			Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(true);						
+			List<ScrapeRequest> scrapeRequests = new ArrayList<>();
+			if (connectors!=null){							
+				for (ProductInfoConnector connector: connectors){
+					for (Product product : products){
+						ScrapeRequest scrape = createScrapeForProduct(username, product, connector.getIdentifier(), false, true);
+						scrapeRequests.add(scrape);					
+					}
 				}
-			}				
+			}
+			scrapeRequestRepository.save(scrapeRequests);
 		}
-
 		return Boolean.TRUE;
 	}
 	

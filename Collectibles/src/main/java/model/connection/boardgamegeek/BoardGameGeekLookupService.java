@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,9 +56,9 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 			
 	@Autowired
 	public BoardGameGeekLookupService(
-			@Value("${ENDPOINTv1}")String ENDPOINTv1,
-			@Value("${ENDPOINTv2}")String ENDPOINTv2,
-			@Value("${PRODUCT_URL}")String PRODUCT_URL){
+			@Value("${BOARDGAMEGEEK.ENDPOINTv1}")String ENDPOINTv1,
+			@Value("${BOARDGAMEGEEK.ENDPOINTv2}")String ENDPOINTv2,
+			@Value("${BOARDGAMEGEEK.PRODUCT_URL}")String PRODUCT_URL){
 		this.PRODUCT_URL = PRODUCT_URL;
 		this.ENDPOINTv1 = ENDPOINTv1;
 		this.ENDPOINTv2 = ENDPOINTv2;
@@ -123,14 +125,8 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	@Override
 	public Document fetchDocFromProduct(Product product)
 			throws TooFastConnectionException, FileNotFoundException {
-		String reference = null;
-		if (product.getConnectorReferences()!=null && product.getConnectorReferences().get(this.getIdentifier())!=null){
-			reference = product.getConnectorReferences().get(this.getIdentifier());		
-		}
-		if (reference==null || "".equals(reference.trim())){
-			reference = product.getUniversalReference();
-		}
-
+		String reference = this.getReferenceFromProduct(product);
+		
 		if (reference==null && product.getName()!=null){
 			reference = getIdFromName(product.getName());			
 		}
@@ -149,7 +145,7 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	}
 
 	@Override
-	public byte[] getImageData(Document doc) throws TooFastConnectionException {
+	public byte[] getMainImageData(Document doc) throws TooFastConnectionException {
 		byte[] image = null;
 		String imageUrl = super.getField(doc, imageUrlDocPath);
 		if (imageUrl!=null) {
@@ -168,17 +164,21 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	}
 
 	@Override
-	public Integer getPublicationYear(Document doc) throws TooFastConnectionException {
+	public Date getPublicationDate(Document doc) throws TooFastConnectionException {
+		Date date = null;
 		Integer year = null;
 		String yearString = super.getAttribute(doc, yearPublishedDocPath, yearPublishedAttribute);
 		if (yearString!=null){
 			try {
 				year = Integer.parseInt(yearString);
+				
+				date = super.getDateFromYear(year);
+				
 			}catch (Exception e){
 				logger.error("Publisher year is not integer", e);
 			}
 		}
-		return year;
+		return date;
 	}
 
 	@Override
@@ -240,6 +240,19 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	@Override
 	public String getReference(Document doc) throws TooFastConnectionException {
 		return super.getAttribute(doc, referenceDocPath, referenceAttribute);
+	}
+
+	@Override
+	public List<byte[]> getAdditionalImageData(Document doc)
+			throws TooFastConnectionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getName(Document doc) throws TooFastConnectionException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

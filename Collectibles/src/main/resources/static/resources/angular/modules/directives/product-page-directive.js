@@ -10,6 +10,7 @@
 				editable: "=",
 				forbidedit: "=",
 				isAuthenticated: "&",
+				isLoggedIn: "&",
 				isAdmin: "&"
 			},
 			link: function(scope,element,attrs){

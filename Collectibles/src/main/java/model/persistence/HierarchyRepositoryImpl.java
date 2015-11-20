@@ -59,7 +59,7 @@ public class HierarchyRepositoryImpl implements HierarchyRepositoryCustom{
 		HierarchyNode node = hierarchyRepository.findOne(id);
 		if (node!=null && node.getFather()!=null){
 			this.deleteCascade(node);
-		} else if (node.getFather()==null){
+		} else if (node!=null && node.getFather()==null){
 			throw new InvalidParameterException("Can't delete root");
 		}
 	}

@@ -4,7 +4,8 @@
 		
 		$httpProvider.interceptors.push('httpInjectProgress')
 		$httpProvider.interceptors.push('httpInjectAuth');
-
+		$httpProvider.interceptors.push('httpInjectParserMessage');
+		
 		var routerConfig = this;
 
 		this.secured = function($location,$q,Auth){

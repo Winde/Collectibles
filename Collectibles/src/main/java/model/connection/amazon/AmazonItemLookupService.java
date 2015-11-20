@@ -23,6 +23,7 @@ package model.connection.amazon;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,13 +78,13 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	
 	@Autowired
 	public AmazonItemLookupService(
-			@Value("${AWS_ACCESS_KEY_ID}")String AWS_ACCESS_KEY_ID,
-			@Value("${AWS_SECRET_KEY}")String AWS_SECRET_KEY,
-			@Value("${PROTOCOL}") String PROTOCOL,
-			@Value("${ENDPOINT}") String ENDPOINT,
-			@Value("${ASSOCIATE_TAG}")String ASSOCIATE_TAG,
-			@Value("${SERVICE_VERSION}") String VERSION,
-			@Value("${SERVICE}") String SERVICE ){
+			@Value("${AMAZON.AWS_ACCESS_KEY_ID}")String AWS_ACCESS_KEY_ID,
+			@Value("${AMAZON.AWS_SECRET_KEY}")String AWS_SECRET_KEY,
+			@Value("${AMAZON.PROTOCOL}") String PROTOCOL,
+			@Value("${AMAZON.ENDPOINT}") String ENDPOINT,
+			@Value("${AMAZON.ASSOCIATE_TAG}")String ASSOCIATE_TAG,
+			@Value("${AMAZON.SERVICE_VERSION}") String VERSION,
+			@Value("${AMAZON.SERVICE}") String SERVICE ){
 
 		this.AWS_SECRET_KEY = AWS_SECRET_KEY;
 		this.AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID;
@@ -232,7 +233,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		return this.getField(doc, publisherDocPath);
 	}
     
-	public byte[] getImageData(Document doc) throws TooFastConnectionException{
+	public byte[] getMainImageData(Document doc) throws TooFastConnectionException{
 		byte [] data = null;
 		String url = parseImageUrl(doc);
 		if (url!=null){
@@ -240,17 +241,11 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		}
 		return data;
 	}
-
+	
 	@Override
-	public Document fetchDocFromProduct(Product product) throws TooFastConnectionException, FileNotFoundException {
-		this.getSearchByName(product.getName());
+	public Document fetchDocFromProduct(Product product) throws TooFastConnectionException, FileNotFoundException {		
 		String reference = null;
-		if (product.getConnectorReferences()!=null && product.getConnectorReferences().get(this.getIdentifier())!=null){
-			reference = product.getConnectorReferences().get(this.getIdentifier());		
-		}
-		if (reference==null || "".equals(reference.trim())){
-			reference = product.getUniversalReference();
-		}
+		reference = this.getReferenceFromProduct(product);
 		if (reference==null){			
 			reference = this.getReferenceByName(product.getName());
 			if (reference!=null){
@@ -266,7 +261,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	}
 
 	@Override
-	public Integer getPublicationYear(Document doc)
+	public Date getPublicationDate(Document doc)
 			throws TooFastConnectionException {
 		return null;
 	}
@@ -328,6 +323,19 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	@Override
 	public String getReference(Document doc) throws TooFastConnectionException {
 		return super.getField(doc, amazonReferencePath);
+	}
+
+	@Override
+	public List<byte[]> getAdditionalImageData(Document doc)
+			throws TooFastConnectionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getName(Document doc) throws TooFastConnectionException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

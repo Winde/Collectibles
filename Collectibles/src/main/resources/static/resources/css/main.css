@@ -1,6 +1,6 @@
 body { 
 	/*Needed for navbar-fixed-top */
-	padding-top: 40px; 
+	padding-top: 50px; 
 }
 
 .editButton {
@@ -144,6 +144,9 @@ body {
 .hierarchy-tree .depth6 {	padding-left: 90px; }
 .hierarchy-tree .depth7 {	padding-left: 105px; }
 
+.uploadProductForm{
+	margin-bottom: 20px;
+}
 
 .createProductForm {
 	clear: both;

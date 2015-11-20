@@ -1,8 +1,14 @@
 package main;
 
+import java.util.concurrent.ScheduledExecutorService;
+
 import javax.persistence.PersistenceContextType;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
+
+import model.connection.ContinuousScrapper;
+import model.connection.amazon.AmazonConnector;
+import model.connection.goodreads.GoodReadsConnector;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -23,6 +29,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -53,7 +62,10 @@ import configuration.security.jwt.TokenAuthenticationService;
 @PropertySource("classpath:amazon.properties")
 @PropertySource("classpath:goodreads.properties")
 @PropertySource("classpath:boardgamegeek.properties")
+@PropertySource("classpath:steam.properties")
 @EnableTransactionManagement
+@EnableAsync
+@EnableScheduling
 public class CollectiblesApplication {
 
 	@Autowired
@@ -94,6 +106,13 @@ public class CollectiblesApplication {
         commonsMultipartResolver.setMaxUploadSize(-1);
         return commonsMultipartResolver;
     }
-    
 
+
+    @Bean
+    public ScheduledExecutorFactoryBean executorService() {
+        ScheduledExecutorFactoryBean bean = new ScheduledExecutorFactoryBean();
+        bean.setThreadNamePrefix("schedule-");
+        bean.setPoolSize(10);
+        return bean;
+    }
 }

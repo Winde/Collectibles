@@ -1,7 +1,10 @@
 package model.connection.drivethrurpg;
 
+import java.util.List;
+
 import model.connection.AbstractProductInfoConnector;
 import model.connection.ProductInfoLookupService;
+import model.connection.TooFastConnectionException;
 import model.dataobjects.Product;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,20 +21,23 @@ public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 	public ProductInfoLookupService getImageLookupService(){
 		return itemLookup;
 	}
-	
-	@Override
-	public String getIdentifier() { 
-		return itemLookup.getIdentifier();
-	}
-	
+
 
 	public String toString(){
 		return "DrivethruRPGConnector";
 	}
 
-	@Override
 	public boolean isApplicable(Product product) {
-		return product!=null && (product.getName()!=null || (product.getExternalLinks()!=null && product.getExternalLinks().get(this.getIdentifier())!=null));
+		String link = null;
+		String name = null;
+		if (product!=null){
+			if (product.getExternalLinks()!=null){
+				link = product.getExternalLinks().get(this.getIdentifier());
+			}
+			name = product.getName();
+		}
+		
+		return ((name!=null && !"".equals(name.trim())) || (link!=null && !"".equals(link.trim())));	
 	}
 
 	@Override
@@ -47,5 +53,18 @@ public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 	@Override
 	public Integer sleepBetweenCalls() {
 		return SLEEP_BETWEEN_CALLS;
+	}
+
+	@Override
+	public List<String> getOwnedReferences(String userId)
+			throws TooFastConnectionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public boolean supportsPrices() {
+		return true;
 	}
 }

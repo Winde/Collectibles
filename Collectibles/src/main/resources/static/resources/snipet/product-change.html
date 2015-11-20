@@ -90,7 +90,7 @@
 			></textarea>
 	</div>
 	
-	
+	<span class="btn btn-default" ng-if="product.id" ng-click="productChangeCtrl.pullProduct(product.id)" >Refresh</span>
 	<button class="btn btn-default" ng-if="product.id && productChangeCtrl.canCreateNew()" ng-click="productChangeCtrl.newProduct()" >New Product</button>
 	<span class="btn btn-default" ng-if="product.id" ng-click="productChangeCtrl.refreshScrape()" >Scrape</span>	
 	<button class="btn btn-default" type="submit" value="Submit">Save</button>			

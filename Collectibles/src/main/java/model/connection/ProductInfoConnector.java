@@ -3,13 +3,9 @@ package model.connection;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import model.dataobjects.Product;
-import model.persistence.AuthorRepository;
-import model.persistence.ImageRepository;
-import model.persistence.ProductRepository;
+
+import org.springframework.transaction.annotation.Transactional;
 
 public interface ProductInfoConnector {
 
@@ -23,11 +19,15 @@ public interface ProductInfoConnector {
 	@Transactional
 	public boolean updateProductTransaction(Product product) throws TooFastConnectionException;
 	
+	boolean updateProductTransaction(Product product, boolean save) throws TooFastConnectionException;
+	
 	@Transactional
 	boolean updatePriceTransaction(Product product) throws TooFastConnectionException;
-		
+	
 	public boolean updatePrice(Product product)  throws TooFastConnectionException;
 	
+	public List<String> getOwnedReferences(String userId) throws TooFastConnectionException;
+			
 	public String getIdentifier();
 	
 	public boolean isApplicable(Product product);
@@ -38,5 +38,12 @@ public interface ProductInfoConnector {
 
 	public boolean canCreateLinks();
 
+	public boolean supportsPrices();
+	
 	public Integer sleepBetweenCalls();
+
+	
+	
+	
+	
 }

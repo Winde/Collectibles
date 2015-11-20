@@ -1,7 +1,10 @@
 package model.connection.amazon;
 
+import java.util.List;
+
 import model.connection.AbstractProductInfoConnector;
 import model.connection.ProductInfoLookupService;
+import model.connection.TooFastConnectionException;
 import model.dataobjects.Product;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,22 +22,15 @@ public class AmazonConnector extends AbstractProductInfoConnector {
 		return itemLookup;
 	}
 
-	@Override
-	public String getIdentifier() {
-		return itemLookup.getIdentifier();
-	}
-
 	public String toString(){
 		return "AmazonConnector";
 	}
 
 	@Override
 	public boolean isApplicable(Product product) {
-		return product!=null && (
-				product.getUniversalReference()!=null 
-				|| (product.getConnectorReferences()!=null && product.getConnectorReferences().get(this.getIdentifier())!=null)
-				|| product.getName()!=null
-		);
+		String reference = itemLookup.getReferenceFromProduct(product);
+		String name = product.getName();			
+		return ((name!=null && !"".equals(name.trim())) || (reference!=null && !"".equals(reference.trim())));	
 	}
 
 	@Override
@@ -50,6 +46,18 @@ public class AmazonConnector extends AbstractProductInfoConnector {
 	@Override
 	public Integer sleepBetweenCalls() {
 		return SLEEP_BETWEEN_CALLS;
+	}
+
+	@Override
+	public List<String> getOwnedReferences(String userId)
+			throws TooFastConnectionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean supportsPrices() {		
+		return true;
 	}
 
 }

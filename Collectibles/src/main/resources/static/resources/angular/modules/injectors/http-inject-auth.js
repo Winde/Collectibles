@@ -14,7 +14,7 @@
 			    			var session = Auth.getSession();
 			    			if (session!=null){
 			    				request.headers[Auth.getHeaderRequestParameter()] = session;
-			    				console.log("Injecting token expires "+ JSON.parse(atob(session.split(".")[0])).expires);
+			    				console.log("Injecting token expires: "+ JSON.parse(atob(session.split(".")[0])).expires);
 			    			}
 			    		}			 			    		
 			    		request.headers['X-Requested-With'] = 'XMLHttpRequest';		    	
@@ -26,7 +26,10 @@
 			    		
 		    		} else {
 		    			if (response.headers && response.headers(Auth.getHeaderResponseParameter())){
-			    			Auth.setStoredSession(response.headers(Auth.getHeaderResponseParameter()))		    			
+		    				var session = response.headers(Auth.getHeaderResponseParameter());
+		    				console.log(response);
+		    				console.log("Saving token, expires: " + JSON.parse(atob(session.split(".")[0])).expires);
+			    			Auth.setStoredSession(session)		    			
 			    		}
 		    		}
 		    		

@@ -266,7 +266,7 @@ public class Product extends SimpleIdDao{
 	}
 
 	public String toString(){
-		return "{" + this.getId() + " - " + this.getName() + " - " + this.getDescription() +"}";		
+		return "{" + this.getId() + " - " + this.getName() +"}";		
 	}
 
 	public String getPublisher() {

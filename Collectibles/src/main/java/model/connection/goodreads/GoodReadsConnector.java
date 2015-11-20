@@ -2,6 +2,7 @@ package model.connection.goodreads;
 
 import java.io.FileNotFoundException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import model.connection.AbstractProductInfoConnector;
@@ -45,11 +46,6 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 		return result;
 		
 	}
-	
-	@Override
-	public String getIdentifier() {
-		return itemLookup.getIdentifier();
-	}
 
 	public String toString(){
 		return "GoodReadsConnector";
@@ -57,9 +53,9 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 	
 	@Override
 	public boolean isApplicable(Product product) {
-		return product!=null && (product.getUniversalReference()!=null 
-				|| (product.getConnectorReferences()!=null && product.getConnectorReferences().get(this.getIdentifier())!=null)
-			);
+		String reference = itemLookup.getReferenceFromProduct(product);
+		String name = product.getName();
+		return ((name!=null && !"".equals(name.trim())) || (reference!=null && !"".equals(reference.trim())));	
 	}
 
 	@Override
@@ -75,5 +71,17 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 	@Override
 	public Integer sleepBetweenCalls() {
 		return SLEEP_BETWEEN_CALLS;
+	}
+
+	@Override
+	public List<String> getOwnedReferences(String userId)
+			throws TooFastConnectionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean supportsPrices() {
+		return false;
 	}
 }

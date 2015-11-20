@@ -1,6 +1,17 @@
 package model.connection;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+
+import javax.imageio.ImageIO;
+
+import model.dataobjects.Product;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -13,6 +24,19 @@ public abstract class AbstractProductInfoLookupService<E> implements ProductInfo
 	private static final int MAXIMUM_DISTANCE_TO_CONSIDER_MULTIPLE_RESULTS = 8;		
 	private static final int MAXIMUM_DISTANCE_TO_CONSIDER_SINGLE_RESULTS = 15;
 	
+	protected Date getDateFromYear(Integer year){
+		Date date = null;
+		if (year!=null){
+			Calendar calendar = Calendar.getInstance();
+			calendar.set(Calendar.DAY_OF_YEAR, 1);
+			calendar.set(Calendar.HOUR_OF_DAY, 12);
+			calendar.set(Calendar.MINUTE,0);
+			calendar.set(Calendar.SECOND,0);
+			calendar.set(Calendar.MILLISECOND,0);
+			date = calendar.getTime();
+		}
+		return date;
+	}
 	
 	
 	protected int selectName(List<String> productNames, String name){
@@ -23,13 +47,13 @@ public abstract class AbstractProductInfoLookupService<E> implements ProductInfo
 				
 				int distance = StringUtils.getLevenshteinDistance(name, productNames.get(i));							
 				
-				logger.info("Title to discriminate: " + productNames.get(i) + ", distance= " + distance);
+				logger.debug("Title to discriminate: " + productNames.get(i) + ", distance= " + distance);
 				
 				if (distance < minDistance || minDistance < 0){
-					logger.info("Could be current best");
-					logger.info("Distance < maximum for multiple? " + (distance <= MAXIMUM_DISTANCE_TO_CONSIDER_MULTIPLE_RESULTS));
-					logger.info("Distance < maximum for single? " + (distance <= MAXIMUM_DISTANCE_TO_CONSIDER_SINGLE_RESULTS));
-					logger.info("We have X results =  " + productNames.size());
+					logger.debug("Could be current best");
+					logger.debug("Distance < maximum for multiple? " + (distance <= MAXIMUM_DISTANCE_TO_CONSIDER_MULTIPLE_RESULTS));
+					logger.debug("Distance < maximum for single? " + (distance <= MAXIMUM_DISTANCE_TO_CONSIDER_SINGLE_RESULTS));
+					logger.debug("We have X results =  " + productNames.size());
 					if (
 						(distance <= MAXIMUM_DISTANCE_TO_CONSIDER_MULTIPLE_RESULTS)
 						||
@@ -45,5 +69,61 @@ public abstract class AbstractProductInfoLookupService<E> implements ProductInfo
 			logger.info("Selected "+productNames.get(selectedIndex)+" with distance ="+minDistance);
 		}
 		return selectedIndex;
+	}
+	
+	protected byte[] fetchImage(String url) throws TooFastConnectionException {
+		byte[] imageInByte = null;
+		if (url!=null){
+			URL imageURL = null;	
+			try {
+				imageURL = new URL(url);
+			} catch (MalformedURLException e) {				
+				logger.error("Malformed URL", e);				
+			}
+			if (imageURL!=null) {
+			    BufferedImage originalImage = null;
+				try {
+					originalImage = ImageIO.read(imageURL);
+				 } catch (IOException ioe) {	    		
+		    		if (ioe.getMessage()!=null && ioe.getMessage().contains("HTTP response code: 503")){
+		    			throw new TooFastConnectionException();	
+		    		} 
+		    		logger.error("Exception when obtaining image", ioe);		        	
+				}
+				if (originalImage!=null){	
+					boolean writeError = false;
+				    ByteArrayOutputStream baos=new ByteArrayOutputStream();				
+					try {
+						ImageIO.write(originalImage, "jpg", baos );
+					} catch (IOException e) {				
+						logger.error("Exception when writing image", e);
+						writeError = true;
+					}
+					if (!writeError){
+						imageInByte=baos.toByteArray();
+					}
+				}
+			}
+		}
+		 
+		return imageInByte;
+	}
+	
+	public List<String> getOwnedReferences(String userId){
+		return null;
+	}
+	
+	public String getReferenceFromProduct(Product product){
+		String reference = null;
+		if (product.getConnectorReferences()!=null){
+			reference = product.getConnectorReferences().get(this.getIdentifier());
+		}
+		if (reference==null || "".equals(reference.trim())){
+			reference = product.getUniversalReference();
+		}
+		if ("".equals(reference.trim())){
+			reference = null;
+		}
+		return reference;
 	}
 }

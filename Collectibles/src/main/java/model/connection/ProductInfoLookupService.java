@@ -1,7 +1,7 @@
 package model.connection;
 
 import java.io.FileNotFoundException;
-import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,18 +9,17 @@ import java.util.Set;
 import model.dataobjects.Author;
 import model.dataobjects.Product;
 
-import org.jsoup.nodes.Element;
-import org.w3c.dom.Document;
-
 public interface ProductInfoLookupService<E> {
 
 	public E fetchDocFromProduct(Product product) throws TooFastConnectionException, FileNotFoundException;
 	
-	public byte [] getImageData(E doc) throws TooFastConnectionException;
+	public byte [] getMainImageData(E doc) throws TooFastConnectionException;
+	
+	public List<byte []> getAdditionalImageData(E doc) throws TooFastConnectionException;
 	
 	public String getDescription(E doc) throws TooFastConnectionException;
 	
-	public Integer getPublicationYear(E doc) throws TooFastConnectionException;
+	public Date getPublicationDate(E doc) throws TooFastConnectionException;
 	
 	public Set<Author> getAuthors(E doc) throws TooFastConnectionException;
 	
@@ -35,4 +34,10 @@ public interface ProductInfoLookupService<E> {
 	public Double getRating(E doc) throws TooFastConnectionException;
 	
 	public String getReference(E doc) throws TooFastConnectionException;
+	
+	public List<String> getOwnedReferences(String userId) throws TooFastConnectionException;
+	
+	public String getName(E doc) throws TooFastConnectionException;
+	
+	public String getIdentifier();
 }
