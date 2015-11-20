@@ -6,7 +6,7 @@ import java.util.List;
 import model.dataobjects.Product;
 import model.dataobjects.inmemory.ScrapeRequest;
 import model.persistence.ProductRepository;
-import model.persistence.ScrapeRequestRepository;
+import model.persistence.queues.ScrapeRequestRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,53 +43,56 @@ public class ContinuousScrapper {
 			if (sleep == null || sleep < 200){
 				sleep = 1000;
 			}
-			
-			ScrapeRequest scrapeReq = null;			
-			List<ScrapeRequest> scrapeRequests = scrapeRequestRepository.findOldestByConnector(connector.getIdentifier());
-			if (scrapeRequests.size()>0){				
-				scrapeReq = scrapeRequests.get(0);
-				logger.info(connector.getIdentifier()+" Found scrapeReq: " + scrapeReq);
-			}
+								
+			ScrapeRequest scrapeReq = scrapeRequestRepository.findOldestByConnector(connector.getIdentifier());
+			logger.info("I'm awake" + connector.getIdentifier());
 			boolean processed = true;
-			if (scrapeReq!=null){
+			boolean markedAsCompleted = false;
+			try {
 				
-				try {
-					long start = new Date().getTime();
-					Product product = productRepository.findOne(scrapeReq.getProductId());
-					if (product!=null){
-						if (scrapeReq.isOnlyTransient()){					
-							connector.updatePriceTransaction(product);
-						} else{
-							connector.updateProductTransaction(product);
+				if (scrapeReq!=null){
+					
+					try {
+						long start = new Date().getTime();
+						Product product = productRepository.findOne(scrapeReq.getProductId());
+						if (product!=null){
+							if (scrapeReq.isOnlyTransient()){					
+								connector.updatePriceTransaction(product);
+							} else{
+								connector.updateProductTransaction(product);
+							}
+						} else {
+							logger.error(connector.getIdentifier() + " product is null");
 						}
-					} else {
-						logger.error(connector.getIdentifier() + " product is null");
+						logger.info(connector.getIdentifier() + " Execution took : " + (new Date().getTime()-start) + " ms");
+					} catch (TooFastConnectionException e) {
+						logger.error("Too Fast connection" + e);
+						processed = false;
+						sleepIfTooFast();
+					} catch (Exception e){
+						logger.error("Other exception "+ e);
+						e.printStackTrace();
+						processed = false;
 					}
-					logger.info(connector.getIdentifier() + " Execution took : " + (new Date().getTime()-start) + " ms");
-				} catch (TooFastConnectionException e) {
-					logger.error("Too Fast connection" + e);
-					processed = false;
-					sleepIfTooFast();
-				} catch (Exception e){
-					logger.error("Other exception "+ e);
-					e.printStackTrace();
-					processed = false;
 				}
-			}
-			
-			if (scrapeReq!=null){
 				
-				if (processed){			
-					scrapeRequestRepository.delete(scrapeReq);
-					logger.info("Processed scrapeReq: " + scrapeReq);
-				} else {
-					scrapeReq.setAttempts(scrapeReq.getAttempts()+1);
-					scrapeReq.setRequestTime(new Date());
-					if (scrapeReq.getAttempts()>MAX_ATTEMPTS_NUMBER){
-						scrapeRequestRepository.delete(scrapeReq);
+				if (scrapeReq!=null){
+					
+					if (processed){	
+						scrapeRequestRepository.markAsCompleted(scrapeReq);
+						markedAsCompleted = true;
+						logger.info("Processed scrapeReq: " + scrapeReq);
 					} else {
-						scrapeRequestRepository.save(scrapeReq);
+						scrapeReq.setAttempts(scrapeReq.getAttempts()+1);
+						scrapeReq.setRequestTime(new Date());
+						if (scrapeReq.getAttempts()<=MAX_ATTEMPTS_NUMBER){						
+							scrapeRequestRepository.save(scrapeReq);
+						}
 					}
+				}
+			}catch (Exception ex){
+				if (!markedAsCompleted){
+					scrapeRequestRepository.markAsCompleted(scrapeReq);
 				}
 			}
 			try {				

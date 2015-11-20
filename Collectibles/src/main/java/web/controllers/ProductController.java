@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -32,8 +34,8 @@ import model.persistence.CategoryValueRepository;
 import model.persistence.HierarchyRepository;
 import model.persistence.ImageRepository;
 import model.persistence.ProductRepository;
-import model.persistence.ScrapeRequestRepository;
 import model.persistence.UserRepository;
+import model.persistence.queues.ScrapeRequestRepository;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -97,16 +99,12 @@ public class ProductController  extends CollectiblesController{
 	private static final int MAX_PARSE_CHECKS = 6;//6;
 	private static final int MILISECONDS_BETWEEN_PARSE_CHECKS = 900; 
 	
-	private Product checkProduct(Product product, List<Long> requestIds) throws NotEnoughTimeToParseException{
+	private Product checkProduct(Product product, List<ScrapeRequest> requests) throws NotEnoughTimeToParseException{
 		int checks = 0;
-		while(checks<MAX_PARSE_CHECKS && requestIds != null && requestIds.size()>0){
+		boolean pending = true;
+		while(checks<MAX_PARSE_CHECKS && requests != null && requests.size()>0 && pending){
 			
-			Iterable<ScrapeRequest> requests = scrapeRequestRepository.findAll(requestIds);			
-			if (requests.iterator()==null || !requests.iterator().hasNext()){				
-				requestIds.clear();
-			} else {
-				logger.info("Still have requests, for example:" + requests.iterator().next());
-			}
+			pending = scrapeRequestRepository.checkPending(requests);			
 			try {
 				Thread.sleep(MILISECONDS_BETWEEN_PARSE_CHECKS);
 			} catch (InterruptedException e) {
@@ -142,39 +140,20 @@ public class ProductController  extends CollectiblesController{
 		return scrape;
 	}
 	
-	private List<Long> scrapeProduct(String username, Product product, boolean liveRequest, boolean onlyTransient){
+	private List<ScrapeRequest> scrapeProduct(String username, Product product, boolean liveRequest, boolean onlyTransient){
 		Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(product,onlyTransient);
 		List<ScrapeRequest> requests = new ArrayList<>();
 		if (connectors!=null) {
 			logger.info("Connectors: " + connectors);
 			ScrapeRequest scrape = null;
-			for (ProductInfoConnector connector: connectors) {					
-							
-				List<ScrapeRequest> scrapes = scrapeRequestRepository.findByProductIdAndConnector(product.getId(), connector.getIdentifier());
-				if (scrapes==null || scrapes.size()==0){					
-					scrape = createScrapeForProduct(username, product, connector.getIdentifier(), liveRequest, onlyTransient);
-					scrape = scrapeRequestRepository.save(scrape);
-					requests.add(scrape);
-				} else {
-					
-					for (ScrapeRequest request: requests){							
-						request.setOnlyTransient(onlyTransient);
-						request.setLiveRequest(liveRequest);							
-					}						
-					scrapeRequestRepository.save(requests);											
-					requests.addAll(scrapes);
-				}
-				
+			for (ProductInfoConnector connector: connectors) {											
+				scrape = createScrapeForProduct(username, product, connector.getIdentifier(), liveRequest, onlyTransient);
+				scrapeRequestRepository.save(scrape);
+				requests.add(scrape);
 			}									
 		}
 		
-		List<Long> requestIds = new ArrayList<>();
-		if (requests!=null){			
-			for (ScrapeRequest request: requests){
-				requestIds.add(request.getId());
-			}
-		}
-		return requestIds;		
+		return requests;		
 	}
 	
 	@RequestMapping(value="/product/find/{id}", method = RequestMethod.GET)
@@ -209,7 +188,7 @@ public class ProductController  extends CollectiblesController{
 			}
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (auth!=null){
-				List<Long> requestIds = this.scrapeProduct(auth.getName(),product,true,false);
+				List<ScrapeRequest> requestIds = this.scrapeProduct(auth.getName(),product,true,false);
 				product = checkProduct(product, requestIds);
 			}
 			return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));			
@@ -258,7 +237,6 @@ public class ProductController  extends CollectiblesController{
 							Product product = new Product();
 							if (name!=null && !"".equals(name.trim())){ product.setName(name); }
 							if (description!=null && !"".equals(description.trim())){ product.setDescription(description); }
-							if (reference!=null && !"".equals(reference.trim())){ product.setReference(reference); }
 							//if (owned !=null && owned.trim().equals("true")){product.setOwned(true); }
 							if (ISBN !=null && !"".equals(ISBN.trim())) { product.setUniversalReference(ISBN.replaceAll("-", "")); }
 							if (date!=null && !date.trim().equals("")){
@@ -413,8 +391,8 @@ public class ProductController  extends CollectiblesController{
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (auth!=null){
 				String username = null;
-				List<Long> requestIds = this.scrapeProduct(username, product,true,true);
-				product = checkProduct(product, requestIds);
+				List<ScrapeRequest> requests = this.scrapeProduct(username, product,true,true);
+				product = checkProduct(product, requests);
 			}
 			return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));			
 		}			
@@ -518,12 +496,11 @@ public class ProductController  extends CollectiblesController{
 
 				Product result = productRepository.save(product);
 				
-				List<Long> requesIds = null;
 				if (scrape){					
 					if (auth!=null){
 						String username = auth.getName();
-						requesIds = this.scrapeProduct(username,result,true,false);
-						result = checkProduct(result, requesIds);
+						List<ScrapeRequest> requests = this.scrapeProduct(username,result,true,false);
+						result = checkProduct(result, requests);
 					}
 				}
 				
@@ -663,16 +640,32 @@ public class ProductController  extends CollectiblesController{
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth!=null){
 			String username = auth.getName();
-			List<Product> products = productRepository.findAll();
+			logger.info("Querying all products in database");
+			List<Product> products = productRepository.findAll();			
 			Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors();						
-			List<ScrapeRequest> scrapeRequests = new ArrayList<>();
-			if (connectors!=null){							
-				for (ProductInfoConnector connector: connectors){
-					for (Product product : products){
-						ScrapeRequest scrape = createScrapeForProduct(username,product, connector.getIdentifier(), false, false);
-						scrapeRequests.add(scrape);
-						
+			List<ScrapeRequest> scrapeRequests = new LinkedList<>();
+			if (connectors!=null && products!=null){			
+				double i=0;
+				int loopCount = 0;
+				logger.info("Preparing to process "+products.size()+" products for "+ connectors.size() + " connectors");
+				
+				
+				int printCount = 0;
+				Iterator<Product> iterator = products.iterator();
+				while (iterator.hasNext()){
+					long currentTime = new Date().getTime();
+					Product product = iterator.next();
+					logger.info("Nexting one product took: " + (new Date().getTime()-currentTime)+ " ms");
+					for (ProductInfoConnector connector: connectors){						
+						ScrapeRequest scrape = createScrapeForProduct(username,product, connector.getIdentifier(), false, false);												
+						scrapeRequests.add(scrape);						
+						loopCount++;
 					}
+					if (i%10 == 0){
+						logger.info("Added "+((i/products.size())*100)+"% to queue");
+						logger.info("loop: " + loopCount);
+					}
+					i++;
 				}
 			}
 			scrapeRequestRepository.save(scrapeRequests);

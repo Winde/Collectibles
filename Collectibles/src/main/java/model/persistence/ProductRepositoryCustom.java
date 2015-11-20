@@ -3,9 +3,11 @@ package model.persistence;
 import java.util.Collection;
 import java.util.List;
 
+import javax.persistence.QueryHint;
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 
 import model.dataobjects.CategoryValue;
@@ -27,8 +29,10 @@ public interface ProductRepositoryCustom {
 	@Transactional
 	boolean removeImage(Product product, Long imageId);
 	
+	@QueryHints({ @QueryHint(name = "org.hibernate.fetchSize", value ="50") })
 	public Collection<Product> searchProduct(HierarchyNode node);
-	
+
+	@QueryHints({ @QueryHint(name = "org.hibernate.fetchSize", value ="50") })
 	public ObjectList<Product> searchProduct(ProductSearch search);
 	
 	@Transactional

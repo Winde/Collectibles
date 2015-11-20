@@ -1,15 +1,26 @@
 package model.dataobjects.inmemory;
 
+import java.io.IOException;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import model.dataobjects.SimpleIdDao;
+import model.persistence.queues.ScrapeRequestRedisRepository;
 
 @Entity(name="ScrapeRequest")
 public class ScrapeRequest extends SimpleIdDao{
 
+	private static final Logger logger = LoggerFactory.getLogger(ScrapeRequest.class);
+
+	
 	@Column(name="product_name")
 	private String productName;
 	
@@ -137,6 +148,28 @@ public class ScrapeRequest extends SimpleIdDao{
 		this.attempts = attempts;
 	}
 
+	public static ScrapeRequest fromJson(String json){
+		ObjectMapper mapper = new ObjectMapper();
+		ScrapeRequest value = null;
+		try {
+			value = mapper.readValue(json, ScrapeRequest.class);
+		} catch (IOException e) {
+			logger.error("Deserializing error from JSON",e);
+		}
+		return value;
+	}
+	
+	public static String toJson(ScrapeRequest request){
+		ObjectMapper mapper = new ObjectMapper();
+		String json = null;
+		try {
+			json = mapper.writeValueAsString(request);
+		} catch (JsonProcessingException e) {
+			logger.error("Serializing error to JSON",e);
+		}
+		return json;
+	}
+	
 	public String toString(){
 		return "{"+ this.getId() + " - " +  this.getConnector() + "}";
 	}

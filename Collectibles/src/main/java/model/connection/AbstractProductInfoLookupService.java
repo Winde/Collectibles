@@ -121,7 +121,7 @@ public abstract class AbstractProductInfoLookupService<E> implements ProductInfo
 		if (reference==null || "".equals(reference.trim())){
 			reference = product.getUniversalReference();
 		}
-		if ("".equals(reference.trim())){
+		if (reference!=null && "".equals(reference.trim())){
 			reference = null;
 		}
 		return reference;

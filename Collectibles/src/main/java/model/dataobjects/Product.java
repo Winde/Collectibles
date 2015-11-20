@@ -53,9 +53,6 @@ public class Product extends SimpleIdDao{
 	@BatchSize(size = 20)
 	private Set<CategoryValue> categoryValues;
 	
-	@Column(name="reference",unique=true )
-	private String reference = null;
-	
 	@Column(name="description")
 	@Lob @Basic	
 	private String description = null;
@@ -127,16 +124,6 @@ public class Product extends SimpleIdDao{
 	public Product(){
 		dollarPrice = new HashMap<>();
 	}
-	
-	public String getReference() {
-		return reference;
-	}
-
-
-	public void setReference(String reference) {
-		this.reference = reference;
-	}
-
 
 	public String getDescription() {
 		return description;
