@@ -89,8 +89,11 @@ public class ContinuousScrapper {
 						logger.info("NOT Processed scrapeReq: " + scrapeReq);
 						scrapeReq.setAttempts(scrapeReq.getAttempts()+1);
 						scrapeReq.setRequestTime(new Date());
-						if (scrapeReq.getAttempts()<=MAX_ATTEMPTS_NUMBER){						
+						if (scrapeReq.getAttempts()<=MAX_ATTEMPTS_NUMBER){
+							logger.info("Re-injecting to queue: " + scrapeReq);
 							scrapeRequestRepository.save(scrapeReq);
+						} else {
+							logger.info("Abandoning due to max requests: " + scrapeReq);
 						}
 					}
 					Boolean pending = scrapeRequestRepository.checkPending(scrapeReq);

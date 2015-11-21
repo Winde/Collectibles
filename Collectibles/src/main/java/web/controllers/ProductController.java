@@ -409,6 +409,10 @@ public class ProductController  extends CollectiblesController{
 		Product product = null;
 		if (serializableProduct !=null) { product = serializableProduct.deserializeProduct(); }
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = null;
+		if (auth!=null && auth.getName()!=null){
+			user = userRepository.findOne(auth.getName());
+		}
 		this.validate(product);
 		
 		if (product.getId()!=null){
@@ -434,15 +438,12 @@ public class ProductController  extends CollectiblesController{
 				//product.setConnectorReferences(productInDb.getConnectorReferences());
 
 				if (serializableProduct.getWished()!=null){
-					if (auth!=null){
-						User user = new User();
-						user.setUsername(auth.getName());
+					if (user!=null){
 						if (!serializableProduct.getWished()) {
 							if (product.getWishers()!=null){
 								product.getWishers().remove(user);
 							}
 						} else {
-							user = userRepository.findOne(user.getUsername());
 							Set<User> owners = product.getWishers();
 							if (owners==null){
 								owners = new HashSet<>();
@@ -455,15 +456,12 @@ public class ProductController  extends CollectiblesController{
 				
 				if (serializableProduct.getOwnedAnotherLanguage()!=null){
 					
-					if (auth!=null){
-						User user = new User();
-						user.setUsername(auth.getName());
+					if (user!=null){
 						if (!serializableProduct.getOwnedAnotherLanguage()) {
 							if (product.getOwnersOtherLanguage()!=null){
 								product.getOwnersOtherLanguage().remove(user);
 							}
 						} else {
-							user = userRepository.findOne(user.getUsername());
 							Set<User> owners = product.getOwnersOtherLanguage();
 							if (owners==null){
 								owners = new HashSet<>();
@@ -475,15 +473,12 @@ public class ProductController  extends CollectiblesController{
 				}
 				
 				if (serializableProduct.getOwned()!=null){
-					if (auth!=null){
-						User user = new User();
-						user.setUsername(auth.getName());
+					if (user!=null){
 						if (!serializableProduct.getOwned()) {
 							if (product.getOwners()!=null){
 								product.getOwners().remove(user);
 							}
 						} else {
-							user = userRepository.findOne(user.getUsername());
 							Set<User> owners = product.getOwners();
 							if (owners==null){
 								owners = new HashSet<>();

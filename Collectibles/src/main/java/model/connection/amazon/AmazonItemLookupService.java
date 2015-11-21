@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import model.connection.ProductInfoLookupServiceXML;
@@ -63,9 +64,11 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	private final String publisherDocPath = "/ItemLookupResponse/Items/Item/ItemAttributes/Publisher";
 	private final String dollarPriceNewPath = "/ItemLookupResponse/Items/Item/OfferSummary/LowestNewPrice/Amount";
 	private final String dollarPriceUsedPath = "/ItemLookupResponse/Items/Item/OfferSummary/LowestUsedPrice/Amount";
+	private final String dollarPriceCollectiblePath = "/ItemLookupResponse/Items/Item/OfferSummary/LowestCollectiblePrice/Amount";
 	private final String amazonReferencePath = "/ItemLookupResponse/Items/Item/ASIN";
 	
 	private final int sleepTimeBetwenCheckByNameAndCheckById = 500;
+	
 	
 	
 	private void sleepDueToAmazonMaxChecksPerMinute(){
@@ -280,30 +283,24 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	@Override
 	public Map<String, Long> getDollarPrice(Document doc) throws TooFastConnectionException {
 		Map<String,Long> result = null;
+		Map<String,String> stringPrices = new HashMap<>();		
 		String newField = this.getField(doc, dollarPriceNewPath);
 		String usedField = this.getField(doc, dollarPriceUsedPath);
-		if (newField!=null || usedField!=null){
+		String collectibleField = this.getField(doc, dollarPriceCollectiblePath);
+		if (newField!=null) { stringPrices.put("New", newField); }
+		if (usedField!=null) { stringPrices.put("Used", usedField); }
+		if (collectibleField!=null) { stringPrices.put("Collectible", collectibleField); }
+		if (stringPrices!=null && !stringPrices.isEmpty()){
 			result = new HashMap<>();
-			if (newField!=null){
-				Long newPrice = null;
+			for (Entry<String,String> entry : stringPrices.entrySet()){
+				Long price = null;
 				try {
-					newPrice = Long.parseLong(newField);
-				}catch(Exception e) {
+					price = Long.parseLong(entry.getValue());
+				}catch (Exception e){
 					logger.error("Amazon price is not long? ", e);
 				}
-				if (newPrice!=null){
-					result.put("New", newPrice);
-				}
-			}
-			if (usedField!=null){
-				Long usedPrice = null;
-				try {
-					usedPrice = Long.parseLong(usedField);
-				}catch(Exception e) {
-					logger.error("Amazon price is not long? ", e);
-				}
-				if (usedPrice!=null){
-					result.put("Used", usedPrice);
+				if (price!=null){
+					result.put(entry.getKey(), price);
 				}
 			}			
 		}

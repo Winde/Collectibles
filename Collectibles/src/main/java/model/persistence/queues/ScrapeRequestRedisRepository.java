@@ -40,13 +40,14 @@ public class ScrapeRequestRedisRepository implements ScrapeRequestRepository {
 		try {			
 			List<String> value = jedis.brpop(POP_TIMEOUT,connectionManager.createUri(QUEUE_PREFIX, connector));			
 			
-			logger.info("POP: " + value);
+			//logger.debug("POP: " + value);
 			
 			if (value!=null && value.size()>=2){
 				String json = value.get(1);
 				request = ScrapeRequest.fromJson(json);
 				if (request!=null && request.getProductId()!=null){
-					jedis.srem(SET_PREFIX +request.getConnector(), request.getProductId().toString());
+					Long returnValue = jedis.srem(connectionManager.createUri(SET_PREFIX, connector), request.getProductId().toString());
+					logger.debug("REM FROM SET: " + request.getProductId().toString() +": removed " + returnValue + " values");
 				}
 			}
 		} catch(Exception e) {
