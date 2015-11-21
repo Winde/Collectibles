@@ -26,10 +26,16 @@
 			    		
 		    		} else {
 		    			if (response.headers && response.headers(Auth.getHeaderResponseParameter())){
-		    				var session = response.headers(Auth.getHeaderResponseParameter());
 		    				console.log(response);
-		    				console.log("Saving token, expires: " + JSON.parse(atob(session.split(".")[0])).expires);
-			    			Auth.setStoredSession(session)		    			
+		    				var newSession = response.headers(Auth.getHeaderResponseParameter());		    				
+		    				var currentSession = Auth.getSession();
+		    				if (currentSession==null || currentSession == undefined){
+		    					Auth.setStoredSession(newSession);	
+		    				} else if (newSession!=null || newSession == undefined){
+		    					
+		    				} else if (Auth.getExpires(newSession) && Auth.getExpires(newSession)>Auth.getExpires(currentSession)){
+		    					Auth.setStoredSession(newSession);
+		    				}			    					    			
 			    		}
 		    		}
 		    		

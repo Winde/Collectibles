@@ -46,13 +46,15 @@ public class ContinuousScrapper {
 				sleep = 1000;
 			}
 								
-			ScrapeRequest scrapeReq = scrapeRequestRepository.findOldestByConnector(identifier);
+			//logger.info(identifier + " Scanning");
+			ScrapeRequest scrapeReq = scrapeRequestRepository.findOldestByConnector(identifier);			
+			
 			boolean processed = true;
 			boolean markedAsCompleted = false;
 			try {
 				
 				if (scrapeReq!=null){
-					
+					logger.info(identifier + " found " + scrapeReq);					
 					try {
 						long start = new Date().getTime();
 						Product product = productRepository.findOne(scrapeReq.getProductId());
@@ -84,13 +86,18 @@ public class ContinuousScrapper {
 						markedAsCompleted = true;
 						logger.info("Processed scrapeReq: " + scrapeReq);
 					} else {
+						logger.info("NOT Processed scrapeReq: " + scrapeReq);
 						scrapeReq.setAttempts(scrapeReq.getAttempts()+1);
 						scrapeReq.setRequestTime(new Date());
 						if (scrapeReq.getAttempts()<=MAX_ATTEMPTS_NUMBER){						
 							scrapeRequestRepository.save(scrapeReq);
 						}
 					}
+					Boolean pending = scrapeRequestRepository.checkPending(scrapeReq);
+					logger.info("Finished scraping, still pending? " + pending);
 				}
+				
+				
 			}catch (Exception ex){
 				if (!markedAsCompleted){
 					scrapeRequestRepository.markAsCompleted(scrapeReq);

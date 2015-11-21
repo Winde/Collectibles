@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Transaction;
 
 @Component
 public class ScrapeRequestRedisRepository implements ScrapeRequestRepository {
@@ -35,15 +36,18 @@ public class ScrapeRequestRedisRepository implements ScrapeRequestRepository {
 	@Override
 	public ScrapeRequest findOldestByConnector(String connector) {
 		ScrapeRequest request = null;	
-		boolean executed = true;
 		Jedis jedis = open();
-		try {
+		try {			
+			List<String> value = jedis.brpop(POP_TIMEOUT,connectionManager.createUri(QUEUE_PREFIX, connector));			
 			
-			List<String> value = jedis.brpop(POP_TIMEOUT,QUEUE_PREFIX + connector);
+			logger.info("POP: " + value);
 			
 			if (value!=null && value.size()>=2){
 				String json = value.get(1);
-				request = ScrapeRequest.fromJson(json);											
+				request = ScrapeRequest.fromJson(json);
+				if (request!=null && request.getProductId()!=null){
+					jedis.srem(SET_PREFIX +request.getConnector(), request.getProductId().toString());
+				}
 			}
 		} catch(Exception e) {
 			logger.error("Exception while Jedis",e);			
@@ -54,10 +58,15 @@ public class ScrapeRequestRedisRepository implements ScrapeRequestRepository {
 	
 	public boolean markAsCompleted(ScrapeRequest request) {
 		Jedis jedis = open();
-		boolean executed = true;
-		try {
-			
-			jedis.srem(SET_PREFIX +request.getConnector(), request.getProductId().toString());
+		boolean executed = true;		
+		try {			
+			if (request.getProductId()!=null){
+				String connector = request.getConnector();
+				jedis.srem(connectionManager.createUri(SET_PREFIX, connector), request.getProductId().toString());
+				boolean isStillPending = checkPendingWithConnection(request,jedis);
+				logger.debug("Removing from set");
+				
+			}
 		} catch(Exception e) {
 			logger.error("Exception while Jedis",e);
 			executed = false;
@@ -66,17 +75,29 @@ public class ScrapeRequestRedisRepository implements ScrapeRequestRepository {
 		return executed;
 	}
 
-	private ScrapeRequest saveWithConnection(ScrapeRequest scrapeReq, Jedis jedis){			
+	private ScrapeRequest saveWithConnection(ScrapeRequest scrapeReq, Jedis jedis){
+		String connector = scrapeReq.getConnector();
+		String key = null;
+		if (scrapeReq!=null && scrapeReq.getProductId()!=null){
+			key = scrapeReq.getProductId().toString();
+		}
 		boolean pending = checkPendingWithConnection(scrapeReq,jedis);
+		logger.debug("Request: " + scrapeReq + " is pending?" + pending);
 		if (!pending){
 			String json = ScrapeRequest.toJson(scrapeReq);
 			if (json!=null){
-				if (scrapeReq.isLiveRequest()){		
-					jedis.rpush(QUEUE_PREFIX + scrapeReq.getConnector(), json);
-				} else {
-					jedis.lpush(QUEUE_PREFIX + scrapeReq.getConnector(), json);
+				Transaction multi = jedis.multi();				
+				if (key!=null){					
+					multi.sadd(connectionManager.createUri(SET_PREFIX, connector), key);
 				}
-				jedis.sadd(SET_PREFIX + scrapeReq.getConnector(), scrapeReq.getProductId().toString());
+				
+				if (scrapeReq.isLiveRequest()){		
+					multi.rpush(connectionManager.createUri(QUEUE_PREFIX, connector), json);
+				} else {					
+					multi.lpush(connectionManager.createUri(QUEUE_PREFIX, connector), json);
+				}
+				
+				multi.exec();
 			}
 		}
 		return scrapeReq;
@@ -116,7 +137,8 @@ public class ScrapeRequestRedisRepository implements ScrapeRequestRepository {
 		boolean pending = false;
 		String json = ScrapeRequest.toJson(request);
 		if (json!=null){
-			Boolean isMember = jedis.sismember(SET_PREFIX + request.getConnector(), request.getProductId().toString());
+			String connector = request.getConnector();
+			Boolean isMember = jedis.sismember(connectionManager.createUri(SET_PREFIX, connector), request.getProductId().toString());
 			if (isMember!=null){
 				pending = isMember;
 			}			

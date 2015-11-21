@@ -75,6 +75,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					logger.info(this.getIdentifier()+" obtained prices: " + prices);
 					
 					if (product.getDollarPrice()!=null){
+						boolean modifiedMinPrice = false;
 						Set<Entry<String, Long>> entries = product.getDollarPrice().entrySet();
 						if (entries!=null){
 							Iterator<Entry<String, Long>> iterator = entries.iterator();
@@ -82,8 +83,12 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 								String key = iterator.next().getKey();
 								if (key!=null && key.startsWith(this.getIdentifier())){
 									iterator.remove();
+									modifiedMinPrice = true;
 								}
 							}
+						}
+						if (modifiedMinPrice){
+							product.calculateMinDollarPrice();
 						}
 					}
 					
@@ -95,6 +100,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 							}
 							product.setDollarPrice(key,priceEntry.getValue());
 						}
+						updated = true;
 					} 
 				}
 			}

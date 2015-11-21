@@ -30,6 +30,10 @@ public class RedisConnectionManager {
 		this.databaseNumber  = databaseNumber;
 	}
 	
+	public String createUri(String type, String name){
+		return this.prefix + type + name;
+	}
+	
 	public RedisConnection connect(){	
 		
 		Jedis jedis = new Jedis(ip,port);		

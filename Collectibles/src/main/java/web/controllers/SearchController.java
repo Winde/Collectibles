@@ -3,14 +3,19 @@ package web.controllers;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import model.connection.ProductInfoConnector;
+import model.connection.ProductInfoConnectorFactory;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Product;
 import model.dataobjects.User;
+import model.dataobjects.inmemory.ScrapeRequest;
 import model.dataobjects.serializable.SerializableProduct;
 import model.dataobjects.serializable.SerializableProduct.ProductComplexView;
 import model.dataobjects.serializable.SerializableProduct.ProductListView;
@@ -19,10 +24,13 @@ import model.persistence.HierarchyRepository;
 import model.persistence.ProductRepository;
 import model.persistence.UserRepository;
 import model.persistence.queryParameters.ProductSearch;
+import model.persistence.queues.ScrapeRequestRepository;
 
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,11 +60,20 @@ public class SearchController extends CollectiblesController{
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private ProductInfoConnectorFactory connectorFactory;
+
+	@Autowired
+	private ScrapeRequestRepository scrapeRequestRepository;
+
 	
-	private final String defaultPaginationSize = "50";
+	private final String defaultPaginationSizeString = "50";
+	private final int defaultPaginationSize = 50;
+	private final int maxPaginationSize = 150;
 	
 	private ObjectList<SerializableProduct> findProduct(
-			String hierarchy, 
+			HierarchyNode hierarchyNode, 
 			String search, 
 			Collection<String> categoryValuesIds, 
 			String withImagesString,
@@ -66,8 +83,9 @@ public class SearchController extends CollectiblesController{
 			String wishedByString,
 			String sortBy,
 			String sortOrder,
-			int page,
-			int maxResults) throws CollectiblesException {
+			Integer page,
+			Integer maxResults,
+			boolean forcePagination) throws CollectiblesException {
 
 			Boolean withImages = null;			
 			Boolean withPrice = null;
@@ -75,10 +93,22 @@ public class SearchController extends CollectiblesController{
 			boolean errorReturnNoResults = false;
 			ProductSearch searchObject = new ProductSearch();
 			
-			searchObject.setSearchTerm(search);
+			searchObject.setSearchTerm(search);			
+			
+			if (forcePagination){
+				if (page==null ) {
+					page = 0;
+				}
+				if (maxResults == 0 || maxResults == null){
+					maxResults = defaultPaginationSize;
+				} else if (maxResults > maxPaginationSize){
+					maxResults = defaultPaginationSize;
+				}				
+			}
+			
 			searchObject.setPage(page);
 			searchObject.setMaxResults(maxResults);
-		
+			
 
 			Boolean owned = null;
 			
@@ -164,21 +194,9 @@ public class SearchController extends CollectiblesController{
 			
 			searchObject.setWithPrice(withPrice);
 			
-			HierarchyNode node = null;
-			if (hierarchy!=null && !"".equals(hierarchy.trim())){
-				Long hierarchyId = this.getId(hierarchy);
-				
-				if (hierarchyId==null){				
-					throw new IncorrectParameterException(new String[]{"hierarchy"});
-				} else {								
-					node = hierarchyRepository.findOne(hierarchyId);					
-					if (node==null){
-						throw new IncorrectParameterException(new String[]{"hierarchy"});
-					}
-				}
-			}
+
 			
-			searchObject.setHierarchy(node);
+			searchObject.setHierarchy(hierarchyNode);
 			
 						
 			List<CategoryValue> categoryValues = new ArrayList<>();
@@ -265,14 +283,14 @@ public class SearchController extends CollectiblesController{
 			@RequestParam(required=false, name="sortBy") String sortBy,
 			@RequestParam(required=false, name="sortOrder") String sortOrder,
 			@RequestParam(required=true, name="page") int page,
-			@RequestParam(required=false, name="maxResults") int maxResults) throws CollectiblesException{	
-		ObjectList<SerializableProduct> objects = findProduct(null,searchString,null,withImagesString,withPrice,owned,ownedBy,wishedBy,sortBy,sortOrder,page,maxResults);
+			@RequestParam(required=false, name="maxResults", defaultValue=defaultPaginationSizeString) int maxResults) throws CollectiblesException{					
+		ObjectList<SerializableProduct> objects = findProduct(null,searchString,null,withImagesString,withPrice,owned,ownedBy,wishedBy,sortBy,sortOrder,page,maxResults,true);
 		return objects;
 	}
 	
 	@JsonView(ProductListView.class)
 	@RequestMapping(value="/product/search/{hierarchy}/", method = RequestMethod.GET)
-	public ObjectList<SerializableProduct> searchCategory(HttpServletRequest request, 
+	public ObjectList<SerializableProduct> searchHierarchy(HttpServletRequest request, 
 			@PathVariable String hierarchy, 
 			@RequestParam(required=false, name="search") String searchString,
 			@RequestParam(required=false, name="withImages") String withImagesString,
@@ -284,10 +302,88 @@ public class SearchController extends CollectiblesController{
 			@RequestParam(required=false, name="sortBy") String sortBy,
 			@RequestParam(required=false, name="sortOrder") String sortOrder,
 			@RequestParam(required=true, name="page") int page,
-			@RequestParam(required=false, name="maxResults", defaultValue=defaultPaginationSize) int maxResults) throws CollectiblesException{					
-		ObjectList<SerializableProduct> objects = findProduct(hierarchy,searchString,categories,withImagesString,withPrice,owned,ownedBy,wishedBy,sortBy,sortOrder,page,maxResults);
-		return objects;
+			@RequestParam(required=false, name="maxResults", defaultValue=defaultPaginationSizeString) int maxResults) throws CollectiblesException{					
+		HierarchyNode node = null;
+		if (hierarchy!=null && !"".equals(hierarchy.trim())){
+			Long hierarchyId = this.getId(hierarchy);
+			
+			if (hierarchyId==null){				
+				throw new IncorrectParameterException(new String[]{"hierarchy"});
+			} else {								
+				node = hierarchyRepository.findOne(hierarchyId);					
+				if (node==null){
+					throw new IncorrectParameterException(new String[]{"hierarchy"});
+				}
+			}
+		}
 		
+		ObjectList<SerializableProduct> objects = findProduct(node,searchString,categories,withImagesString,withPrice,owned,ownedBy,wishedBy,sortBy,sortOrder,page,maxResults,true);		
+		return objects;	
+	}
+	
+	
+	@Secured(value = { "ROLE_ADMIN" })
+	@RequestMapping(value="/product/update/prices/{hierarchy}/", method = RequestMethod.POST)
+	public Boolean updatePricesHierarchy(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable String hierarchy, 
+			@RequestParam(required=false, name="search") String searchString,
+			@RequestParam(required=false, name="withImages") String withImagesString,
+			@RequestParam(required=false, name="owned" ) String owned,
+			@RequestParam(required=false, name="ownedBy" ) String ownedBy,
+			@RequestParam(required=false, name="wishedBy" ) String wishedBy,
+			@RequestParam(required=false, name="withPrice") String withPrice,
+			@RequestParam(required=false, name="categoryValues" ) List<String> categories) throws CollectiblesException{					
+		HierarchyNode node = null;
+		if (hierarchy!=null && !"".equals(hierarchy.trim())){
+			Long hierarchyId = this.getId(hierarchy);
+			
+			if (hierarchyId==null){				
+				throw new IncorrectParameterException(new String[]{"hierarchy"});
+			} else {								
+				node = hierarchyRepository.findOne(hierarchyId);					
+				if (node==null){
+					throw new IncorrectParameterException(new String[]{"hierarchy"});
+				}
+			}
+		}
+		
+		logger.info("WithPrice {"  + withPrice + " }");
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		if (auth!=null){
+			String username = auth.getName();
+			
+			ObjectList<SerializableProduct> objects = findProduct(node,searchString,categories,withImagesString,withPrice,owned,ownedBy,wishedBy,null,null,null,null,false);
+			if (objects!=null && objects.getObjects()!=null && objects.getObjects().size()>0){
+				
+				
+				Collection<SerializableProduct> products = objects.getObjects();
+				Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(node, true);
+				List<ScrapeRequest> scrapes = new ArrayList<>();
+				
+
+				for (ProductInfoConnector connector : connectors){
+					String connectorId = connector.getIdentifier();
+					for (SerializableProduct product: products){
+						ScrapeRequest scrape = new ScrapeRequest();		
+						scrape.setProductId(product.getId());
+						scrape.setOnlyTransient(true);
+						scrape.setLiveRequest(false);
+						scrape.setConnector(connectorId);
+						scrape.setUserId(username);
+						scrape.setRequestTime(new Date());
+						scrapes.add(scrape);						
+					}
+				}
+				
+				logger.info("SCRAPPING: " + scrapes);
+				scrapeRequestRepository.save(scrapes);
+				response.setStatus(HttpStatus.SC_PARTIAL_CONTENT);
+			}
+						
+			
+		}
+		return Boolean.TRUE;	
 	}
 }
 

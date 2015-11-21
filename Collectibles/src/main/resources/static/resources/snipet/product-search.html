@@ -37,7 +37,7 @@
 		
 	<ajax ng-show="processingSearch" ></ajax>
 	
-	
+	<span class="btn btn-default" ng-if="isAdmin() && products && products.length && products.length>0" ng-click="productListCtrl.updatePriceSearch()" >Update Prices</span>
 	
 	<div class="row">
 		

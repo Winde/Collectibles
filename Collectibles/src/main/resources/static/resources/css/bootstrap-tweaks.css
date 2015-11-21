@@ -1,3 +1,8 @@
+body { 
+	/*Needed for navbar-fixed-top */
+	padding-top: 50px; 
+}
+
 html.touchevents .btn.btn-default:hover,html.touchevents .btn.btn-default:focus {	
     background-color: #fff;
     border-color: #ccc;

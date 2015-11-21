@@ -64,6 +64,7 @@ import configuration.security.jwt.TokenAuthenticationService;
 @PropertySource("classpath:goodreads.properties")
 @PropertySource("classpath:boardgamegeek.properties")
 @PropertySource("classpath:steam.properties")
+@PropertySource("classpath:reddis.properties")
 @EnableTransactionManagement
 @EnableAsync
 @EnableScheduling

@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class TokenHandler {
 
 
-	private static final Logger logger = LoggerFactory.getLogger(StatelessLoginFilter.class);		
+	private static final Logger logger = LoggerFactory.getLogger(TokenHandler.class);		
 		
 	private static final String CIPHER_NAME = "AES/ECB/PKCS5Padding";
 	private static final String KEY_CIPHER = "AES";

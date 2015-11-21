@@ -1,3 +1,6 @@
 /amazon.properties
+/application.properties
 /boardgamegeek.properties
+/goodreads.properties
+/reddis.properties
 /steam.properties

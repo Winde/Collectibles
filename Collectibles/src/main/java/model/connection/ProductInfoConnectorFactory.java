@@ -90,6 +90,14 @@ public class ProductInfoConnectorFactory {
 		return connectorsForProduct;
 	}
 	
+	public Collection<ProductInfoConnector> getConnectors(HierarchyNode node, boolean supportsPrices){
+		Collection<ProductInfoConnector> connectorsForProduct = this.getConnectors(node);
+		if (supportsPrices){
+			filterSupportPrices(connectorsForProduct);
+		}
+		return connectorsForProduct;
+	}
+	
 	public Collection<ProductInfoConnector> getConnectors(Product product){
 		return this.getConnectors(product.getHierarchyPlacement());		
 	}

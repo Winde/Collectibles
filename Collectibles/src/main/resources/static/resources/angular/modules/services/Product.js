@@ -1,7 +1,7 @@
 (function(){
 	
 	angular.module('product')
-	.factory('Product', function ProductFactory($http,Upload){
+	.factory('Product', function ProductFactory($http,Upload,$httpParamSerializer){
 		var factory = this;
 		
 		this.cleanUpProduct = function cleanUpProduct(product){
@@ -66,7 +66,23 @@
 					progressbar: true,
 					params: searchObject
 				});
-			},			
+			},
+			updatePricesForSearch: function(searchObject){
+				var url = "/product/update/prices/";
+
+				if ( searchObject && searchObject.hierarchy){
+					url = url + searchObject.hierarchy + "/";
+				}
+				return $http({
+					url: url,
+					method: 'POST',
+					progressbar: true,
+					data: $httpParamSerializer(searchObject),		
+					headers: {
+					    'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				});
+			},
 			addImage: function(product,file){
 				var upload = Upload.upload({
 					url: '/product/'+product.id+'/image/add/',

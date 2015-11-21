@@ -287,6 +287,18 @@ public class Product extends SimpleIdDao{
 		this.dollarPrice = dollarPrice;
 	}
 
+	public Long calculateMinDollarPrice() {
+		Long newMinPrice = null;
+		Map<String, Long> map = this.getDollarPrice();
+		for (Long dollarPrice : map.values()) {
+			if (dollarPrice!=null && (newMinPrice == null || dollarPrice < newMinPrice)){
+				newMinPrice = dollarPrice;
+			}	
+		}
+		this.minPrice = newMinPrice;
+		return newMinPrice;
+	}
+	
 	public void setDollarPrice(String provider, Long dollarPrice) {
 		Map<String, Long> map = this.getDollarPrice();
 		if (map == null){
@@ -361,6 +373,7 @@ public class Product extends SimpleIdDao{
 	public void setWishers(Set<User> wishers) {
 		this.wishers = wishers;
 	}
+
 
 }
 

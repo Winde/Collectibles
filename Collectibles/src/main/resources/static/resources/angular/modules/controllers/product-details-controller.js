@@ -20,6 +20,7 @@
 		}
 		
 		this.updatePrices = function(id){
+			$scope.updatingPrice = true;
 			Product.updatePrice(id)
 			.success(function(data){			
 				$scope.product = Product.prepareProduct(data);				
@@ -27,7 +28,8 @@
 			.catch(function(){	
 				Message.alert("There was an error");
 			})
-			.finally(function(){			
+			.finally(function(){		
+				$scope.updatingPrice = false;
 			});
 		}
 		

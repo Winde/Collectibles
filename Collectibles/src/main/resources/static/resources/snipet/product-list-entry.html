@@ -16,10 +16,14 @@
 		</div>
 	</div>
 	<div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
-		<h3><span class="label label-success" ng-if="product.minPrice">{{(product.minPrice/100) | currency}}</span></h3>		
+		<h3><span class="label label-success" ng-if="product.minPrice">{{(product.minPrice/100) | currency}}</span></h3>
+		
 		<h3 ng-if="product && product.id && isLoggedIn()">
-			<span class="btn btn-default" ng-click="productManagementCtrl.updatePrices(product.id)">Update price</span>
+			<span class="btn btn-default"  ng-click="productManagementCtrl.updatePrices(product.id)">Update price</span> 
+			<ajax ng-show="updatingPrice"></ajax>
 		</h3>
+			
+			
 	</div>	
 	<div class="col-lg-2 col-md-5 col-sm-6 col-xs-6">
 		<h3 ng-if="editMode && isLoggedIn()">

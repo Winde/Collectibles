@@ -8,6 +8,21 @@
 		this.headerWithSessionResponse = "X-AUTH-TOKEN";
 		var localStorageKeyForSession = "X-AUTH-TOKEN";
 		
+		
+		this.getExpires = function(session){
+			if (session){
+				split = session.split(".");
+				if (split && split.length && split.length == 2){
+					try {
+						var token = JSON.parse(split[0]);
+						return token.expires;
+					}catch (err){
+						console.log(err);
+					}
+				}
+			}
+		}
+		
 		this.isAuthenticated = function(){
 			return factory.getStoredSession()!=null;
 		}
@@ -44,6 +59,9 @@
 		return {
 			getRoles: function(){
 				return factory.getRoles();
+			},
+			getExpires: function(session){
+				return factory.getExpire(session);
 			},
 			setRoles: function(roles){
 				factory.setRoles(roles);
