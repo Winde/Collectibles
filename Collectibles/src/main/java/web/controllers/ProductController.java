@@ -102,6 +102,7 @@ public class ProductController  extends CollectiblesController{
 	private Product checkProduct(Product product, List<ScrapeRequest> requests) throws NotEnoughTimeToParseException{
 		int checks = 0;
 		boolean pending = true;
+		long startTime = new Date().getTime();
 		while(checks<MAX_PARSE_CHECKS && requests != null && requests.size()>0 && pending){
 			
 			pending = scrapeRequestRepository.checkPending(requests);			
@@ -114,7 +115,7 @@ public class ProductController  extends CollectiblesController{
 		}
 		
 		logger.info("Out of the loop in "+checks +" checks");		
-		logger.info("Stopped WAITING!!");
+		logger.info("Stopped WAITING!!" + (new Date().getTime()-startTime));
 		
 		entityManager.detach(product);
 		Product result = productRepository.findOne(product.getId());
@@ -172,12 +173,10 @@ public class ProductController  extends CollectiblesController{
 		}
 	}
 	
-	@Secured(value = { "ROLE_USER" })
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/refresh/{id}", method = RequestMethod.PUT)
 	public SerializableProduct productRefresh(@PathVariable String id) throws CollectiblesException, NotEnoughTimeToParseException {
 		Long idLong = this.getId(id);
-		
-		
 		
 		if (idLong==null){
 			throw new IncorrectParameterException(new String[]{"id"});
@@ -195,6 +194,7 @@ public class ProductController  extends CollectiblesController{
 		}
 	}
 	
+	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/refresh/", method = RequestMethod.PUT)
 	public SerializableProduct productSaveAndRefresh(@RequestBody SerializableProduct product) throws CollectiblesException, NotEnoughTimeToParseException {
 		SerializableProduct result = this.modifyProductScrapeOption(product,true);
@@ -493,16 +493,13 @@ public class ProductController  extends CollectiblesController{
 				Product result = productRepository.save(product);
 				
 				if (scrape){					
-					if (auth!=null){
-						String username = auth.getName();
+					if (user!=null){
+						String username = user.getUsername();
 						List<ScrapeRequest> requests = this.scrapeProduct(username,result,true,false);
 						result = checkProduct(result, requests);
 					}
 				}
-				
-				logger.info("DESCRIPTION: " + result.getDescription());
-				
-				
+
 				return SerializableProduct.cloneProduct(result,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
 			} else {
 				throw new NotFoundException(new String[]{"product"});

@@ -53,9 +53,8 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 	
 	@Override
 	public boolean isApplicable(Product product) {
-		String reference = itemLookup.getReferenceFromProduct(product);
-		String name = product.getName();
-		return ((name!=null && !"".equals(name.trim())) || (reference!=null && !"".equals(reference.trim())));	
+		String reference = itemLookup.getReferenceFromProduct(product);		
+		return (reference!=null && !"".equals(reference.trim()));	
 	}
 
 	@Override

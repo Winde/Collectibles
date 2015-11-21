@@ -14,6 +14,8 @@ public interface ScrapeRequestRepository {
 	//@Query("select s from ScrapeRequest s where connector = :connector ORDER BY liveRequest DESC, requestTime ASC")
 	public ScrapeRequest findOldestByConnector(@Param("connector") String connector);	
 	
+	public boolean saveIgnoreCheck(ScrapeRequest scrapeReq);
+
 	public boolean save(ScrapeRequest scrapeReq);
 
 	public boolean save(Iterable<ScrapeRequest> requests);
@@ -23,4 +25,7 @@ public interface ScrapeRequestRepository {
 	public Boolean checkPending(ScrapeRequest request);
 
 	public boolean markAsCompleted(ScrapeRequest scrapeReq);
+
+
+	
 }

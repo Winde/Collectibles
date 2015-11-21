@@ -45,10 +45,10 @@ public class ScrapeRequestRedisRepository implements ScrapeRequestRepository {
 			if (value!=null && value.size()>=2){
 				String json = value.get(1);
 				request = ScrapeRequest.fromJson(json);
-				if (request!=null && request.getProductId()!=null){
-					Long returnValue = jedis.srem(connectionManager.createUri(SET_PREFIX, connector), request.getProductId().toString());
-					logger.debug("REM FROM SET: " + request.getProductId().toString() +": removed " + returnValue + " values");
-				}
+				//if (request!=null && request.getProductId()!=null){
+					//Long returnValue = jedis.srem(connectionManager.createUri(SET_PREFIX, connector), request.getProductId().toString());
+					//logger.debug("REM FROM SET: " + request.getProductId().toString() +": removed " + returnValue + " values");
+				//}
 			}
 		} catch(Exception e) {
 			logger.error("Exception while Jedis",e);			
@@ -76,14 +76,18 @@ public class ScrapeRequestRedisRepository implements ScrapeRequestRepository {
 		return executed;
 	}
 
-	private ScrapeRequest saveWithConnection(ScrapeRequest scrapeReq, Jedis jedis){
+	private ScrapeRequest saveWithConnection(ScrapeRequest scrapeReq, Jedis jedis, boolean ignoreCheck){
 		String connector = scrapeReq.getConnector();
 		String key = null;
 		if (scrapeReq!=null && scrapeReq.getProductId()!=null){
 			key = scrapeReq.getProductId().toString();
 		}
-		boolean pending = checkPendingWithConnection(scrapeReq,jedis);
-		logger.debug("Request: " + scrapeReq + " is pending?" + pending);
+		boolean pending = false;
+		if (!ignoreCheck){
+			pending = checkPendingWithConnection(scrapeReq,jedis);
+			logger.debug("Request: " + scrapeReq + " is pending?" + pending);
+		}		
+		
 		if (!pending){
 			String json = ScrapeRequest.toJson(scrapeReq);
 			if (json!=null){
@@ -110,7 +114,7 @@ public class ScrapeRequestRedisRepository implements ScrapeRequestRepository {
 		boolean executed = true;
 		try{
 			for (ScrapeRequest request : requests){
-				this.saveWithConnection(request,jedis);
+				this.saveWithConnection(request,jedis, false);
 			}
 		} catch(Exception e) {
 			logger.error("Exception while Jedis",e);
@@ -120,12 +124,13 @@ public class ScrapeRequestRedisRepository implements ScrapeRequestRepository {
 		return executed;
 	}
 	
-	@Override
-	public boolean save(ScrapeRequest scrapeReq) {		
+
+	
+	private boolean save(ScrapeRequest scrapeReq, boolean ignoreCheck) {		
 		Jedis jedis = open();
 		boolean executed = true;
 		try{
-			scrapeReq = saveWithConnection(scrapeReq, jedis);
+			scrapeReq = saveWithConnection(scrapeReq, jedis, true);
 		} catch(Exception e) {
 			logger.error("Exception while Jedis",e);
 			executed = false;
@@ -133,7 +138,17 @@ public class ScrapeRequestRedisRepository implements ScrapeRequestRepository {
 		close(jedis);
 		return executed;
 	}
-
+	
+	@Override
+	public boolean save(ScrapeRequest scrapeReq) {
+		return save(scrapeReq,false);
+	}
+	
+	@Override
+	public boolean saveIgnoreCheck(ScrapeRequest scrapeReq) {
+		return save(scrapeReq,true);
+	}
+	
 	private boolean checkPendingWithConnection(ScrapeRequest request, Jedis jedis){
 		boolean pending = false;
 		String json = ScrapeRequest.toJson(request);
@@ -179,6 +194,7 @@ public class ScrapeRequestRedisRepository implements ScrapeRequestRepository {
 		close(jedis);		
 		return pending;
 	}
+
 	
 	
 

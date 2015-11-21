@@ -91,7 +91,8 @@ public class ContinuousScrapper {
 						scrapeReq.setRequestTime(new Date());
 						if (scrapeReq.getAttempts()<=MAX_ATTEMPTS_NUMBER){
 							logger.info("Re-injecting to queue: " + scrapeReq);
-							scrapeRequestRepository.save(scrapeReq);
+							scrapeRequestRepository.saveIgnoreCheck(scrapeReq);
+							markedAsCompleted = true;
 						} else {
 							logger.info("Abandoning due to max requests: " + scrapeReq);
 						}
