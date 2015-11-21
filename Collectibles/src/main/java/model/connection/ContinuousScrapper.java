@@ -45,7 +45,6 @@ public class ContinuousScrapper {
 			}
 								
 			ScrapeRequest scrapeReq = scrapeRequestRepository.findOldestByConnector(connector.getIdentifier());
-			logger.info("I'm awake" + connector.getIdentifier());
 			boolean processed = true;
 			boolean markedAsCompleted = false;
 			try {
