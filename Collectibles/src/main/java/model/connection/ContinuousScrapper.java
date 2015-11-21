@@ -38,13 +38,15 @@ public class ContinuousScrapper {
 
 
 	public void doScrape(ProductInfoConnector connector) {
+		String identifier = connector.getIdentifier();
+		Integer sleep = connector.sleepBetweenCalls();
 		while(true){
-			Integer sleep = connector.sleepBetweenCalls();
+			
 			if (sleep == null || sleep < 200){
 				sleep = 1000;
 			}
 								
-			ScrapeRequest scrapeReq = scrapeRequestRepository.findOldestByConnector(connector.getIdentifier());
+			ScrapeRequest scrapeReq = scrapeRequestRepository.findOldestByConnector(identifier);
 			boolean processed = true;
 			boolean markedAsCompleted = false;
 			try {
@@ -61,9 +63,9 @@ public class ContinuousScrapper {
 								connector.updateProductTransaction(product);
 							}
 						} else {
-							logger.error(connector.getIdentifier() + " product is null");
+							logger.error(identifier + " product is null");
 						}
-						logger.info(connector.getIdentifier() + " Execution took : " + (new Date().getTime()-start) + " ms");
+						logger.info(identifier + " Execution took : " + (new Date().getTime()-start) + " ms");
 					} catch (TooFastConnectionException e) {
 						logger.error("Too Fast connection" + e);
 						processed = false;
@@ -97,8 +99,7 @@ public class ContinuousScrapper {
 			try {				
 				Thread.sleep(sleep);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error("Interrupt sleep", e);
 			}
 		}
     }

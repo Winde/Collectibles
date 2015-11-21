@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface ProductInfoConnector {
 
-
 	public void processInBackground(Collection<Product> products);
 
 	public void processPricesInBackground(Collection<Product> products);

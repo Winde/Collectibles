@@ -15,37 +15,37 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import model.dataobjects.SimpleIdDao;
 import model.persistence.queues.ScrapeRequestRedisRepository;
 
-@Entity(name="ScrapeRequest")
-public class ScrapeRequest extends SimpleIdDao{
+//@Entity(name="ScrapeRequest")
+public class ScrapeRequest {// extends SimpleIdDao{
 
 	private static final Logger logger = LoggerFactory.getLogger(ScrapeRequest.class);
 
 	
-	@Column(name="product_name")
+	//@Column(name="product_name")
 	private String productName;
 	
-	@Column(name="product_reference")
+	//@Column(name="product_reference")
 	private String productReference;
 	
-	@Column(name="product_id")	
+	//@Column(name="product_id")	
 	private Long productId;
 	
-	@Column(name="connector")
+	//@Column(name="connector")
 	private String connector;
 
-	@Column(name="update_transient")
+	//@Column(name="update_transient")
 	private boolean onlyTransient = false;
 	
-	@Column(name="request_time")
+	//@Column(name="request_time")
 	private Date requestTime;
 	
-	@Column(name="live_request")
+	//@Column(name="live_request")
 	private boolean liveRequest;
 	
-	@Column(name="attempts")
+	//@Column(name="attempts")
 	private long attempts = 0;
 	
-	@Column(name="userId")
+	//@Column(name="userId")
 	private String userId;
 	
 	public ScrapeRequest(){}
@@ -171,6 +171,6 @@ public class ScrapeRequest extends SimpleIdDao{
 	}
 	
 	public String toString(){
-		return "{"+ this.getId() + " - " +  this.getConnector() + "}";
+		return "{"+ this.getProductId() + " - " +  this.getConnector() + "}";
 	}
 }

@@ -266,8 +266,9 @@ public class ProductController  extends CollectiblesController{
 							List<ScrapeRequest> scrapeRequests = new ArrayList<>();
 							if (connectors!=null){							
 								for (ProductInfoConnector connector: connectors){
+									String identifier = connector.getIdentifier();
 									for (Product product : products){
-										ScrapeRequest scrape = createScrapeForProduct(username, product, connector.getIdentifier(), false, false);
+										ScrapeRequest scrape = createScrapeForProduct(username, product, identifier, false, false);
 										scrapeRequests.add(scrape);
 										
 									}
@@ -644,28 +645,17 @@ public class ProductController  extends CollectiblesController{
 			List<Product> products = productRepository.findAll();			
 			Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors();						
 			List<ScrapeRequest> scrapeRequests = new LinkedList<>();
+			double i=0;
 			if (connectors!=null && products!=null){			
-				double i=0;
-				int loopCount = 0;
+				
 				logger.info("Preparing to process "+products.size()+" products for "+ connectors.size() + " connectors");
-				
-				
-				int printCount = 0;
-				Iterator<Product> iterator = products.iterator();
-				while (iterator.hasNext()){
-					long currentTime = new Date().getTime();
-					Product product = iterator.next();
-					logger.info("Nexting one product took: " + (new Date().getTime()-currentTime)+ " ms");
-					for (ProductInfoConnector connector: connectors){						
-						ScrapeRequest scrape = createScrapeForProduct(username,product, connector.getIdentifier(), false, false);												
-						scrapeRequests.add(scrape);						
-						loopCount++;
-					}
-					if (i%10 == 0){
-						logger.info("Added "+((i/products.size())*100)+"% to queue");
-						logger.info("loop: " + loopCount);
-					}
-					i++;
+								
+				for (ProductInfoConnector connector: connectors){
+					String identifier = connector.getIdentifier();					
+					for (Product product: products){																		
+						ScrapeRequest scrape = createScrapeForProduct(username, product, identifier, false, false);
+						scrapeRequests.add(scrape);												
+					}										
 				}
 			}
 			scrapeRequestRepository.save(scrapeRequests);
@@ -689,8 +679,9 @@ public class ProductController  extends CollectiblesController{
 			List<ScrapeRequest> scrapeRequests = new ArrayList<>();
 			if (connectors!=null){							
 				for (ProductInfoConnector connector: connectors){
+					String identifier = connector.getIdentifier();
 					for (Product product : products){
-						ScrapeRequest scrape = createScrapeForProduct(username, product, connector.getIdentifier(), false, true);
+						ScrapeRequest scrape = createScrapeForProduct(username, product, identifier, false, true);
 						scrapeRequests.add(scrape);					
 					}
 				}
