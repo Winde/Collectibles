@@ -18,7 +18,8 @@ public interface ProductInfoConnector {
 	@Transactional
 	public boolean updateProductTransaction(Product product) throws TooFastConnectionException;
 	
-	boolean updateProductTransaction(Product product, boolean save) throws TooFastConnectionException;
+	@Transactional
+	public boolean updateProductWithoutSave(Product product) throws TooFastConnectionException;
 	
 	@Transactional
 	boolean updatePriceTransaction(Product product) throws TooFastConnectionException;
@@ -39,10 +40,10 @@ public interface ProductInfoConnector {
 
 	public boolean supportsPrices();
 	
+	public boolean supportsImportingProducts();
+	
 	public Integer sleepBetweenCalls();
 
-	
-	
-	
-	
+	public List<String> getMultipleReferences(String criteria) throws TooFastConnectionException;
+
 }

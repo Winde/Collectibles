@@ -315,7 +315,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
  
 		String hql = "";
 		
-		hql = "select distinct p from Product p "
+		hql = "select distinct p from Product p LEFT JOIN FETCH p.owners "
 				+ "WHERE p.connectorReferences[:connector] = :reference ";				
 				
 		

@@ -57,4 +57,11 @@ public class SteamConnector extends AbstractProductInfoConnector{
 		return true;
 	}
 
+	public List<String> getMultipleReferences(String criteria) throws TooFastConnectionException{
+		return itemLookUp.getOwnedReferences(criteria);
+	}
+	
+	public boolean supportsImportingProducts(){	
+		return true;
+	}
 }

@@ -35,6 +35,14 @@
 					progressbar: true
 				});				
 			},
+			modifyLite: function(product){
+				return $http({ 
+					method: 'PUT', 
+					url: '/product/modify/minor/', 
+					data: product,
+					progressbar: true
+				});
+			},			
 			modify: function(product){
 				factory.cleanUpProduct(product);
 				return $http({ 

@@ -20,6 +20,7 @@ public class ScrapeRequest {// extends SimpleIdDao{
 
 	private static final Logger logger = LoggerFactory.getLogger(ScrapeRequest.class);
 
+	private Long hierarchy;
 	
 	//@Column(name="product_name")
 	private String productName;
@@ -146,6 +147,14 @@ public class ScrapeRequest {// extends SimpleIdDao{
 
 	public void setAttempts(long attempts) {
 		this.attempts = attempts;
+	}
+
+	public Long getHierarchy() {
+		return hierarchy;
+	}
+
+	public void setHierarchy(Long hierarchy) {
+		this.hierarchy = hierarchy;
 	}
 
 	public static ScrapeRequest fromJson(String json){

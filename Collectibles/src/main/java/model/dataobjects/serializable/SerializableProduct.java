@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 
 import model.dataobjects.Author;
 import model.dataobjects.Author.AuthorView;
@@ -114,7 +115,7 @@ public class SerializableProduct {
 	
 	@JsonView(ProductComplexView.class)
 	@JsonInclude(Include.ALWAYS) 
-	private Map<String,String> externalLinks = null;
+	private SortedMap<String,String> externalLinks = null;
 	
 	public static Collection<SerializableProduct> cloneProduct(Collection<Product> products){
 		return cloneProduct(products,null);
@@ -363,11 +364,11 @@ public class SerializableProduct {
 		this.ratings = ratings;
 	}
 
-	public Map<String, String> getExternalLinks() {
+	public SortedMap<String, String> getExternalLinks() {
 		return externalLinks;
 	}
 
-	public void setExternalLinks(Map<String, String> externalLinks) {		
+	public void setExternalLinks(SortedMap<String, String> externalLinks) {		
 		this.externalLinks = externalLinks;
 	}
 

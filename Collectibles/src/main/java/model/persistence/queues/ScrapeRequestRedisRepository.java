@@ -150,15 +150,14 @@ public class ScrapeRequestRedisRepository implements ScrapeRequestRepository {
 	}
 	
 	private boolean checkPendingWithConnection(ScrapeRequest request, Jedis jedis){
-		boolean pending = false;
-		String json = ScrapeRequest.toJson(request);
-		if (json!=null){
+		boolean pending = false;		
+		if (request!=null && request.getProductId()!=null){
 			String connector = request.getConnector();
 			Boolean isMember = jedis.sismember(connectionManager.createUri(SET_PREFIX, connector), request.getProductId().toString());
 			if (isMember!=null){
 				pending = isMember;
 			}			
-		}
+		} 
 		return pending;		
 	}
 	

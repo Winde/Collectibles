@@ -93,31 +93,21 @@
 				</div>
 			</div>
 			<div class="row providerLinksBlock">
-				<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.externalLinks.Amazon">
-					<a class="btn btn-block btn-lg btn-amazon" ng-href="{{product.externalLinks.Amazon}}">
-						<i class="fa fa-amazon"></i> Amazon
-					</a>
-				</div>
-				<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.externalLinks.DrivethruRPG">
-					<a class="btn btn-block btn-lg btn-yelp" ng-href="{{product.externalLinks.DrivethruRPG}}">
-						DriveThruRPG
-					</a>
-				</div>
-				
-				<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.externalLinks.BoardGameGeek">
-					<a class="btn btn-block btn-lg btn-intensedebate" ng-href="{{product.externalLinks.BoardGameGeek}}">
-						Board Game Geek
-					</a>
-				</div>
-				
-				<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.externalLinks.Goodreads">
-					<a class="btn btn-block btn-lg btn-android" ng-href="{{product.externalLinks.Goodreads}}">
-						<span style="font-family:helvetica;">g</span> Goodreads
-					</a>
-				</div>
-				<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.externalLinks.GoodreadsSeries">
-					<a class="btn btn-block btn-lg btn-android" ng-href="{{product.externalLinks.GoodreadsSeries}}">
-						<span style="font-family:helvetica;">g</span> Related items
+				<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.externalLinks" ng-repeat="(key, value) in product.externalLinks">
+					<a 	class="btn btn-block btn-lg" ng-href="{{value}}" 
+						ng-class="{
+							'btn-amazon': key == 'Amazon',
+							'btn-yelp': key == 'DrivethruRPG',
+							'btn-intensedebate': key == 'BoardGameGeek',						
+							'btn-android': key == 'GoodreadsSeries' || key == 'Goodreads',							
+							'btn-steam': key == 'Steam',
+						}"
+					>						
+						<i class="fa fa-amazon" ng-if="key=='Amazon'"></i> 
+						<span style="font-family:helvetica;" ng-if="key=='Goodreads'">g</span> 
+						<span style="font-family:helvetica;" ng-if="key=='GoodreadsSeries'">g</span>
+						<span ng-if="key!='GoodreadsSeries'">{{key}}</span>
+						<span ng-if="key=='GoodreadsSeries'">Related items</span>
 					</a>
 				</div>
 				

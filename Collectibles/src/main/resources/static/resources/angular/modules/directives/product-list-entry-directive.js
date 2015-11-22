@@ -11,9 +11,9 @@
 			link: function(scope, element, attrs,productSearchCtrl) {
 				scope.remove = function(){
 					productSearchCtrl.remove(scope.product);
-				}
-				scope.update = function(){
-					productSearchCtrl.update(scope.product);
+				},
+				scope.modifyLite = function(){
+					productSearchCtrl.modifyLite(scope.product);
 				}
 			}
 				

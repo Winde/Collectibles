@@ -33,7 +33,7 @@
 					uib-btn-checkbox 
 					btn-checkbox-true="true" 
 					btn-checkbox-false="false"
-					ng-change="update(product)">
+					ng-change="modifyLite(product)">
 				Owned
 			</span>
 		</h3>
@@ -44,7 +44,7 @@
 					uib-btn-checkbox 
 					btn-checkbox-true="true" 
 					btn-checkbox-false="false"
-					ng-change="update(product)">
+					ng-change="modifyLite(product)">
 				Owned <i class="fa fa-globe"></i>
 			</span>
 		</h3>
@@ -55,15 +55,11 @@
 					uib-btn-checkbox 
 					btn-checkbox-true="true" 
 					btn-checkbox-false="false"
-					ng-change="update(product)">
+					ng-change="modifyLite(product)">
 				In wishlist
 			</span>
 		</h3>	
-			<!-- 
-			<input type="checkbox" 
-				ng-model="product.owned" 
-				ng-change="productManagementCtrl.update(product)" />
- 			-->		
+
 		<div ng-if="!editMode || !isLoggedIn()">
 			<h3><span class="label label-default" ng-if="product.owned">Owned</span></h3>			
 		</div>
@@ -83,7 +79,7 @@
 						ng-model="product.hierarchyPlacement"										
 						data-collection-name="allHierarchies"								
 						ng-options="item as item.name for item in (allHierarchies|filter:{isRoot:'!'}) track by item.id"
-						ng-change="productManagementCtrl.update(product)" 					
+						ng-change="modifyLite(product)" 					
 							options-class="{ 
 							root: isRoot == true,
 							depth0: depth == 0,

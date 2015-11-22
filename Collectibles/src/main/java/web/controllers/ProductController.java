@@ -20,6 +20,7 @@ import javax.persistence.EntityManager;
 import model.connection.BackgroundProcessOwnItems;
 import model.connection.ProductInfoConnector;
 import model.connection.ProductInfoConnectorFactory;
+import model.connection.TooFastConnectionException;
 import model.dataobjects.Category;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
@@ -405,6 +406,96 @@ public class ProductController  extends CollectiblesController{
 		return modifyProductScrapeOption(serializableProduct,false);
 	}
 	
+	@Secured(value = { "ROLE_USER" })
+	@RequestMapping(value="/product/modify/minor/", method = RequestMethod.PUT)
+	public SerializableProduct ownOrWish(@RequestBody SerializableProduct serializableProduct) throws CollectiblesException {
+		Product product = null;
+		if (serializableProduct !=null) { product = serializableProduct.deserializeProduct(); }
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = null;
+		if (auth!=null && auth.getName()!=null){
+			user = userRepository.findOne(auth.getName());
+		}
+		
+		if (user!=null){
+			Product productInDb = productRepository.findOne(product.getId());
+			
+			HierarchyNode hierarchy = product.getHierarchyPlacement();
+			if (hierarchy!=null && hierarchy.getId()!=null){
+				HierarchyNode currentHierarchy = productInDb.getHierarchyPlacement();
+				if (currentHierarchy == null || !hierarchy.equals(currentHierarchy)){
+					hierarchy = hierarchyRepository.findOne(hierarchy.getId());
+					if (hierarchy!=null){
+						productInDb.setHierarchyPlacement(hierarchy);
+					}
+				}
+			}
+			
+			
+			if (productInDb!=null){			
+				if (serializableProduct.getWished()!=null){
+					if (user!=null){
+						if (!serializableProduct.getWished()) {
+							if (productInDb.getWishers()!=null){
+								productInDb.getWishers().remove(user);
+							}
+						} else {
+							Set<User> owners = productInDb.getWishers();
+							if (owners==null){
+								owners = new HashSet<>();
+								productInDb.setWishers(owners);
+							}						
+							productInDb.getWishers().add(user);
+						}
+					}
+				}
+				
+				if (serializableProduct.getOwnedAnotherLanguage()!=null){
+					
+					if (user!=null){
+						if (!serializableProduct.getOwnedAnotherLanguage()) {
+							if (productInDb.getOwnersOtherLanguage()!=null){
+								productInDb.getOwnersOtherLanguage().remove(user);
+							}
+						} else {
+							Set<User> owners = productInDb.getOwnersOtherLanguage();
+							if (owners==null){
+								owners = new HashSet<>();
+								productInDb.setOwnersOtherLanguage(owners);
+							}						
+							productInDb.getOwnersOtherLanguage().add(user);
+						}
+					}
+				}
+				
+				if (serializableProduct.getOwned()!=null){
+					if (user!=null){
+						if (!serializableProduct.getOwned()) {
+							if (productInDb.getOwners()!=null){
+								productInDb.getOwners().remove(user);
+							}
+						} else {
+							Set<User> owners = productInDb.getOwners();
+							if (owners==null){
+								owners = new HashSet<>();
+								productInDb.setOwners(owners);
+							}
+							
+							productInDb.getOwners().add(user);
+						}
+					}
+				}
+				Product result = productRepository.save(productInDb);
+				
+				return SerializableProduct.cloneProduct(result,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
+			} else {
+				throw new NotFoundException(new String[]{"product"});
+			}
+		} else {
+			throw new NotFoundException(new String[]{"user"});
+		}
+	} 
+	
 	public SerializableProduct modifyProductScrapeOption(SerializableProduct serializableProduct, boolean scrape) throws CollectiblesException, NotEnoughTimeToParseException {		
 		Product product = null;
 		if (serializableProduct !=null) { product = serializableProduct.deserializeProduct(); }
@@ -610,7 +701,28 @@ public class ProductController  extends CollectiblesController{
 				if (hierarchyNode!=null){								
 					ProductInfoConnector connector = connectorFactory.getConnector(connectorName);
 					if (connector!=null){						
-						result = processOwnershipItems.run(user, hierarchyNode, userId, productRepository, imageRepository, authorRepository, connector);												
+						try {
+							String identifier = connector.getIdentifier();
+							String userName = user.getUsername();
+							List<String> references = connector.getMultipleReferences(userId);
+							List<ScrapeRequest> scrapeRequests = new ArrayList<>();
+							for (String reference : references){
+								ScrapeRequest request = new ScrapeRequest();
+								request.setConnector(identifier);
+								request.setLiveRequest(false);
+								request.setOnlyTransient(false);
+								request.setProductId(null);
+								request.setProductReference(reference);
+								request.setRequestTime(new Date());
+								request.setUserId(userName);
+								request.setHierarchy(hierarchyNode.getId());
+								scrapeRequests.add(request);			
+							}
+							scrapeRequestRepository.save(scrapeRequests);
+							
+						} catch (Exception e) {
+							throw new NotFoundException(new String[]{"user"});
+						}												
 					} else {
 						throw new IncorrectParameterException(new String[]{"connector"});
 					}

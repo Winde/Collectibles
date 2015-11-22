@@ -144,7 +144,7 @@ public class SteamItemLookupService extends AbstractProductInfoLookupService<Jso
 	public byte[] getMainImageData(JsonNode doc) throws TooFastConnectionException {
 		byte [] imageBytes = null;
 		String imageUrl = doc.path("data").path("header_image").asText();
-		if (imageUrl!=null){
+		if (imageUrl!=null && !"".equals(imageUrl.trim())){
 			imageBytes = fetchImage(imageUrl);
 		}
 		return imageBytes;

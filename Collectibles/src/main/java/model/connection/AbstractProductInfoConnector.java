@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import model.dataobjects.Author;
 import model.dataobjects.Image;
@@ -115,12 +117,18 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		return result;
 	}
 	
+	@Override
+	public boolean updateProductWithoutSave(Product product) throws TooFastConnectionException{
+		return updateProductTransaction(product,false);
+	}
+	
+	@Override
 	public boolean updateProductTransaction(Product product) throws TooFastConnectionException{
 		return updateProductTransaction(product,true);
 	}
 	
-	@Override	
-	public boolean updateProductTransaction(Product product, boolean save) throws TooFastConnectionException{		
+		
+	private boolean updateProductTransaction(Product product, boolean save) throws TooFastConnectionException{		
 		AbstractProductInfoConnector connector = this;
 		boolean result = true; 		
 		
@@ -131,12 +139,14 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 			Collection<Image> imagesRemove = new ArrayList<>();
 			Set<Author> authorsAdd = new HashSet<>();				
 			logger.info("Looking for product in database:" + product);
-			Product productInDb = productRepository.findOne(product.getId());					
-			logger.info("Product found in database:" + productInDb);
-			updated = updateProductDo(productInDb, imagesAdd, imagesRemove,authorsAdd);
+			if (product.getId()!=null){
+				product = productRepository.findOne(product.getId());					
+				logger.info("Product found in database:" + product);				
+			}
+			updated = updateProductDo(product, imagesAdd, imagesRemove,authorsAdd);
 			if (updated && save){	
 				logger.info("Saving product");
-				productRepository.save(productInDb);
+				productRepository.save(product);
 				imageRepository.delete(imagesRemove);
 				//storeAfterSuccess(productInDb,productRepository);
 			}
@@ -205,9 +215,9 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						logger.info("Obtained Url for "+this.getIdentifier()+": " + externalLink);
 							
 						if (externalLink!=null){
-							Map<String, String> externalLinks = product.getExternalLinks();
+							SortedMap<String, String> externalLinks = product.getExternalLinks();
 							if (externalLinks==null){
-								externalLinks = new HashMap<>();
+								externalLinks = new TreeMap<>();
 								product.setExternalLinks(externalLinks);								
 							}
 							externalLinks.put(this.getIdentifier(), externalLink);
@@ -228,9 +238,9 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						seriesUrl = itemLookup.getSeriesUrl(doc);
 						logger.info("Obtained "+this.getIdentifier()+" series url :" + seriesUrl);
 						if (seriesUrl!=null){
-							Map<String, String> externalLinks = product.getExternalLinks();
+							SortedMap<String, String> externalLinks = product.getExternalLinks();
 							if (externalLinks==null){
-								externalLinks = new HashMap<>();
+								externalLinks = new TreeMap<>();
 								product.setExternalLinks(externalLinks);								
 							}
 							externalLinks.put(seriesKey, seriesUrl);
@@ -397,4 +407,15 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	public String getIdentifier(){
 		return this.getImageLookupService().getIdentifier();
 	}
+	
+	public List<String> getMultipleReferences(String criteria) throws TooFastConnectionException{
+		//Unsupported by default
+		return null;
+	}
+
+	public boolean supportsImportingProducts(){
+		//Unsupported by default
+		return false;
+	}
+	
 }

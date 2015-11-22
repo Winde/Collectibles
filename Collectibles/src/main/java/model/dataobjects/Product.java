@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -22,7 +23,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.PrePersist;
 import javax.persistence.Transient;
 
@@ -46,7 +49,7 @@ public class Product extends SimpleIdDao{
 	
 	private static final long MINIMUM_LENGTH_DESCRIPTION = 100;
 	
-	@ManyToOne	
+	@ManyToOne
 	private HierarchyNode hierarchyPlacement;
 	
 	@OneToMany(fetch=FetchType.LAZY)
@@ -60,7 +63,8 @@ public class Product extends SimpleIdDao{
 	@Column(name="name")
 	private String name = null;
 
-	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.MERGE,CascadeType.REMOVE})
+	//@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.MERGE,CascadeType.REMOVE})
+	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.ALL})
 	@BatchSize(size = 50)
 	private List<Image> images = null;
 
@@ -115,7 +119,9 @@ public class Product extends SimpleIdDao{
 	@ElementCollection(fetch = FetchType.LAZY)
 	@CollectionTable(name="product_links", joinColumns=@JoinColumn(name="id"))
 	@Column(name="external_links")
-	private Map<String,String> externalLinks = null;
+	@MapKeyColumn(name="external_links_key")
+	@OrderBy("external_links_key")
+	private SortedMap<String, String> externalLinks = null;
 	
 	
 	@Column(name="min_price")
@@ -358,11 +364,11 @@ public class Product extends SimpleIdDao{
 		this.ratings = ratings;
 	}
 
-	public Map<String, String> getExternalLinks() {		
+	public SortedMap<String, String> getExternalLinks() {		
 		return externalLinks;
 	}
 
-	public void setExternalLinks(Map<String, String> externalLinks) {
+	public void setExternalLinks(SortedMap<String, String> externalLinks) {
 		this.externalLinks = externalLinks;
 	}
 
