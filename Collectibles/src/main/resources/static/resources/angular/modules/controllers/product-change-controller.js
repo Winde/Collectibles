@@ -115,6 +115,28 @@
 			});
 		}
 		
+		this.refreshConnectors = function(){
+			$scope.connectorNames = Hierarchy.calculateConnectorNames($scope.hierarchy);
+			console.log($scope.connectorNames.length)
+			if ($scope.connectorNames && $scope.connectorNames.length && $scope.connectorNames.length == 1){				
+				$scope.connector = $scope.connectorNames[0];
+			}
+			
+		};
+		
+		this.importFromScrapUser = function(){
+			Product.importFromScrapUser($scope.connector,$scope.userIdToScrape,$scope.hierarchy.id)
+			.success(function(data){
+				Message.success("Success; " + data + " products to be imported");	
+			})
+			.catch(function(){
+				Message.alert("There was an error");
+			})
+			.finally(function(){
+				
+			});
+		}
+		
 		this.uploadImage = function(file){
 			
 			var product = $scope.product;

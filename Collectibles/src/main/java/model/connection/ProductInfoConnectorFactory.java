@@ -105,11 +105,11 @@ public class ProductInfoConnectorFactory {
 	public Collection<ProductInfoConnector> getConnectors(HierarchyNode node){
 		Set<String> connectorIdentifiers = new HashSet<>();
 		HierarchyNode current = node;
-		connectorIdentifiers.addAll(current.getConnectorsNames());
+		connectorIdentifiers.addAll(current.getConnectorNames());
 		while (current.getFather()!=null){
 			logger.info("Parsing connectors for: " + current.getName());
 			current = current.getFather();
-			connectorIdentifiers.addAll(current.getConnectorsNames());
+			connectorIdentifiers.addAll(current.getConnectorNames());
 		}
 		
 				

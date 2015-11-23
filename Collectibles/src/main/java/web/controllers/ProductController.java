@@ -679,11 +679,11 @@ public class ProductController  extends CollectiblesController{
 	
 	@Secured(value = { "ROLE_ADMIN" })
 	@RequestMapping(value="/product/create/from/{connectorName}/user/{userId}/tohierarchy/{hierarchy}", method = RequestMethod.POST)
-	public Boolean reProcessAll(
+	public Integer reProcessAll(
 			@PathVariable String userId,
 			@PathVariable String connectorName,
 			@PathVariable String hierarchy) throws CollectiblesException{
-		Future<Boolean> result = null;
+		Integer toBeProcessed = null;
 		
 		Long hierarchyId = super.getId(hierarchy);
 		
@@ -701,7 +701,7 @@ public class ProductController  extends CollectiblesController{
 				logger.info("Found hierarchy: " + hierarchyNode);
 				if (hierarchyNode!=null){								
 					ProductInfoConnector connector = connectorFactory.getConnector(connectorName);
-					if (connector!=null){						
+					if (connector!=null && connector.supportsImportingProducts()){						
 						try {
 							String identifier = connector.getIdentifier();
 							String userName = user.getUsername();
@@ -720,7 +720,7 @@ public class ProductController  extends CollectiblesController{
 								scrapeRequests.add(request);			
 							}
 							scrapeRequestRepository.save(scrapeRequests);
-							
+							toBeProcessed = scrapeRequests.size();
 						} catch (Exception e) {
 							throw new NotFoundException(new String[]{"user"});
 						}												
@@ -737,7 +737,7 @@ public class ProductController  extends CollectiblesController{
 			throw new NotFoundException(new String[]{"user"});
 		}
 				
-		return Boolean.TRUE;
+		return toBeProcessed;
 	}
 	
 	@Secured(value = { "ROLE_ADMIN" })

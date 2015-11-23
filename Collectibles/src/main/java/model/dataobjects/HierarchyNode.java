@@ -61,9 +61,9 @@ public class HierarchyNode extends SimpleIdDao{
 	@ElementCollection(fetch = FetchType.LAZY)
 	@CollectionTable(name="hierarchy_connectors", joinColumns=@JoinColumn(name="id"))
 	@Column(name="hierarchy_connectors")	
-	@JsonIgnore
 	@BatchSize(size = 50)
-	private Set<String> connectorsNames;
+	@JsonView(HierarchyTreeView.class)
+	private Set<String> connectorNames;
 		
 	@Column(name="is_book")
 	@JsonView(HierarchySimpleView.class)
@@ -139,12 +139,12 @@ public class HierarchyNode extends SimpleIdDao{
 		return lineage;
 	}
 
-	public Set<String> getConnectorsNames() {
-		return connectorsNames;
+	public Set<String> getConnectorNames() {
+		return connectorNames;
 	}
 
-	public void setConnectorsNames(Set<String> connectorsNames) {
-		this.connectorsNames = connectorsNames;
+	public void setConnectorNames(Set<String> connectorNames) {
+		this.connectorNames = connectorNames;
 	}
 
 	public boolean updateLineage() {

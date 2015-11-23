@@ -8,6 +8,7 @@
 		function addChildren(array, parent, children, maxDepth, optionalToAddChildren){
 			for (var j=0;j<children.length;j++){
 				var current = children[j];
+				current.parent = parent;
 				var depth = current.depth;					
 				
 				var optionalLineageParent = null;
@@ -82,6 +83,17 @@
 					}	
 				}				
 				
+			},
+			calculateConnectorNames: function(node){
+				var connectorNames = [];
+				var current = node;
+				while(current.parent){									
+					if (current.connectorNames && current.connectorNames.length>0){		
+						connectorNames = connectorNames.concat(current.connectorNames);						
+					}
+					current = current.parent;
+				}
+				return connectorNames;
 			},
 			create: function(hierarchy, parent){
 				return $http({

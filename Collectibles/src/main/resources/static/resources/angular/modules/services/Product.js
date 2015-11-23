@@ -115,6 +115,14 @@
 								
 				return upload;
 			},
+			importFromScrapUser: function(connector,userId,hierarchyId){
+				
+				return $http({
+					method: 'POST', 
+					url: '/product/create/from/'+connector+'/user/'+userId+'/tohierarchy/'+hierarchyId,
+					progressbar: true
+				});
+			},
 			prepareProduct : function(data){							
 				if (data.images!=undefined && data.images!=null && data.images.length>0){
 					if (data.mainImage != null) {
