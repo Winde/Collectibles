@@ -65,6 +65,10 @@ public class HierarchyNode extends SimpleIdDao{
 	@BatchSize(size = 50)
 	private Set<String> connectorsNames;
 		
+	@Column(name="is_book")
+	@JsonView(HierarchySimpleView.class)
+	private Boolean isBook;
+	
 	public HierarchyNode(){
 		children = new TreeSet<>();
 		//categories = new TreeSet<>();
@@ -157,6 +161,14 @@ public class HierarchyNode extends SimpleIdDao{
 
 	public Integer getDepth() {
 		return depth;
+	}
+
+	public Boolean getIsBook() {
+		return isBook;
+	}
+
+	public void setIsBook(Boolean isBook) {
+		this.isBook = isBook;
 	}
 
 }

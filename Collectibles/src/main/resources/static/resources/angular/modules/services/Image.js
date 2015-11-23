@@ -17,7 +17,15 @@
 					}
 				}				
 				return $http({method: 'GET', url: '/images/'+parameter});
-			}			
+			},
+			modifyLite: function(image){
+				return $http({ 
+					method: 'PUT', 
+					url: '/image/modify/minor/', 
+					data: image,
+					progressbar: true
+				});
+			},
 		}
 		
 	});

@@ -408,7 +408,7 @@ public class ProductController  extends CollectiblesController{
 	
 	@Secured(value = { "ROLE_USER" })
 	@RequestMapping(value="/product/modify/minor/", method = RequestMethod.PUT)
-	public SerializableProduct ownOrWish(@RequestBody SerializableProduct serializableProduct) throws CollectiblesException {
+	public SerializableProduct modifyLiteProduct(@RequestBody SerializableProduct serializableProduct) throws CollectiblesException {
 		Product product = null;
 		if (serializableProduct !=null) { product = serializableProduct.deserializeProduct(); }
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();

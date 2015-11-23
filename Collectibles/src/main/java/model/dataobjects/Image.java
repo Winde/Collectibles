@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,6 +32,7 @@ public class Image extends SimpleIdDao{
 	
 	@Column(name="data")
 	@Lob 
+	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
 	private byte[] data;
 	
@@ -48,6 +50,10 @@ public class Image extends SimpleIdDao{
 	
 	@Column(name="height")
 	private Integer height;
+	
+	@Column(name="not_book")
+	@JsonView(ImageSimpleView.class)
+	private Boolean notBook;
 	
 	@OneToOne(fetch=FetchType.LAZY)
 	@JsonIgnore
@@ -152,6 +158,13 @@ public class Image extends SimpleIdDao{
 
 	public void setProduct(Product product) {
 		this.product = product;
+	}
+	public Boolean getNotBook() {
+		return notBook;
+	}
+
+	public void setNotBook(Boolean notBook) {
+		this.notBook = notBook;
 	}
 
 	public String toString(){

@@ -18,6 +18,32 @@
 			});
 		}
 		
+		$scope.modifyImageLite = function(image){
+			Image.modifyLite(image)
+			.success(function(data){
+				if (data && data.id){
+					if ($scope.product && $scope.product.selectedImage && data.id == $scope.product.selectedImage.id){
+						$scope.product.selectedImage = data;
+					}
+					if ($scope.product && $scope.product.images && $scope.product.images.length){
+						for (var i=0;i<$scopeproduct.images.length;i++){
+							var image = product.images[i];
+							if (image.id && image.id == data.id){
+								product.images[i] = data;
+							}
+						}
+					}
+				}
+			})
+			.catch(function(data){
+				Message.alert("There was an error");
+			})
+			.finally(function(data){
+				
+			});
+			
+		}
+		
 		this.pullProduct = function(id){
 			Product.one(id)
 			.success(function(data){

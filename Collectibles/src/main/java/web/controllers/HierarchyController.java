@@ -85,7 +85,10 @@ public class HierarchyController extends CollectiblesController{
 			
 			HierarchyNode fatherNode = hierarchyRepository.findOne(fatherId);
 			
-			if (fatherNode!=null){				
+			if (fatherNode!=null){			
+				if (node.getIsBook()==null){
+					node.setIsBook(fatherNode.getIsBook());
+				}
 				hierarchyRepository.addChild(fatherNode, node);								
 				return node;
 			} else{				

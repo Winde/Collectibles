@@ -133,9 +133,12 @@
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>				
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+        			<mainClass>main.CollectiblesApplication</mainClass>
+        		</configuration>				
 			</plugin>
-		</plugins>
+		</plugins>		
 	</build>
 	
 	<repositories>

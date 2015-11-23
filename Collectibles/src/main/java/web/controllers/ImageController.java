@@ -5,6 +5,7 @@ import java.util.List;
 
 import model.dataobjects.Author;
 import model.dataobjects.Image;
+import model.dataobjects.Image.ImageSimpleView;
 import model.persistence.AuthorRepository;
 import model.persistence.ImageRepository;
 
@@ -13,7 +14,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 import web.supporting.error.exceptions.CollectiblesException;
 import web.supporting.error.exceptions.IncorrectParameterException;
 import web.supporting.error.exceptions.NotFoundException;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 @RestController
 public class ImageController extends CollectiblesController{
@@ -47,7 +52,20 @@ public class ImageController extends CollectiblesController{
 		}
 	}
 	
-
+	@JsonView(ImageSimpleView.class)
+	@Secured(value = { "ROLE_ADMIN" })
+	@RequestMapping(value="/image/modify/minor/", method = RequestMethod.PUT)
+	public Image modifyLiteImage(@RequestBody Image image) throws CollectiblesException {
+		Image imageResult = null;
+		if (image.getId()!=null){
+			Image imageInDB = imageRepository.findOne(image.getId());
+			if (imageInDB!=null){
+				imageInDB.setNotBook(image.getNotBook());
+				imageResult = imageRepository.save(imageInDB);				
+			}
+		}
+		return imageResult;
+	} 
 	
 	private ResponseEntity<byte[]> generateImage(byte [] data){
 		final HttpHeaders headers = new HttpHeaders();

@@ -81,13 +81,16 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	public Date getPublicationDate(Document doc){
 		Date result = null;
 		Integer year = null;
-		try{
-			year = Integer.parseInt(this.getField(doc, publicationYearDocPath));
-			if (year!=null){
-				result = super.getDateFromYear(year);
+		String pubYear = this.getField(doc, publicationYearDocPath);
+		if (pubYear!=null && !"".equals(pubYear)){
+			try{
+				year = Integer.parseInt(pubYear);
+				if (year!=null){
+					result = super.getDateFromYear(year);
+				}
+			}catch (Exception e){
+				logger.error("Publication year is not integer", e);
 			}
-		}catch (Exception e){
-			logger.error("Publication year is not integer", e);
 		}
 		return result;
 	}
