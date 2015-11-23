@@ -184,6 +184,7 @@ public class Product extends SimpleIdDao{
 		if (this.images==null){
 			this.images = new ArrayList<>();
 		} 
+		image.setProduct(this);
 		return this.images.add(image);
 	}
 	

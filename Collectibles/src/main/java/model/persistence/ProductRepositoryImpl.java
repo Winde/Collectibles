@@ -37,16 +37,15 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			image.setMain(true);
 		} else {
 			image.setMain(false);
-		}
+		}		
+		product.addImage(image);
 		imageRepository.save(image);
-		product.addImage(image);	
 		productRepository.save(product);
 		return product;
 	}
 
 	@Override
-	public Product addImage(Product product, Collection<Image> images) {
-		imageRepository.save(images);		
+	public Product addImage(Product product, Collection<Image> images) {			
 		for (Image image: images) {
 			if (product.getImages()==null || product.getImages().size()<=0){
 				image.setMain(true);
@@ -55,6 +54,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			}
 			product.addImage(image);
 		}
+		imageRepository.save(images);	
 		productRepository.save(product);
 		return product;
 	}

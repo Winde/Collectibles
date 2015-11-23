@@ -627,6 +627,7 @@ public class ProductController  extends CollectiblesController{
 						logger.error("Exception reading image bytes", e);
 						throw new IncorrectParameterException(new String[]{"images[" + j + "]"});				
 					}
+					image.setProduct(productInDb);
 					images.add(image);
 					j++;
 				}

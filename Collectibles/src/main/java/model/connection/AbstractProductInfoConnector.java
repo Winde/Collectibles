@@ -272,6 +272,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						Image newImage = new Image();
 						newImage.setData(imageData);
 						newImage.setMain(true);
+						newImage.setProduct(product);
 						
 						boolean executeChange = true;
 						if (product.getImages()!=null && product.getImages().size()==1 && product.getImages().get(0).isBigger(newImage)){
@@ -298,8 +299,8 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						if (imagesData!=null){
 							for (byte[] imageBytes : imagesData) {
 								Image image = new Image();							
-								image.setData(imageBytes);
-								imagesAdd.add(image);
+								image.setData(imageBytes);								
+								imagesAdd.add(image);								
 								product.addImage(image);							
 							}
 						}
