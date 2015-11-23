@@ -80,7 +80,7 @@
 						data-collection-name="allHierarchies"								
 						ng-options="item as item.name for item in (allHierarchies|filter:{isRoot:'!'}) track by item.id"
 						ng-change="modifyLite(product)" 					
-							options-class="{ 
+						options-class="{ 
 							root: isRoot == true,
 							depth0: depth == 0,
 							depth1: depth == 1,

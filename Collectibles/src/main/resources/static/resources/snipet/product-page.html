@@ -11,11 +11,48 @@
 	  <li class="active">{{product.name}}</li>	  	  
 	</ol>
 
-	<h2>{{product.name}}</h2>
+	<div class="row ownershipBlock" ng-show="product.id">				
+		<div class="col-xs-12">
+			<span ng-if="isLoggedIn()"
+					class="btn btn-default" 
+					ng-model="product.owned" 
+					uib-btn-checkbox 
+					btn-checkbox-true="true" 
+					btn-checkbox-false="false"
+					ng-change="modifyLite(product)">
+				Owned
+			</span>
+			<span ng-if="isLoggedIn()"  
+					class="btn btn-default" 
+					ng-model="product.ownedAnotherLanguage" 
+					uib-btn-checkbox 
+					btn-checkbox-true="true" 
+					btn-checkbox-false="false"
+					ng-change="modifyLite(product)">
+				Owned <i class="fa fa-globe"></i>
+			</span>
+			<span ng-if="isLoggedIn()"  
+					class="btn btn-default" 
+					ng-model="product.wished" 
+					uib-btn-checkbox 
+					btn-checkbox-true="true" 
+					btn-checkbox-false="false"
+					ng-change="modifyLite(product)">
+				In wishlist
+			</span>
+		</div>	
+	</div>
+	
+	<div class="row">
+		<div class="col-xs-12">
+			<h2>{{product.name}}</h2>
+		</div>
+	</div>
 
 	<div class="row">
 	
-			
+		
+		
 		<div class="col-lg-4 col-sm-4 col-sm-push-8 col-xs-12">
 			<div class="images">	
 				<div ng-if="product.selectedImage"> 		
@@ -63,9 +100,11 @@
 					<div class="ratingsBlock" ng-show="product.ratings && !isEmptyObject(product.ratings)">
 						<p><b>Ratings: </b></p>
 						<div class="blockContent">							
-							<p ng-if="product.ratings" ng-repeat="(key, value) in product.ratings">
-								<span ng-if="key">{{key}}: </span>
-								<span ng-if="value===0.0 || value">{{value | number:2}}</span>								
+							<p ng-if="product.ratings" ng-repeat="(key, value) in product.ratings" >
+								<span ng-if="value > 0.0">				
+									<span ng-if="key">{{key}}: </span>
+									<uib-rating ng-model="value" max="10" readonly="true" aria-labelledby="default-rating"></uib-rating>
+								</span>															
 							</p>							
 						</div>						
 					</div>	
@@ -89,7 +128,8 @@
 								</div>
 							</div>
 						</div>
-					</div> 						
+					</div> 	
+									
 				</div>
 			</div>
 			<div class="row providerLinksBlock">
@@ -112,6 +152,7 @@
 				</div>
 				
 			</div>
+				
 		</div>
 
 		

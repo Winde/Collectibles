@@ -26,7 +26,14 @@
 		}
 		
 		this.newProduct = function(){
+			var hierarchy = null;
+			if ($scope.product && $scope.product.hierarchyPlacement){
+				hierarchy = $scope.product.hierarchyPlacement;
+			}
 			$scope.product = {};
+			if (hierarchy!=null){
+				$scope.product.hierarchyPlacement = hierarchy;
+			}
 		}
 		
 		this.refreshScrape = function(){

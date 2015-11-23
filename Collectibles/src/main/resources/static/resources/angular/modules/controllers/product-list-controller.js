@@ -281,18 +281,7 @@
 		}
 		
 		
-		this.modifyLite = function(product){
-			Product.modifyLite(product)
-			.success(function(data){
-				product = angular.copy(data);
-			})
-			.catch(function(data){
-				Message.alert("There was an error");
-			})
-			.finally(function(data){
-				
-			});
-		}
+
 		
 		
 		/*//Removed due to product list controller having a partial model of the product objects
