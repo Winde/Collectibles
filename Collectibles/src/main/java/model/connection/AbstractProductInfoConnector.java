@@ -178,7 +178,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 				
 				Object doc = itemLookup.fetchDocFromProduct(product);
 				
-				logger.info("Obtained doc: " + doc);
+				logger.debug("Obtained doc: " + doc);
 				
 				if (doc!=null){
 					

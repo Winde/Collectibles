@@ -55,6 +55,7 @@ public class ContinuousScrapper implements ContinuousScrapperInterface {
 
 	@Transactional
 	public boolean scrapeOne(ScrapeRequest scrapeReq, ProductInfoConnector connector, String identifier){
+		boolean accessedRemoteConnector = true;
 		boolean processed = true;
 		boolean markedAsCompleted = false;
 		try{
@@ -85,10 +86,12 @@ public class ContinuousScrapper implements ContinuousScrapperInterface {
 				try {
 					HierarchyNode hierarchyNode = hierarchyRepository.findOne(scrapeReq.getHierarchy());
 					if (hierarchyNode!=null){
+						boolean alreadyExists = false;
 						Product product = null;
 						Collection<Product> products = productRepository.findByConnectorReference(identifier, scrapeReq.getProductReference());
 						if (products!=null && products.size()==1){
 							product = products.iterator().next();
+							alreadyExists = true;
 						}  else {
 							Map<String,String> connectorReferences = new HashMap<>();							
 							
@@ -110,7 +113,13 @@ public class ContinuousScrapper implements ContinuousScrapperInterface {
 								owners.add(user);
 							}
 						}
-						boolean updated = connector.updateProductWithoutSave(product);
+						boolean updated = false;
+						if (alreadyExists){
+							updated  = true;
+							accessedRemoteConnector = false;
+						} else {
+							updated = connector.updateProductWithoutSave(product);
+						}
 						if (updated){																
 							processed = true;								
 							if (product.getName()!=null && !"".equals(product.getName().trim())){
@@ -159,7 +168,7 @@ public class ContinuousScrapper implements ContinuousScrapperInterface {
 				scrapeRequestRepository.markAsCompleted(scrapeReq);
 			}
 		}
-		return processed;
+		return accessedRemoteConnector;
 	}
 
 	public void doScrape(ProductInfoConnector connector) {
@@ -170,18 +179,20 @@ public class ContinuousScrapper implements ContinuousScrapperInterface {
 			if (sleep == null || sleep < 200){
 				sleep = 1000;
 			}
-								
+			boolean accessedRemoteConnector = true; 					
 			//logger.info(identifier + " Scanning");
 			ScrapeRequest scrapeReq = scrapeRequestRepository.findOldestByConnector(identifier);			
 			
 			
 			if (scrapeReq!=null){
 				logger.info(identifier + " found " + scrapeReq);
-				scrapeOne(scrapeReq, connector, identifier);
+				accessedRemoteConnector = scrapeOne(scrapeReq, connector, identifier);
 			}			
 			
 			try {				
-				Thread.sleep(sleep);
+				if (accessedRemoteConnector){
+					Thread.sleep(sleep);
+				}
 			} catch (InterruptedException e) {
 				logger.error("Interrupt sleep", e);
 			}

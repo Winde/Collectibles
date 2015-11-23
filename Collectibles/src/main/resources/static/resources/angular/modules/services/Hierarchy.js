@@ -8,7 +8,10 @@
 		function addChildren(array, parent, children, maxDepth, optionalToAddChildren){
 			for (var j=0;j<children.length;j++){
 				var current = children[j];
-				current.parent = parent;
+				if (parent!=null){
+					current.parent = angular.copy(parent);
+					current.parent.children = null;
+				}
 				var depth = current.depth;					
 				
 				var optionalLineageParent = null;

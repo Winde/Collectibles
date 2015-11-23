@@ -110,20 +110,25 @@
 							</figure>
 						
 						</div>
-						<img class="hidden-lg hidden-md img-responsive mainImage" ng-id="image.id" ng-src="/image/content/{{product.selectedImage.id}}">
+						<a href="/image/content/{{product.selectedImage.id}}">
+							<img fluidbox class="hidden-lg hidden-md img-responsive mainImage" ng-id="image.id" ng-src="/image/content/{{product.selectedImage.id}}">
+						</a>
 					</div>
-					<img ng-if="!product.hierarchyPlacement.isBook || product.selectedImage.notBook" class="img-responsive mainImage" ng-id="image.id" ng-src="/image/content/{{product.selectedImage.id}}">
-						
+					<a href="/image/content/{{product.selectedImage.id}}">
+						<img fluidbox ng-if="!product.hierarchyPlacement.isBook || product.selectedImage.notBook" class="img-responsive mainImage" ng-id="image.id" ng-src="/image/content/{{product.selectedImage.id}}">
+					</a>
 				</div>
 			
 				<div class="carousel hidden-xs" ng-if="product.images && product.images.length>1">
 					<div class="row">
-						<div class="col-xs-4" ng-repeat="image in product.images">
+						<div class="col-xs-4" ng-repeat="image in product.images" ng-if="product.selectedImage.id != image.id">							
 							<a href ng-if="productCtrl.isEditable() && isAdmin()" ng-click="productCtrl.removeImage(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>			
-							<img class="img-responsive img-thumbnail" 
-								ng-click="productCtrl.setSelectedImage(image)" 
+							<a href="/image/content/{{image.id}}">
+								<img class="img-responsive img-thumbnail" fluidbox 								
 								ng-id="image.id" 
-								ng-src="/image/content/{{image.id}}">		
+								ng-src="/image/content/{{image.id}}">
+								<!-- ng-click="productCtrl.setSelectedImage(image)" -->
+							</a>									
 						</div>
 					</div>
 				</div>	
@@ -182,7 +187,7 @@
 		<div ng-if="product.authors && product.authors.length && product.authors.length>0">
 			<p><b>Authors:</b></p>
 			<div class="row">
-				<div class="col-lg-1 col-md-2 col-sm-3 col-xs-3 authorEntry" ng-repeat="author in product.authors">															
+				<div class="col-lg-1 col-md-2 col-sm-2 col-xs-3 authorEntry" ng-repeat="author in product.authors">															
 						<a href="{{author.goodreadsAuthorLink}}">																		
 							<span class="authorContainer">
 								<img class="img-responsive img-thumbnail " ng-if="author.id && author.hasImage" ng-src="/image/author/{{author.id}}" />											

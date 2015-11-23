@@ -127,10 +127,10 @@
 		this.importFromScrapUser = function(){
 			Product.importFromScrapUser($scope.connector,$scope.userIdToScrape,$scope.hierarchy.id)
 			.success(function(data){
-				Message.success("Success; " + data + " products to be imported");	
+				Message.success("Success; " + data + " products to be imported",true);	
 			})
 			.catch(function(){
-				Message.alert("There was an error");
+				Message.alert("There was an error",true);
 			})
 			.finally(function(){
 				

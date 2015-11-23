@@ -136,7 +136,7 @@ public class SteamItemLookupService extends AbstractProductInfoLookupService<Jso
 			
 		}
 		
-		logger.info("Returning doc: " + doc);
+		logger.debug("Returning doc: " + doc);
 		return doc;
 	}
 
