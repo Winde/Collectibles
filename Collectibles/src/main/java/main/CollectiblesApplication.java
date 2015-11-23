@@ -65,11 +65,15 @@ import configuration.security.jwt.TokenAuthenticationService;
 @PropertySource("classpath:boardgamegeek.properties")
 @PropertySource("classpath:steam.properties")
 @PropertySource("classpath:reddis.properties")
+@PropertySource(value = {
+        "classpath:reddis.properties",
+        "classpath:reddis-${spring.profiles.active:default}.properties"
+})
 @EnableTransactionManagement
 @EnableAsync
 @EnableScheduling
 public class CollectiblesApplication {
-
+	
 	@Autowired
 	private TokenAuthenticationService tokenAuthenticationService;
 	
