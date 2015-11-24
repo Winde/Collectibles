@@ -1,6 +1,7 @@
 package model.connection.drivethrurpg;
 
 import java.util.List;
+import java.util.SortedMap;
 
 import model.connection.AbstractProductInfoConnector;
 import model.connection.ProductInfoLookupService;
@@ -18,7 +19,7 @@ public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 	@Autowired
 	private DrivethrurpgItemLookupService itemLookup;
 	
-	public ProductInfoLookupService getImageLookupService(){
+	public ProductInfoLookupService getProductInfoLookupService(){
 		return itemLookup;
 	}
 
@@ -72,5 +73,16 @@ public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 	@Override
 	public boolean supportsRating() {
 		return false;
+	}
+	
+	@Override
+	public boolean guaranteeUnivocalResponse(Product product){
+		boolean canGuarantee = false;
+		SortedMap<String, String> links = product.getExternalLinks();
+		if (links!=null){
+			String link  =links.get(this.getIdentifier());
+			canGuarantee = (link!=null && !"".equals(link.trim()));
+		}
+		return canGuarantee;
 	}
 }

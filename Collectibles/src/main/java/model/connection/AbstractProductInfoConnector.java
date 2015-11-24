@@ -45,12 +45,12 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	private AuthorRepository authorRepository;
 	
 	@Override	
-	public boolean updateSuperficialTransaction(Product product) throws TooFastConnectionException{
+	public boolean updateTransitionalTransaction(Product product) throws TooFastConnectionException{
 		AbstractProductInfoConnector connector = this;		
 		Product productInDb = productRepository.findOne(product.getId());
 		boolean updated = false;
 		try {
-			updated = connector.updateSuperficial(productInDb);
+			updated = connector.updateTransitional(productInDb);
 		} catch (TooFastConnectionException e) {
 			logger.error("Too fast connection to: "+connector.getIdentifier() , e);
 		}
@@ -61,21 +61,26 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	}
 	
 	@Override	
-	public boolean updateSuperficial(Product product) throws TooFastConnectionException{
+	public boolean updateTransitional(Product product) throws TooFastConnectionException{
 		AbstractProductInfoConnector connector = this;
 		boolean result = true; 		
 
-		logger.info("Starting access to provider : " + connector.getIdentifier());
+		logger.debug("Starting access to provider : " + connector.getIdentifier());
 		boolean updated = false;
 		try {
 								
-			ProductInfoLookupService itemLookup = connector.getImageLookupService();										
+			ProductInfoLookupService itemLookup = connector.getProductInfoLookupService();										
 			if (itemLookup!=null){
 				Object doc = itemLookup.fetchDocFromProduct(product);
 				if (doc!=null){
 					
-					Map<String,Long> prices = itemLookup.getDollarPrice(doc);
-					logger.info(this.getIdentifier()+" obtained prices: " + prices);					
+					Map<String,Long> prices = null;
+					if (connector.guaranteeUnivocalResponse(product)){
+						prices = itemLookup.getDollarPrice(doc);
+						logger.info(this.getIdentifier()+" obtained prices: " + prices +" for " + product);
+					} else {
+						logger.info(this.getIdentifier() + " Skip prices for" + product);
+					}
 					if (product.getDollarPrice()!=null){
 						boolean modifiedMinPrice = false;
 						Set<Entry<String, Long>> entries = product.getDollarPrice().entrySet();
@@ -105,10 +110,15 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						updated = true;
 					} 
 					
-					logger.debug(this.getIdentifier() + " Checking Rating");					
-					Double rating = itemLookup.getRating(doc);
-					if (rating!=null){
-						logger.info("Obtained rating :" + rating);
+					logger.debug(this.getIdentifier() + " Checking Rating");
+					Double rating = null;
+					if (connector.guaranteeUnivocalResponse(product)){
+						rating = itemLookup.getRating(doc);
+						logger.info(this.getIdentifier() + " Obtained rating"+ rating +"for" + product);
+					} else {
+						logger.info(this.getIdentifier() + " Skip rating for" + product);
+					}
+					if (rating!=null){						
 						Map<String, Double> ratings = product.getRatings();
 						if (ratings==null){
 							ratings = new HashMap<>();
@@ -128,7 +138,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 			updated = false;			
 		}
 		
-		logger.info("Finishing access to price provider "+ connector.getIdentifier()+", was updated?  : " + updated );
+		logger.info("Finishing access to Transitional provider "+ connector.getIdentifier()+", was updated?  : " + updated );
 		result = updated;
 		
 		return result;
@@ -155,14 +165,14 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 			Collection<Image> imagesAdd = new ArrayList<>();
 			Collection<Image> imagesRemove = new ArrayList<>();
 			Set<Author> authorsAdd = new HashSet<>();				
-			logger.info("Looking for product in database:" + product);
+			logger.debug("Looking for product in database:" + product);
 			if (product.getId()!=null){
 				product = productRepository.findOne(product.getId());					
-				logger.info("Product found in database:" + product);				
+				logger.debug("Product found in database:" + product);				
 			}
 			updated = updateProductDo(product, imagesAdd, imagesRemove,authorsAdd);
 			if (updated && save){	
-				logger.info("Saving product");
+				logger.info("Saving product " + product);
 				productRepository.save(product);
 				imageRepository.delete(imagesRemove);
 				//storeAfterSuccess(productInDb,productRepository);
@@ -187,7 +197,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	
 	protected boolean updateProductDo(Product product, Collection<Image> imagesAdd, Collection<Image> imagesRemove, Set<Author> authorsAdd) throws TooFastConnectionException, FileNotFoundException{
 		boolean processed = false;
-		ProductInfoLookupService itemLookup = this.getImageLookupService();		
+		ProductInfoLookupService itemLookup = this.getProductInfoLookupService();		
 
 		if (this.isApplicable(product)){						
 			
@@ -199,16 +209,17 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 				
 				if (doc!=null){
 					
-					logger.debug(this.getIdentifier() + " Checking product name");
+					
 					if (product.getName()==null || "".equals(product.getName().trim())){
 						String name = itemLookup.getName(doc);
+						logger.info(this.getIdentifier() + " Obtained name for" + product);
 						product.setName(name);
 					}					
 					
 					String obtainedDescription = null;					
-					obtainedDescription = itemLookup.getDescription(doc);
-					logger.debug(this.getIdentifier() + " Obtained Description from Service: " + obtainedDescription);
+					obtainedDescription = itemLookup.getDescription(doc);					
 					if (obtainedDescription!=null){
+						logger.info(this.getIdentifier() + " Obtained Description from Service for " + product);
 						if (product.getDescription()==null || "".equals(product.getDescription().trim()) || !product.isLengthyDescription()){
 							if (product.getDescription()!=null){
 								if (obtainedDescription.length()>product.getDescription().length()){
@@ -219,8 +230,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 							}
 						}
 					}				
-
-					logger.debug(this.getIdentifier() + " Checking external links");
+					
 					String externalLink = null;
 					if (product.getExternalLinks()!=null){
 						externalLink = product.getExternalLinks().get(this.getIdentifier());
@@ -229,7 +239,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						
 						
 						externalLink = itemLookup.getExternalUrlLink(doc);
-						logger.info("Obtained Url for "+this.getIdentifier()+": " + externalLink);
+						logger.info(this.getIdentifier()+ " Obtained Url for "+ product +": " + externalLink);
 							
 						if (externalLink!=null){
 							SortedMap<String, String> externalLinks = product.getExternalLinks();
@@ -240,7 +250,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 							externalLinks.put(this.getIdentifier(), externalLink);
 						}
 					} else {
-						logger.info("Already got url? : " + product.getExternalLinks().get(this.getIdentifier()));
+						logger.debug("Already got url? : " + product.getExternalLinks().get(this.getIdentifier()));
 					}
 					
 					
@@ -253,7 +263,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					if (externalRelatedLink == null || "".equals(externalRelatedLink.trim())){
 						String seriesUrl = null;
 						seriesUrl = itemLookup.getSeriesUrl(doc);
-						logger.info("Obtained "+this.getIdentifier()+" series url :" + seriesUrl);
+						logger.info(this.getIdentifier() + "Obtained for product" +product +" series url :" + seriesUrl);
 						if (seriesUrl!=null){
 							SortedMap<String, String> externalLinks = product.getExternalLinks();
 							if (externalLinks==null){
@@ -269,7 +279,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						String publisher = null;
 						
 						publisher = itemLookup.getPublisher(doc);
-						logger.info("Obtained publisher: " + publisher);
+						logger.info(this.getIdentifier()+" obtained publisher: " + publisher);
 							
 						if (publisher!=null && !"".equals(publisher.trim())){
 							product.setPublisher(publisher);
@@ -298,11 +308,10 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						
 						if (executeChange){
 							if (product.getImages()!=null && product.getImages().size()>0){
-								logger.info("Substituting images: " + product.getImages());
+								logger.info(this.getIdentifier() + " Substituting images for product " +product+": " + product.getImages());
 								imagesRemove.addAll(product.getImages());
 							}						
-														
-							logger.info("Obtained image from: " + this.getClass() );
+																					
 							List<Image> images = new ArrayList<>();
 							images.add(newImage);
 							imagesAdd.add(newImage);
@@ -314,6 +323,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					if (product.getImages()!=null && product.getImages().size()==1){
 						List<byte []> imagesData = itemLookup.getAdditionalImageData(doc);
 						if (imagesData!=null){
+							logger.info(this.getIdentifier() + " Obtained additinal images for " +product+" (" + imagesData.size()+")");
 							for (byte[] imageBytes : imagesData) {
 								Image image = new Image();							
 								image.setData(imageBytes);								
@@ -327,7 +337,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					if (product.getReleaseDate()==null){
 						Date date = null;
 						date = itemLookup.getPublicationDate(doc);
-						logger.info("Obtained publication date :" + date);
+						logger.info(this.getIdentifier() + "Obtained publication date :" + date);
 						if (date!=null){							
 							product.setReleaseDate(date);
 						}
@@ -339,10 +349,9 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					
 					if (product.getAuthors()==null || product.getAuthors().size()==0){
 						Set<Author> authors = null;
-						authors = itemLookup.getAuthors(doc);
-						logger.info("Obtained authors :" + authors);
+						authors = itemLookup.getAuthors(doc);						
 						if (authors!=null && authors.size()>0){
-							logger.info("Obtained " + authors.size() + " authors");
+							logger.info(this.getIdentifier() + "obtained authors for product "+product+ ":" + authors);
 							product.setAuthors(authors);
 							authorsAdd.addAll(authors);
 						}						
@@ -352,7 +361,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					
 					Map<String,Long> prices = itemLookup.getDollarPrice(doc);					
 					if (prices!=null){
-						logger.info("Obtained prices :" + prices);
+						logger.info(this.getIdentifier() + "obtained prices for product "+product+":" + prices);
 						for (Entry<String,Long> priceEntry: prices.entrySet()){
 							String key = this.getIdentifier();
 							if (priceEntry.getKey()!=null && !"".equals(priceEntry.getKey().trim())){
@@ -366,7 +375,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					
 					Double rating = itemLookup.getRating(doc);
 					if (rating!=null){
-						logger.info("Obtained rating :" + rating);
+						logger.info(this.getIdentifier()+ " obtained rating for product " +product+" :" + rating);
 						Map<String, Double> ratings = product.getRatings();
 						if (ratings==null){
 							ratings = new HashMap<>();
@@ -387,7 +396,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					}
 					if (connectorReference== null || "".equals(connectorReference.trim())){
 						String reference = itemLookup.getReference(doc);
-						logger.info("Obtained reference :" + reference);
+						logger.info(this.getIdentifier() + " obtained reference for product "+product +":" + reference);
 						if (reference!=null){
 							Map<String, String> references = product.getConnectorReferences();
 							if (references==null){
@@ -410,7 +419,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	}
 	
 	public String getIdentifier(){
-		return this.getImageLookupService().getIdentifier();
+		return this.getProductInfoLookupService().getIdentifier();
 	}
 	
 	public List<String> getMultipleReferences(String criteria) throws TooFastConnectionException{
@@ -424,6 +433,11 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	}
 	
 	public boolean supportsTransientData(){
-		return this.supportsImportingProducts() || this.supportsRating();
+		return this.supportsPrices() || this.supportsRating();
+	}
+	
+	public boolean guaranteeUnivocalResponse(Product product){
+		String reference = this.getProductInfoLookupService().getReferenceFromProduct(product);
+		return reference!=null;
 	}
 }

@@ -56,8 +56,7 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	}
 	
 	public String getLookupUrl(String id){
-		String url = entryPointQueryOne + "?isbn="+id+"&key="+key;
-		logger.info("Goodreads url for fetch data: " + url);
+		String url = entryPointQueryOne + "?isbn="+id+"&key="+key;		
 		return url;
 	}
 			

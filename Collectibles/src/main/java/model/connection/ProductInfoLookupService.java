@@ -40,4 +40,6 @@ public interface ProductInfoLookupService<E> {
 	public String getName(E doc) throws TooFastConnectionException;
 	
 	public String getIdentifier();
+	
+	public String getReferenceFromProduct(Product product);
 }

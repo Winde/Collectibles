@@ -17,17 +17,17 @@ public class BoardGameGeekConnector extends AbstractProductInfoConnector{
 	private static final int SLEEP_BETWEEN_CALLS = 1400;	
 	
 	@Autowired
-	private BoardGameGeekLookupService lookupService;
+	private BoardGameGeekLookupService itemLookup;
 	
 	@Override
-	public ProductInfoLookupService getImageLookupService() {
-		return lookupService;
+	public ProductInfoLookupService getProductInfoLookupService() {
+		return itemLookup;
 	}
 
 
 	@Override
 	public boolean isApplicable(Product product) {
-		String reference = lookupService.getReferenceFromProduct(product);
+		String reference = itemLookup.getReferenceFromProduct(product);
 		String name = product.getName();
 		return ((name!=null && !"".equals(name.trim())) || (reference!=null && !"".equals(reference.trim())));	
 	}
@@ -70,5 +70,4 @@ public class BoardGameGeekConnector extends AbstractProductInfoConnector{
 	public boolean supportsRating() {
 		return true;
 	}
-
 }

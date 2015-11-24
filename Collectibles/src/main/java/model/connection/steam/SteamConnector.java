@@ -19,7 +19,7 @@ public class SteamConnector extends AbstractProductInfoConnector{
 	private SteamItemLookupService itemLookUp;
 	
 	@Override
-	public ProductInfoLookupService getImageLookupService() {
+	public ProductInfoLookupService getProductInfoLookupService() {
 		return itemLookUp;
 	}
 	

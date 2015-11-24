@@ -51,19 +51,19 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 				url = "http://www.drivethrurpg.com/browse.php?keywords=";
 				url = url + URLEncoder.encode(product.getName(),"UTF-8");
 				
-				logger.info("Connecting to url: " + url);				
+				logger.debug("Connecting to url: " + url);				
 				Document doc = Jsoup.connect(url).get();
 				if (doc!=null){
-					logger.info("Obtained doc");
+					logger.debug("Obtained doc");
 					Elements productTables = doc.getElementsByClass("productListing");
 				
 					if (productTables!=null && productTables.size()>0){
-						logger.info("Obtained productTables");
+						logger.debug("Obtained productTables");
 						
 						Element productTable = productTables.get(0);
 						
 						if (productTable!=null){
-							logger.info("Obtained productTable");
+							logger.debug("Obtained productTable");
 							Elements productListings = productTable.getElementsByTag("tr");
 
 								
@@ -71,7 +71,7 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 							List<String> productNames = new ArrayList<>();
 							if (productListings!=null && productListings.size()>1){
 								
-								logger.info("Have productListings");
+								logger.debug("Have productListings");
 								
 								for (int i=1;i<productListings.size();i++){
 									String title ="";
@@ -88,7 +88,7 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 								
 		
 								if (selectedIndex>=0){
-									logger.info("Selected: " + productNames.get(selectedIndex));
+									logger.debug("Selected: " + productNames.get(selectedIndex));
 									Element selected = productListings.get(selectedIndex +1);
 									
 									
@@ -113,7 +113,7 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 										link = link +  "affiliate_id=597859";			
 									}
 									
-									logger.info("Found link: " + link);																		
+									logger.debug("Found link: " + link);																		
 								}
 								
 								
@@ -259,44 +259,44 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 					if (text!=null){
 						
 						Long price = getPriceFromProductPriceNode(priceEntry);
-						logger.info("Text: " + text);
+						logger.debug("Text: " + text);
 						
 						if (text.contains("Hardcover") && text.contains("Premium") && text.contains("Color")){
 							if (price!=null && (hardcoverColorPremiumPrice==null || price <hardcoverColorPremiumPrice)){
 								hardcoverColorPremiumNode = priceEntry;
 								hardcoverColorPremiumPrice = price;								
 							}
-							logger.info("Price Hardcover Premium Color: " + price);
+							logger.debug("Price Hardcover Premium Color: " + price);
 						}else if (text.contains("Hardcover") && text.contains("Premium")){
 							if (price!=null && (hardcoverPremiumPrice==null || price <hardcoverPremiumPrice)){
 								hardcoverPremiumNode = priceEntry;
 								hardcoverPremiumPrice = price;
 							}
-							logger.info("Price Hardcover Premium: " + price);
+							logger.debug("Price Hardcover Premium: " + price);
 						} else if (text.contains("Softcover") && text.contains("Premium") && text.contains("Color")){
 							if (price!=null && (softcoverColorPremiumPrice==null || price <softcoverColorPremiumPrice)){
 								softcoverColorPremiumNode = priceEntry;
 								softcoverColorPremiumPrice = price;
 							}
-							logger.info("Price Softcover Premium Color: " + price);
+							logger.debug("Price Softcover Premium Color: " + price);
 						} else if (text.contains("Softcover") && text.contains("Premium")){
 							if (price!=null && (softcoverPremiumPrice==null || price <softcoverPremiumPrice)){
 								softcoverPremiumNode = priceEntry;
 								softcoverPremiumPrice = price;
 							}
-							logger.info("Price Softcover Premium: " + price);
+							logger.debug("Price Softcover Premium: " + price);
 						} else if (text.contains("Hardcover")){
 							if (price!=null && (hardcoverPrice==null || price <hardcoverPrice)){
 								hardcoverNode = priceEntry;
 								hardcoverPrice = price;
 							}						
-							logger.info("Price Hardcover: " + price);
+							logger.debug("Price Hardcover: " + price);
 						} else if (text.contains("Softcover")){
 							if (price!=null && (softcoverPrice==null || price <softcoverPrice)){
 								softcoverNode = priceEntry;
 								softcoverPrice = price;
 							}	
-							logger.info("Price Softcover: " + price);
+							logger.debug("Price Softcover: " + price);
 						}
 					}
 				}

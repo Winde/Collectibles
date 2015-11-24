@@ -30,7 +30,7 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 	private GoodReadsItemLookupService itemLookup;
 	
 
-	public ProductInfoLookupService getImageLookupService(){
+	public ProductInfoLookupService getProductInfoLookupService(){
 		return itemLookup;
 	}
 
@@ -88,4 +88,5 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 	public boolean supportsRating() {
 		return false;
 	}
+
 }

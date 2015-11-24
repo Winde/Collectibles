@@ -100,6 +100,7 @@
 
 .product .authorsBlock .authorEntry {
 	margin-bottom: 10px;
+	min-height: 140px;
 }
 
 .product .authorsBlock .authorContainer {

@@ -180,7 +180,7 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 			if (imageUrl.startsWith("//")){
 				imageUrl = "http:"+imageUrl;
 			}
-			logger.info("Image url: " + imageUrl);
+			logger.info(this.getIdentifier() + " Image url: " + imageUrl);
 			image = super.fetchImage(imageUrl);
 		}
 		return image;

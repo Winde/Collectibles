@@ -65,7 +65,7 @@ public class SteamItemLookupService extends AbstractProductInfoLookupService<Jso
 			url = url + "?term=" + URLEncoder.encode(name,"UTF-8"); 
 			url = url + "&f=games";
 			
-			logger.info("Connecting to url: " + url);
+			logger.info(this.getIdentifier() + " connecting to url for name search: " + url);
 			doc = Jsoup.connect(url).get();
 		} catch (Exception e) {
 			logger.error("Issue when connecting to Steam HTML",e);
@@ -118,7 +118,7 @@ public class SteamItemLookupService extends AbstractProductInfoLookupService<Jso
 					
 			String url = searchByIdEndpoint+"?cc=us&appids="+reference;
 						
-			logger.info("Steam connecting to url: " + url);
+			logger.info(this.getIdentifier() + " connecting to url: " + url);
 			String json = null;
 			try {
 				URL urlObject = new URL(url);             

@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface ProductInfoConnector {
 
-	public ProductInfoLookupService getImageLookupService();
+	public ProductInfoLookupService getProductInfoLookupService();
 
 	@Transactional
 	public boolean updateProductTransaction(Product product) throws TooFastConnectionException;
@@ -18,9 +18,9 @@ public interface ProductInfoConnector {
 	public boolean updateProductWithoutSave(Product product) throws TooFastConnectionException;
 	
 	@Transactional
-	boolean updateSuperficialTransaction(Product product) throws TooFastConnectionException;
+	boolean updateTransitionalTransaction(Product product) throws TooFastConnectionException;
 	
-	public boolean updateSuperficial(Product product)  throws TooFastConnectionException;
+	public boolean updateTransitional(Product product)  throws TooFastConnectionException;
 	
 	public List<String> getOwnedReferences(String userId) throws TooFastConnectionException;
 			
@@ -46,4 +46,5 @@ public interface ProductInfoConnector {
 
 	public List<String> getMultipleReferences(String criteria) throws TooFastConnectionException;
 
+	public boolean guaranteeUnivocalResponse(Product product);
 }

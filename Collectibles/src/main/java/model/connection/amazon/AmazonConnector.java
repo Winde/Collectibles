@@ -18,7 +18,7 @@ public class AmazonConnector extends AbstractProductInfoConnector {
 	@Autowired
 	private AmazonItemLookupService itemLookup;
 	
-	public ProductInfoLookupService getImageLookupService(){
+	public ProductInfoLookupService getProductInfoLookupService(){
 		return itemLookup;
 	}
 
@@ -64,5 +64,6 @@ public class AmazonConnector extends AbstractProductInfoConnector {
 	public boolean supportsRating() {
 		return false;
 	}
+
 
 }

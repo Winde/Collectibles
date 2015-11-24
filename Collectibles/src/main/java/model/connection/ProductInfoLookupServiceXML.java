@@ -116,12 +116,12 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
 				for (int i=0;i<nodes.getLength();i++){
 					Node node = nodes.item(i);
 					NamedNodeMap attributes = node.getAttributes();
-					logger.info("Node: " +node );
+					logger.debug("Node: " +node );
 					if (attributes!=null && attributes.getLength()>0) {
 						for (int j=0;j<attributes.getLength();j++) {							
 							Node attribute = attributes.item(j);	
-							logger.info("Attribute: " +attribute + "[name: " + attribute.getNodeName() + ", value: " + attribute.getNodeValue() + "]" );
-							logger.info(attributeToReturn + "=" + attribute.getNodeName() +"? " + (attribute!=null && attributeToReturn.equals(attribute.getNodeName())));
+							logger.debug("Attribute: " +attribute + "[name: " + attribute.getNodeName() + ", value: " + attribute.getNodeValue() + "]" );
+							logger.debug(attributeToReturn + "=" + attribute.getNodeName() +"? " + (attribute!=null && attributeToReturn.equals(attribute.getNodeName())));
 							if (attribute!=null && attributeToReturn.equals(attribute.getNodeName())){
 								result = attribute.getNodeValue();
 								break;
