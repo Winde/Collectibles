@@ -45,12 +45,12 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	private AuthorRepository authorRepository;
 	
 	@Override	
-	public boolean updatePriceTransaction(Product product) throws TooFastConnectionException{
+	public boolean updateSuperficialTransaction(Product product) throws TooFastConnectionException{
 		AbstractProductInfoConnector connector = this;		
 		Product productInDb = productRepository.findOne(product.getId());
 		boolean updated = false;
 		try {
-			updated = connector.updatePrice(productInDb);
+			updated = connector.updateSuperficial(productInDb);
 		} catch (TooFastConnectionException e) {
 			logger.error("Too fast connection to: "+connector.getIdentifier() , e);
 		}
@@ -61,7 +61,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	}
 	
 	@Override	
-	public boolean updatePrice(Product product) throws TooFastConnectionException{
+	public boolean updateSuperficial(Product product) throws TooFastConnectionException{
 		AbstractProductInfoConnector connector = this;
 		boolean result = true; 		
 
@@ -69,13 +69,13 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		boolean updated = false;
 		try {
 								
-			ProductInfoLookupService imageLookup = connector.getImageLookupService();										
-			if (imageLookup!=null){
-				Object doc = imageLookup.fetchDocFromProduct(product);
+			ProductInfoLookupService itemLookup = connector.getImageLookupService();										
+			if (itemLookup!=null){
+				Object doc = itemLookup.fetchDocFromProduct(product);
 				if (doc!=null){
-					Map<String,Long> prices = imageLookup.getDollarPrice(doc);
-					logger.info(this.getIdentifier()+" obtained prices: " + prices);
 					
+					Map<String,Long> prices = itemLookup.getDollarPrice(doc);
+					logger.info(this.getIdentifier()+" obtained prices: " + prices);					
 					if (product.getDollarPrice()!=null){
 						boolean modifiedMinPrice = false;
 						Set<Entry<String, Long>> entries = product.getDollarPrice().entrySet();
@@ -104,6 +104,23 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 						}
 						updated = true;
 					} 
+					
+					logger.debug(this.getIdentifier() + " Checking Rating");					
+					Double rating = itemLookup.getRating(doc);
+					if (rating!=null){
+						logger.info("Obtained rating :" + rating);
+						Map<String, Double> ratings = product.getRatings();
+						if (ratings==null){
+							ratings = new HashMap<>();
+							product.setRatings(ratings);
+						}
+						ratings.put(this.getIdentifier(), rating);
+					} else {
+						Map<String, Double> ratings = product.getRatings();
+						if (ratings!=null){
+							ratings.remove(this.getIdentifier());
+						}
+					}
 				}
 			}
 		}catch (Exception e){
@@ -356,6 +373,11 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 							product.setRatings(ratings);
 						}
 						ratings.put(this.getIdentifier(), rating);
+					} else {
+						Map<String, Double> ratings = product.getRatings();
+						if (ratings!=null){
+							ratings.remove(this.getIdentifier());
+						}
 					}
 					
 					logger.debug(this.getIdentifier() + " Checking Reference");					
@@ -386,24 +408,6 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		}
 		return processed;
 	}
-
-	@Override
-	public void processInBackground(Collection<Product> products){
-		
-		Collection<Product> clonedProducts = new ArrayList<Product>();		
-		clonedProducts.addAll(products);
-		BackgroundProcessor thread = new BackgroundProcessor(clonedProducts, productRepository, imageRepository,authorRepository,  this);
-		thread.start();
-	}
-	
-	@Override
-	public void processPricesInBackground(Collection<Product> products){
-		
-		Collection<Product> clonedProducts = new ArrayList<Product>();		
-		clonedProducts.addAll(products);
-		BackgroundProcessorPrices thread = new BackgroundProcessorPrices(clonedProducts, productRepository, imageRepository,authorRepository,  this);
-		thread.start();
-	}
 	
 	public String getIdentifier(){
 		return this.getImageLookupService().getIdentifier();
@@ -419,4 +423,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		return false;
 	}
 	
+	public boolean supportsTransientData(){
+		return this.supportsImportingProducts() || this.supportsRating();
+	}
 }

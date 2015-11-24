@@ -9,18 +9,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Future;
 
 import javax.persistence.EntityManager;
 
-import model.connection.BackgroundProcessOwnItems;
 import model.connection.ProductInfoConnector;
 import model.connection.ProductInfoConnectorFactory;
-import model.connection.TooFastConnectionException;
 import model.dataobjects.Category;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
@@ -90,9 +86,6 @@ public class ProductController  extends CollectiblesController{
 
 	@Autowired
 	private EntityManager entityManager;
-	
-	@Autowired
-	private BackgroundProcessOwnItems processOwnershipItems;
 	
 	@Autowired
 	private ProductInfoConnectorFactory connectorFactory;

@@ -60,4 +60,9 @@ public class AmazonConnector extends AbstractProductInfoConnector {
 		return true;
 	}
 
+	@Override
+	public boolean supportsRating() {
+		return false;
+	}
+
 }

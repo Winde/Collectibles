@@ -64,4 +64,9 @@ public class SteamConnector extends AbstractProductInfoConnector{
 	public boolean supportsImportingProducts(){	
 		return true;
 	}
+
+	@Override
+	public boolean supportsRating() {
+		return true;
+	}
 }

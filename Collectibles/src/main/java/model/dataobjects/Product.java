@@ -345,8 +345,8 @@ public class Product extends SimpleIdDao{
 		return connector.updateProductTransaction(this);
 	}
 
-	public synchronized boolean updatePricesWithConnector(ProductInfoConnector connector) throws TooFastConnectionException {
-		return connector.updatePriceTransaction(this);
+	public synchronized boolean updateSuperficialWithConnector(ProductInfoConnector connector) throws TooFastConnectionException {
+		return connector.updateSuperficialTransaction(this);
 	}
 
 	public Date getLastPriceUpdate() {

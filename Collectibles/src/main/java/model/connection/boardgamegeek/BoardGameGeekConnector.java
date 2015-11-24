@@ -1,5 +1,6 @@
 package model.connection.boardgamegeek;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,12 @@ public class BoardGameGeekConnector extends AbstractProductInfoConnector{
 	@Override
 	public boolean supportsPrices() { 
 		return false;
+	}
+
+
+	@Override
+	public boolean supportsRating() {
+		return true;
 	}
 
 }

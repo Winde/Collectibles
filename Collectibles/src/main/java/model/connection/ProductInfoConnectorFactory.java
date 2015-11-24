@@ -61,39 +61,39 @@ public class ProductInfoConnectorFactory {
 		return null;
 	}
 	
-	private void filterSupportPrices(Collection<ProductInfoConnector> collection){		
+	private void filterSupportTransient(Collection<ProductInfoConnector> collection){		
 		if (collection!=null){
 			Iterator<ProductInfoConnector> iterator = collection.iterator();
 			while (iterator.hasNext()){
 				ProductInfoConnector connector = iterator.next();
-				if (!connector.supportsPrices()){
+				if (!connector.supportsTransientData()){
 					iterator.remove();
 				}
 			}
 		}		
 	}
 	
-	public Collection<ProductInfoConnector> getConnectors(boolean supportsPrices) {
+	public Collection<ProductInfoConnector> getConnectors(boolean requireSupportsTransient) {
 		Collection<ProductInfoConnector> allConnectors= this.getConnectors();
-		if (supportsPrices){
-			filterSupportPrices(allConnectors);
+		if (requireSupportsTransient){
+			filterSupportTransient(allConnectors);
 		}
 		return null;
 	}
 
 	
-	public Collection<ProductInfoConnector> getConnectors(Product product, boolean supportsPrices){
+	public Collection<ProductInfoConnector> getConnectors(Product product, boolean requireSupportsTransient){
 		Collection<ProductInfoConnector> connectorsForProduct = this.getConnectors(product.getHierarchyPlacement());
-		if (supportsPrices){
-			filterSupportPrices(connectorsForProduct);
+		if (requireSupportsTransient){
+			filterSupportTransient(connectorsForProduct);
 		}
 		return connectorsForProduct;
 	}
 	
-	public Collection<ProductInfoConnector> getConnectors(HierarchyNode node, boolean supportsPrices){
+	public Collection<ProductInfoConnector> getConnectors(HierarchyNode node, boolean requireSupportsTransient){
 		Collection<ProductInfoConnector> connectorsForProduct = this.getConnectors(node);
-		if (supportsPrices){
-			filterSupportPrices(connectorsForProduct);
+		if (requireSupportsTransient){
+			filterSupportTransient(connectorsForProduct);
 		}
 		return connectorsForProduct;
 	}

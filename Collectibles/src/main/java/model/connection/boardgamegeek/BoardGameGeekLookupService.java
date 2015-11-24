@@ -37,7 +37,9 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 
 	private static final String IDENTIFIER = "BoardGameGeek";
 	
-	private String PRODUCT_URL = null;
+	private String DEFAULT_PRODUCT_URL = null;
+	private String BOARDGAME_PRODUCT_URL = null;
+	private String RPG_PRODUCT_URL = null;	
 	private String ENDPOINT = null;
 	private String OPERATION_THING = null;
 	private String OPERATION_SEARCH = null;
@@ -51,11 +53,15 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	private final String yearPublishedDocPath = "/items/item/yearpublished";
 	private final String yearPublishedAttribute = "value";
 	
-	private final String ratingDocPath = "/items/item/statistics/ratings/bayesaverage";
+	private final String ratingDocPathBayesAverage = "/items/item/statistics/ratings/bayesaverage";
+	private final String ratingDocPathAverage = "/items/item/statistics/ratings/average";
 	private final String ratingAttribute = "value";	
 	
 	private final String referenceDocPath = "/items/item";
 	private final String referenceAttribute = "id";
+	
+	private final String typeDocPath = "/items/item";
+	private final String typeAttribute = "type";
 
 		
 	@Autowired
@@ -65,13 +71,17 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 			@Value("${BOARDGAMEGEEK.V2.OPERATION.SEARCH.PARAMETER}")String OPERATION_SEARCH_PARAMETER,
 			@Value("${BOARDGAMEGEEK.V2.OPERATION.THING}")String OPERATION_THING,			
 			@Value("${BOARDGAMEGEEK.V2.OPERATION.THING.PARAMETER}")String OPERATION_THING_PARAMETER,
-			@Value("${BOARDGAMEGEEK.PRODUCT_URL}")String PRODUCT_URL){		
+			@Value("${BOARDGAMEGEEK.DEFAULT_PRODUCT_URL}")String DEFAULT_PRODUCT_URL,
+			@Value("${BOARDGAMEGEEK.BOARDGAME_PRODUCT_URL}")String BOARDGAME_PRODUCT_URL,
+			@Value("${BOARDGAMEGEEK.RPG_PRODUCT_URL}")String RPG_PRODUCT_URL){		
 		this.ENDPOINT = ENDPOINT;
 		this.OPERATION_SEARCH = OPERATION_SEARCH;
 		this.OPERATION_SEARCH_PARAMETER = OPERATION_SEARCH_PARAMETER;
 		this.OPERATION_THING = OPERATION_THING;
 		this.OPERATION_THING_PARAMETER = OPERATION_THING_PARAMETER;
-		this.PRODUCT_URL = PRODUCT_URL;		
+		this.DEFAULT_PRODUCT_URL = DEFAULT_PRODUCT_URL;	
+		this.BOARDGAME_PRODUCT_URL = BOARDGAME_PRODUCT_URL;
+		this.RPG_PRODUCT_URL = RPG_PRODUCT_URL;
 	}
 	
 	private String getIdFromName(String name){
@@ -216,8 +226,16 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
     public String getExternalUrlLink(Document doc) throws TooFastConnectionException{
 		String reference = this.getReference(doc);
 		String url = null;
-		if (reference!=null){
-			url = PRODUCT_URL + reference + "/";
+		if (reference!=null){	
+			url = DEFAULT_PRODUCT_URL + reference + "/";
+			String typeString = super.getAttribute(doc, typeDocPath,typeAttribute);		
+			if (typeString!=null){
+				if ("boardgame".equals(typeString)){
+					url = BOARDGAME_PRODUCT_URL + reference + "/";
+				} else if ("rpgitem".equals(typeString)){
+					url = RPG_PRODUCT_URL + reference + "/";
+				}
+			}
 		} 
 		return url;
 	}
@@ -239,7 +257,7 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	@Override
 	public Double getRating(Document doc) throws TooFastConnectionException {
 		Double rating = null;
-		String ratingString = super.getAttribute(doc, ratingDocPath,ratingAttribute);		
+		String ratingString = super.getAttribute(doc, ratingDocPathBayesAverage,ratingAttribute);		
 		if (ratingString!=null){
 			try{
 				rating = Double.parseDouble(ratingString);
@@ -247,6 +265,17 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 				logger.error("Rating is not a double", e);
 			}
 		}
+		if (rating==null || rating<=0.0){
+			ratingString = super.getAttribute(doc, ratingDocPathAverage,ratingAttribute);
+			try{
+				rating = Double.parseDouble(ratingString);
+			}catch (Exception e){
+				logger.error("Rating is not a double", e);
+			}
+		}
+		if (rating!=null && rating<=0.0){
+			rating = null;
+		}		
 		
 		return rating;
 	}

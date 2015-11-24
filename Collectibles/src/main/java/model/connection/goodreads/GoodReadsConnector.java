@@ -83,4 +83,9 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 	public boolean supportsPrices() {
 		return false;
 	}
+
+	@Override
+	public boolean supportsRating() {
+		return false;
+	}
 }

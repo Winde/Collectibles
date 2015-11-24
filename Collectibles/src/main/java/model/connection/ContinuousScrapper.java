@@ -65,7 +65,7 @@ public class ContinuousScrapper implements ContinuousScrapperInterface {
 					Product product = productRepository.findOne(scrapeReq.getProductId());
 					if (product!=null){
 						if (scrapeReq.isOnlyTransient()){					
-							connector.updatePriceTransaction(product);
+							connector.updateSuperficialTransaction(product);
 						} else{
 							connector.updateProductTransaction(product);
 						}

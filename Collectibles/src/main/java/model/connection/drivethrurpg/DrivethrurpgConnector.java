@@ -67,4 +67,10 @@ public class DrivethrurpgConnector extends AbstractProductInfoConnector {
 	public boolean supportsPrices() {
 		return true;
 	}
+
+
+	@Override
+	public boolean supportsRating() {
+		return false;
+	}
 }
