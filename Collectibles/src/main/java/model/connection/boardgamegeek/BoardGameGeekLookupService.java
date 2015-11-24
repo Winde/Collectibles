@@ -38,10 +38,13 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	private static final String IDENTIFIER = "BoardGameGeek";
 	
 	private String PRODUCT_URL = null;
-	private String ENDPOINTv1 = null;
-	private String ENDPOINTv2 = null;
+	private String ENDPOINT = null;
+	private String OPERATION_THING = null;
+	private String OPERATION_SEARCH = null;
+	private String OPERATION_SEARCH_PARAMETER = null;
+	private String OPERATION_THING_PARAMETER = null;
 	
-	private final String gameNameDocPath = "/boardgames/boardgame/name";
+	private final String gameNameDocPath = "/items/item/name";
 	private final String imageUrlDocPath = "/items/item/image";
 	private final String itemDescriptionDocPath = "/items/item/description";
 	
@@ -53,22 +56,29 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	
 	private final String referenceDocPath = "/items/item";
 	private final String referenceAttribute = "id";
-			
+
+		
 	@Autowired
-	public BoardGameGeekLookupService(
-			@Value("${BOARDGAMEGEEK.ENDPOINTv1}")String ENDPOINTv1,
-			@Value("${BOARDGAMEGEEK.ENDPOINTv2}")String ENDPOINTv2,
-			@Value("${BOARDGAMEGEEK.PRODUCT_URL}")String PRODUCT_URL){
-		this.PRODUCT_URL = PRODUCT_URL;
-		this.ENDPOINTv1 = ENDPOINTv1;
-		this.ENDPOINTv2 = ENDPOINTv2;
+	public BoardGameGeekLookupService(			
+			@Value("${BOARDGAMEGEEK.V2.ENDPOINTv2}")String ENDPOINT,
+			@Value("${BOARDGAMEGEEK.V2.OPERATION.SEARCH}")String OPERATION_SEARCH,
+			@Value("${BOARDGAMEGEEK.V2.OPERATION.SEARCH.PARAMETER}")String OPERATION_SEARCH_PARAMETER,
+			@Value("${BOARDGAMEGEEK.V2.OPERATION.THING}")String OPERATION_THING,			
+			@Value("${BOARDGAMEGEEK.V2.OPERATION.THING.PARAMETER}")String OPERATION_THING_PARAMETER,
+			@Value("${BOARDGAMEGEEK.PRODUCT_URL}")String PRODUCT_URL){		
+		this.ENDPOINT = ENDPOINT;
+		this.OPERATION_SEARCH = OPERATION_SEARCH;
+		this.OPERATION_SEARCH_PARAMETER = OPERATION_SEARCH_PARAMETER;
+		this.OPERATION_THING = OPERATION_THING;
+		this.OPERATION_THING_PARAMETER = OPERATION_THING_PARAMETER;
+		this.PRODUCT_URL = PRODUCT_URL;		
 	}
 	
 	private String getIdFromName(String name){
 		String reference = null;
 		String url = null;
 		try {
-			url = this.ENDPOINTv1 +"?search="+URLEncoder.encode(name, "UTF-8");			
+			url = this.ENDPOINT +this.OPERATION_SEARCH+"?"+this.OPERATION_SEARCH_PARAMETER+"="+URLEncoder.encode(name, "UTF-8");			
 		} catch (UnsupportedEncodingException e) {
 			logger.error("Exception when encoding URL", e);
 		}
@@ -90,7 +100,14 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 					List<String> productNames = new ArrayList<>();					
 					for (int i=0;i<nodes.getLength();i++){
 						String title ="";						
-						title = nodes.item(i).getTextContent();						
+						NamedNodeMap attributes = nodes.item(i).getAttributes();
+						for (int j=0;j<attributes.getLength();j++){
+							Node attribute = attributes.item(j);
+							if ("value".equals(attribute.getNodeName())){
+								title = attribute.getNodeValue();
+								break;
+							}
+						}
 						productNames.add(title);
 					}
 					
@@ -105,7 +122,7 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 							if (attributes!=null){
 								for (int i=0;i<attributes.getLength();i++){
 									Node attribute = attributes.item(i);
-									if ("objectid".equals(attribute.getNodeName())){
+									if ("id".equals(attribute.getNodeName())){
 										reference = attribute.getNodeValue();
 										break;
 									}
@@ -135,9 +152,10 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 		}
 		String url = null;
 		
-		url = this.ENDPOINTv2;		
+		url = this.ENDPOINT;	
+		url = url + this.OPERATION_THING;
 		url = url + "?stats=1";		
-		url = url + "&id=" + reference;
+		url = url + "&"+this.OPERATION_THING_PARAMETER+"=" + reference;
 		logger.info("BoardgameGeek url for fetch data: " + url);
 		
 		return super.fetchDocFromUrl(url);
@@ -255,5 +273,15 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 		return null;
 	}
 
+	public String getReferenceFromProduct(Product product){
+		String reference = null;
+		if (product.getConnectorReferences()!=null){
+			reference = product.getConnectorReferences().get(this.getIdentifier());
+		}
+		if (reference!=null && "".equals(reference.trim())){
+			reference = null;
+		}
+		return reference;
+	}
 
 }
