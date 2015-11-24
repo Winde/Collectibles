@@ -140,7 +140,7 @@ public class Image extends SimpleIdDao{
 		logger.info("GENERATING THUMBNAIL");
 		BufferedImage thumb = Scalr.resize(bimg,  Scalr.Method.ULTRA_QUALITY, thumbSize);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ImageIO.write( thumb, "jpg", baos );
+		ImageIO.write( thumb, "png", baos );
 		baos.flush();
 		byte[] thumbData = baos.toByteArray();
 		baos.close();
