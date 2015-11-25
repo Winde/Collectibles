@@ -119,14 +119,17 @@
 		};
 			
 		this.updatePriceSearch = function(){
-			var searchObject = controller.obtainSearchParameters();
-			Product.updatePricesForSearch(searchObject)
-			.success(function(data){ 				
-			})
-			.catch(function(data){
-				Message.alert("There was an error");							
-			}).finally(function(data){
+			Message.confirm("Are you sure?", function(){
+				var searchObject = controller.obtainSearchParameters();
 				
+				Product.updatePricesForSearch(searchObject)
+				.success(function(data){ 				
+				})
+				.catch(function(data){
+					Message.alert("There was an error");							
+				}).finally(function(data){
+					
+				});
 			});
 		}
 				
