@@ -8,6 +8,7 @@ import java.util.Set;
 
 import model.dataobjects.Author;
 import model.dataobjects.Product;
+import model.dataobjects.Rating;
 
 public interface ProductInfoLookupService<E> {
 
@@ -31,7 +32,7 @@ public interface ProductInfoLookupService<E> {
 	
 	public Map<String, Long> getDollarPrice(E doc) throws TooFastConnectionException;
 	
-	public Double getRating(E doc) throws TooFastConnectionException;
+	public Rating getRating(E doc) throws TooFastConnectionException;
 	
 	public String getReference(E doc) throws TooFastConnectionException;
 	

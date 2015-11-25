@@ -90,7 +90,7 @@ public class ProductController  extends CollectiblesController{
 	@Autowired
 	private ProductInfoConnectorFactory connectorFactory;
 	
-	private static final int MAX_PARSE_CHECKS = 6;//6;
+	private static final int MAX_PARSE_CHECKS = 20;//6;
 	private static final int MILISECONDS_BETWEEN_PARSE_CHECKS = 900; 
 	
 	private Product checkProduct(Product product, List<ScrapeRequest> requests) throws NotEnoughTimeToParseException{

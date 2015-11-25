@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -87,7 +89,7 @@ public class Product extends SimpleIdDao{
 	private String universalReference = null;
 
 	@ElementCollection(fetch = FetchType.LAZY)
-	@CollectionTable(name="connector_references", joinColumns=@JoinColumn(name="id"))
+	@CollectionTable(name="product_connector_references", joinColumns=@JoinColumn(name="id"))
 	@Column(name="connector_reference")	
 	@BatchSize(size = 50)
 	private Map<String,String> connectorReferences;
@@ -110,11 +112,10 @@ public class Product extends SimpleIdDao{
 	@CollectionTable(name="product_dollar_price", joinColumns=@JoinColumn(name="id"))
 	@Column(name="dollar_price")
 	private Map<String,Long> dollarPrice = null;
-	
-	@ElementCollection(fetch = FetchType.LAZY)
-	@CollectionTable(name="product_rating", joinColumns=@JoinColumn(name="id"))
-	@Column(name="rating")
-	private Map<String,Double> ratings = null;
+		
+	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.ALL})
+	@OrderBy("rating")
+	private SortedSet<Rating> ratings = null;
 	
 	@ElementCollection(fetch = FetchType.LAZY)
 	@CollectionTable(name="product_links", joinColumns=@JoinColumn(name="id"))
@@ -122,11 +123,13 @@ public class Product extends SimpleIdDao{
 	@MapKeyColumn(name="external_links_key")
 	@OrderBy("external_links_key")
 	private SortedMap<String, String> externalLinks = null;
-	
-	
+		
 	@Column(name="min_price")
 	private Long minPrice = null;	
 
+	@Column(name="main_rating")
+	private Double mainRating = null;
+	
 	public Product(){
 		dollarPrice = new HashMap<>();
 	}
@@ -293,6 +296,44 @@ public class Product extends SimpleIdDao{
 	public void setDollarPrice(Map<String, Long> dollarPrice) {
 		this.dollarPrice = dollarPrice;
 	}
+	
+	public SortedSet<Rating> getRatings() {
+		return ratings;
+	}
+
+	public boolean removeRating(String provider){		
+		boolean removed = false;
+		if (provider!=null){
+			Iterator<Rating> iterator = this.getRatings().iterator();
+			while (iterator.hasNext()){
+				Rating ratingInSet = iterator.next();
+				if (provider.equals(ratingInSet.getProvider())){
+					iterator.remove();
+					removed = true;
+				}
+			}
+			this.mainRating = this.calculateBestRating();
+		}
+		return removed;
+		
+	}
+	
+	
+	public void addRating(Rating rating){
+		if (this.ratings==null){
+			this.ratings = new TreeSet<>();
+		}
+		ratings.add(rating);
+		this.mainRating = this.calculateBestRating();
+	}
+	
+	public Double calculateBestRating(){
+		if (this.getRatings()!=null && this.getRatings().size()>0){
+			return this.getRatings().first().getRating();
+		} else{
+			return null;
+		}
+	}
 
 	public Long calculateMinDollarPrice() {
 		Long newMinPrice = null;
@@ -357,14 +398,6 @@ public class Product extends SimpleIdDao{
 		this.lastPriceUpdate = lastPriceUpdate;
 	}
 
-	public Map<String, Double> getRatings() {
-		return ratings;
-	}
-
-	public void setRatings(Map<String, Double> ratings) {
-		this.ratings = ratings;
-	}
-
 	public SortedMap<String, String> getExternalLinks() {		
 		return externalLinks;
 	}
@@ -379,6 +412,14 @@ public class Product extends SimpleIdDao{
 
 	public void setWishers(Set<User> wishers) {
 		this.wishers = wishers;
+	}
+
+	public Double getMainRating() {
+		return mainRating;
+	}
+
+	public void setMainRating(Double mainRating) {
+		this.mainRating = mainRating;
 	}
 
 

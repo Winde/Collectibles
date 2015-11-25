@@ -18,6 +18,7 @@ import model.connection.AbstractProductInfoLookupService;
 import model.connection.TooFastConnectionException;
 import model.dataobjects.Author;
 import model.dataobjects.Product;
+import model.dataobjects.Rating;
 
 import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
@@ -38,11 +39,14 @@ public class SteamItemLookupService extends AbstractProductInfoLookupService<Jso
 	private static final Logger logger = LoggerFactory.getLogger(SteamItemLookupService.class);
 	
 	private static final int MAX_ADDITIONAL_IMAGES = 2;
+	private static final long RATING_PRIORITY = 7;
+	
 	
 	private String searchByNameEndpoint = null;
 	private String searchByIdEndpoint = null;
 	private String obtainOwnedEndpoint = null;
 	private String key = null;
+	
 	
 	
 	@Autowired
@@ -226,7 +230,7 @@ public class SteamItemLookupService extends AbstractProductInfoLookupService<Jso
 	}
 
 	@Override
-	public Double getRating(JsonNode doc) throws TooFastConnectionException {
+	public Rating getRating(JsonNode doc) throws TooFastConnectionException {
 		Double ratingOverTen = null;
 		String ratingString = doc.path("data").path("metacritic").path("score").asText();
 		if (ratingString!=null && !"".equals(ratingString)){
@@ -240,7 +244,16 @@ public class SteamItemLookupService extends AbstractProductInfoLookupService<Jso
 				ratingOverTen = ratingOverHundred / 10.0;
 			}
 		}
-		return ratingOverTen;
+		
+		Rating ratingObject = null;
+		if (ratingOverTen!=null){
+			ratingObject = new Rating();
+			ratingObject.setPriority(RATING_PRIORITY);
+			ratingObject.setProvider(this.getIdentifier());
+			ratingObject.setRating(ratingOverTen);
+		}
+		
+		return ratingObject;
 	}
 
 	@Override

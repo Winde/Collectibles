@@ -13,6 +13,7 @@ import model.connection.AbstractProductInfoLookupService;
 import model.connection.ProductInfoLookupService;
 import model.connection.TooFastConnectionException;
 import model.dataobjects.Product;
+import model.dataobjects.Rating;
 
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
@@ -331,7 +332,7 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 	}
 
 	@Override
-	public Double getRating(DrivethrurpgData doc)
+	public Rating getRating(DrivethrurpgData doc)
 			throws TooFastConnectionException {
 		return null;
 	}

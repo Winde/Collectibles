@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import model.dataobjects.Author;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
+import model.dataobjects.Rating;
 import model.persistence.AuthorRepository;
 import model.persistence.ImageRepository;
 import model.persistence.ProductRepository;
@@ -111,25 +112,18 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					} 
 					
 					logger.debug(this.getIdentifier() + " Checking Rating");
-					Double rating = null;
+					Rating rating = null;
 					if (connector.guaranteeUnivocalResponse(product)){
-						rating = itemLookup.getRating(doc);
+						rating = itemLookup.getRating(doc);						
 						logger.info(this.getIdentifier() + " Obtained rating"+ rating +"for" + product);
 					} else {
 						logger.info(this.getIdentifier() + " Skip rating for" + product);
 					}
-					if (rating!=null){						
-						Map<String, Double> ratings = product.getRatings();
-						if (ratings==null){
-							ratings = new HashMap<>();
-							product.setRatings(ratings);
-						}
-						ratings.put(this.getIdentifier(), rating);
+					if (rating!=null){
+						rating.setProduct(product);
+						product.addRating(rating);
 					} else {
-						Map<String, Double> ratings = product.getRatings();
-						if (ratings!=null){
-							ratings.remove(this.getIdentifier());
-						}
+						product.removeRating(this.getIdentifier());
 					}
 				}
 			}
@@ -372,21 +366,14 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					}
 					
 					logger.debug(this.getIdentifier() + " Checking Rating");
-					
-					Double rating = itemLookup.getRating(doc);
-					if (rating!=null){
-						logger.info(this.getIdentifier()+ " obtained rating for product " +product+" :" + rating);
-						Map<String, Double> ratings = product.getRatings();
-						if (ratings==null){
-							ratings = new HashMap<>();
-							product.setRatings(ratings);
-						}
-						ratings.put(this.getIdentifier(), rating);
+					Rating rating = null;					
+					rating = itemLookup.getRating(doc);
+					logger.info(this.getIdentifier() + " Obtained rating"+ rating +"for" + product);				
+					if (rating!=null){		
+						rating.setProduct(product);
+						product.addRating(rating);
 					} else {
-						Map<String, Double> ratings = product.getRatings();
-						if (ratings!=null){
-							ratings.remove(this.getIdentifier());
-						}
+						product.removeRating(this.getIdentifier());
 					}
 					
 					logger.debug(this.getIdentifier() + " Checking Reference");					

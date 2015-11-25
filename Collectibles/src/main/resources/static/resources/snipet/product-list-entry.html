@@ -19,7 +19,7 @@
 		<h3><span class="label label-success" ng-if="product.minPrice">{{(product.minPrice/100) | currency}}</span></h3>
 		
 		<h3 ng-if="product && product.id && isLoggedIn()">
-			<span class="btn btn-default"  ng-click="productManagementCtrl.updatePrices(product.id)">Update price</span> 
+			<span class="btn btn-default"  ng-click="productManagementCtrl.updatePrices(product.id)">Update</span> 
 			<ajax ng-show="updatingPrice"></ajax>
 		</h3>
 			
@@ -70,7 +70,7 @@
 			<h3><span class="label label-default" ng-if="product.wished">In wishlist</span></h3>			
 		</div>
 	</div>	
-	<div class="col-lg-2 col-md-5 hidden-sm hidden-xs">		
+	<div class="col-lg-2 hidden-md hidden-sm hidden-xs">		
 		<h3>
 			<form ng-if="editMode && isAdmin()">
 				<div class="form-group">
@@ -100,6 +100,9 @@
 				<a class="btn label label-default" ng-click="selectHierarchy(product.hierarchyPlacement)">{{product.hierarchyPlacement.name}}</a>
 			</h3>
 		</div>	 
+	</div>
+	<div class="ratingData col-lg-3 col-md-6 col-sm-12 col-xs-12" ng-if="product.mainRating && product.mainRating > 0.0">
+		<uib-rating ng-model="product.mainRating" max="10" readonly="true" aria-labelledby="default-rating"></uib-rating>
 	</div>
 
 	<div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">

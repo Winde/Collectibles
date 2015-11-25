@@ -15,6 +15,7 @@ import model.connection.TooFastConnectionException;
 import model.connection.amazon.AmazonItemLookupService;
 import model.dataobjects.Author;
 import model.dataobjects.Product;
+import model.dataobjects.Rating;
 
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.nodes.Element;
@@ -45,6 +46,8 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	private String OPERATION_SEARCH = null;
 	private String OPERATION_SEARCH_PARAMETER = null;
 	private String OPERATION_THING_PARAMETER = null;
+	
+	private final long RATING_PRIORITY = 10;
 	
 	private final String gameNameDocPath = "/items/item/name";
 	private final String imageUrlDocPath = "/items/item/image";
@@ -255,7 +258,7 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	
 
 	@Override
-	public Double getRating(Document doc) throws TooFastConnectionException {
+	public Rating getRating(Document doc) throws TooFastConnectionException {
 		Double rating = null;
 		String ratingString = super.getAttribute(doc, ratingDocPathBayesAverage,ratingAttribute);		
 		if (ratingString!=null){
@@ -277,7 +280,14 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 			rating = null;
 		}		
 		
-		return rating;
+		Rating ratingObject = null;
+		if (rating!=null){
+			ratingObject = new Rating();
+			ratingObject.setPriority(RATING_PRIORITY);
+			ratingObject.setProvider(this.getIdentifier());
+			ratingObject.setRating(rating);
+		}
+		return ratingObject;
 	}
 	
 	public String getIdentifier(){

@@ -192,6 +192,12 @@ select.ng-invalid,.ng-invalid.ng-dirty:not(.btn),.ng-invalid:not(.btn) {
     margin: auto;
     max-height: 175px;
 }
+
+.productGrid .productListEntry .ratingData{
+	text-align: center;
+	margin-top: 5px;
+}
+
 .productGrid .productListEntry .imageContainer {
     text-align: center;
 }

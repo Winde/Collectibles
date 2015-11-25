@@ -34,6 +34,7 @@ import model.connection.ProductInfoLookupServiceXML;
 import model.connection.TooFastConnectionException;
 import model.dataobjects.Author;
 import model.dataobjects.Product;
+import model.dataobjects.Rating;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -313,7 +314,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	}
 
 	@Override
-	public Double getRating(Document doc) throws TooFastConnectionException {
+	public Rating getRating(Document doc) throws TooFastConnectionException {
 		return null;
 	}
 

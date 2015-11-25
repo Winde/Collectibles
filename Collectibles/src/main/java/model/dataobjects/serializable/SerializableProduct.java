@@ -9,11 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 
 import model.dataobjects.Author;
 import model.dataobjects.Author.AuthorView;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
+import model.dataobjects.Rating;
 import model.dataobjects.HierarchyNode.HierarchySimpleView;
 import model.dataobjects.Image;
 import model.dataobjects.Image.ImageSimpleView;
@@ -98,6 +100,9 @@ public class SerializableProduct {
 	private Long minPrice = null;	
 	
 	@JsonView(ProductSimpleView.class)
+	private Double mainRating = null;
+	
+	@JsonView(ProductSimpleView.class)
 	private Date lastPriceUpdate = null;
 	
 	@JsonIgnore
@@ -110,7 +115,8 @@ public class SerializableProduct {
 	private Map<String,String> connectorReferences;
 	
 	@JsonView(ProductComplexView.class)
-	private Map<String,Double> ratings = null;
+	@JsonIgnoreProperties({"product"})
+	private SortedSet<Rating> ratings = null;
 	
 	@JsonView(ProductComplexView.class)
 	@JsonInclude(Include.ALWAYS) 
@@ -248,7 +254,7 @@ public class SerializableProduct {
 		return ownedAnotherLanguage;
 	}
 
-	public void setOwnedAnotherLanguage(boolean ownedAnotherLanguage) {
+	public void setOwnedAnotherLanguage(Boolean ownedAnotherLanguage) {
 		this.ownedAnotherLanguage = ownedAnotherLanguage;
 	}
 
@@ -354,12 +360,20 @@ public class SerializableProduct {
 		}
 		return product;
 	}
+	
+	public Double getMainRating() {
+		return mainRating;
+	}
 
-	public Map<String, Double> getRatings() {
+	public void setMainRating(Double mainRating) {
+		this.mainRating = mainRating;
+	}
+
+	public SortedSet<Rating> getRatings() {
 		return ratings;
 	}
 
-	public void setRatings(Map<String, Double> ratings) {
+	public void setRatings(SortedSet<Rating> ratings) {
 		this.ratings = ratings;
 	}
 
@@ -370,7 +384,6 @@ public class SerializableProduct {
 	public void setExternalLinks(SortedMap<String, String> externalLinks) {		
 		this.externalLinks = externalLinks;
 	}
-
 	
 
 }

@@ -152,26 +152,25 @@
 								</p>
 								<p ng-if="product.lastPriceUpdate">Last updated: {{product.lastPriceUpdate | date:'yyyy-MM-dd HH:mm:ss'}}</p>
 							</div>
-						</div>
-						<span class="btn btn-default" ng-if="product && product.id && isLoggedIn()" ng-click="productCtrl.updatePrices(product.id)">Update prices</span>
-						
+						</div>												
 					</div>
 					
 					
 					<div class="ratingsBlock" ng-show="product.ratings && !isEmptyObject(product.ratings)">
 						<p><b>Ratings: </b></p>
 						<div class="blockContent">							
-							<p ng-if="product.ratings" ng-repeat="(key, value) in product.ratings" >
-								<span ng-if="value > 0.0">				
-									<span ng-if="key">{{key}}: </span>
-									<uib-rating ng-model="value" max="10" readonly="true" aria-labelledby="default-rating"></uib-rating>
+							<p ng-if="product.ratings" ng-repeat="ratingObject in product.ratings" >
+								<span ng-if="ratingObject.rating && ratingObject.rating > 0.0">				
+									<span ng-if="ratingObject.provider">{{ratingObject.provider}}: </span>
+									<uib-rating ng-model="ratingObject.rating" max="10" readonly="true" aria-labelledby="default-rating"></uib-rating>
 								</span>															
 							</p>							
 						</div>						
 					</div>	
-					
 					<p ng-if="product.publisher"><b>Publisher:</b> <span>{{product.publisher}}</span></p>							
-						
+					<div>
+						<span class="btn btn-default" ng-if="product && product.id && isLoggedIn()" ng-click="productCtrl.updatePrices(product.id)">Update prices</span>
+					</div>	
 						
 									
 				</div>
