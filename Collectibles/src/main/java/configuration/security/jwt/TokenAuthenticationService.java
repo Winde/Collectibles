@@ -18,10 +18,11 @@ public class TokenAuthenticationService {
 
 	private static final Logger logger = LoggerFactory.getLogger(StatelessLoginFilter.class);		
 		
-	private static final String AUTH_HEADER_NAME = "X-AUTH-TOKEN";
+	private static final String AUTH_HEADER_NAME = "X-AUTH-TOKEN";	
 	private static final long TEN_DAYS = 1000 * 60 * 60 * 24 * 10;
 	private static final long TWO_HOURS = 1000 * 60 * 60 * 2;
 	private static final long THIRTY_MINUTES = 1000 * 60 * 30;
+	private static final long THIRTY_SECONDS = 1000 * 30;
  
 	private TokenHandler tokenHandler = null;
  

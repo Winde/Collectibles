@@ -45,6 +45,8 @@ public class JwtAuthenticationOnSuccess implements Filter {
 				logger.info("Adding token for user "+ userAuth + " to response, INTENDED AFTER AUTH!!!");
 				tokenAuthenticationService.addAuthentication(httpResponse, userAuth);
 			}
+		} else {
+			httpResponse.addHeader("X-AUTH-EXPIRE", "true");
 		}
 		chain.doFilter(request, response);
 	}

@@ -35,8 +35,16 @@
 		    					
 		    				} else if (Auth.getExpires(newSession) && Auth.getExpires(newSession)>Auth.getExpires(currentSession)){
 		    					Auth.setStoredSession(newSession);
-		    				}			    					    			
+		    				} 		    			
 			    		}
+	    				
+	    				if (response.headers('X-AUTH-EXPIRE')){
+	    					
+	    					if (Auth.isloggedIn()){
+	    						Message.info("Your session has expired");
+	    						Auth.logout();
+	    					}		    										
+	    				}
 		    		}
 		    		
 		    		return response;

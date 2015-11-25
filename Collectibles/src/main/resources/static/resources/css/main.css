@@ -69,6 +69,7 @@
 
 .productGrid .productListEntry .imageContainer  {
 	margin-top: 10px;
+	min-height: 110px;
 }
 
 .productGrid .rowTitles{
