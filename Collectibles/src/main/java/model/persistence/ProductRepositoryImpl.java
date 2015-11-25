@@ -184,6 +184,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 				hql = hql + " ORDER BY p.name";
 			} else if (search.getSortBy().toLowerCase().equals("price")){
 				hql = hql + " ORDER BY p.minPrice";
+			} else if (search.getSortBy().toLowerCase().equals("rating")){
+				hql = hql + " ORDER BY p.mainRating";			
 			} else {
 				hql = hql + " ORDER BY p.id";
 			}
@@ -323,6 +325,14 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		query.setParameter("reference", reference);
 		query.setParameter("connector", connector);
 		return query.getResultList();
+	}
+
+	@Override
+	public Product findOneRefreshed(Long id) {
+		Product product = entityManager.find(Product.class, id);
+		if (product!=null)
+		entityManager.refresh(product);
+		return product;
 	}
 
 

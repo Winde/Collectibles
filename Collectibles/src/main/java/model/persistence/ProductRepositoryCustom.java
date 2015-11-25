@@ -46,4 +46,7 @@ public interface ProductRepositoryCustom {
 
 	public Collection<Product> findByConnectorReference(String connector, String reference);
 
+	@Transactional
+	public Product findOneRefreshed(Long id);
+
 }

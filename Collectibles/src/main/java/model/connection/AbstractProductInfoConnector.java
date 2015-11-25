@@ -122,6 +122,9 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					}
 					if (rating!=null){
 						rating.setProduct(product);
+						if (product.getRatings()==null){
+							product.setMainRating(rating.getRating());
+						}
 						product.addRating(rating);
 						updated = true;
 					} else {
@@ -378,6 +381,9 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					logger.info(this.getIdentifier() + " Obtained rating"+ rating +"for" + product);				
 					if (rating!=null){		
 						rating.setProduct(product);
+						if (product.getRatings()==null){
+							product.setMainRating(rating.getRating());
+						}
 						product.addRating(rating);
 					} else {
 						product.removeRating(this.getIdentifier());

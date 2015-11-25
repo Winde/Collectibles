@@ -111,8 +111,8 @@ public class ProductController  extends CollectiblesController{
 		logger.info("Out of the loop in "+checks +" checks");		
 		logger.info("Stopped WAITING!!" + (new Date().getTime()-startTime));
 		
-		entityManager.detach(product);
-		Product result = productRepository.findOne(product.getId());
+		//entityManager.detach(product);
+		Product result = productRepository.findOneRefreshed(product.getId());
 		
 		if (checks>=MAX_PARSE_CHECKS){
 			SerializableProduct serializableProduct = SerializableProduct.cloneProduct(result,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
