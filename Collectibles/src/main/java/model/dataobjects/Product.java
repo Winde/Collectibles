@@ -301,15 +301,15 @@ public class Product extends SimpleIdDao{
 		return ratings;
 	}
 
-	public boolean removeRating(String provider){		
-		boolean removed = false;
+	public Rating removeRating(String provider){		
+		Rating removed = null;
 		if (provider!=null){
 			Iterator<Rating> iterator = this.getRatings().iterator();
 			while (iterator.hasNext()){
 				Rating ratingInSet = iterator.next();
 				if (provider.equals(ratingInSet.getProvider())){
 					iterator.remove();
-					removed = true;
+					removed = ratingInSet;
 				}
 			}
 			this.mainRating = this.calculateBestRating();
@@ -319,12 +319,17 @@ public class Product extends SimpleIdDao{
 	}
 	
 	
-	public void addRating(Rating rating){
-		if (this.ratings==null){
+	public Rating addRating(Rating rating){
+		Rating removed = null;
+		if (this.getRatings()==null){
 			this.ratings = new TreeSet<>();
 		}
-		ratings.add(rating);
-		this.mainRating = this.calculateBestRating();
+		if (rating.getProvider()!=null){
+			removed = this.removeRating(rating.getProvider());
+			ratings.add(rating);
+			this.mainRating = this.calculateBestRating();
+		}		
+		return removed;
 	}
 	
 	public Double calculateBestRating(){

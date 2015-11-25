@@ -5,18 +5,26 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+class Rating_PK implements Serializable{
+	private Product product = null;
+	private String provider = null;
+}
+
 @Entity(name="Rating")
 @Table(name="product_rating")
-public class Rating implements Comparable<Rating>, Serializable {
-
-	@OneToOne
+@IdClass(Rating_PK.class)
+public class Rating implements Comparable<Rating>,Serializable {
+		
+	@ManyToOne
+	@JoinColumn(name="product_id", referencedColumnName="id")
 	@Id
-	@JoinColumn(name="product_id", referencedColumnName="id")	
-	Product product = null;
+	private Product product = null;
 	
 	@Column(name="rating")
 	private Double rating = null;
@@ -28,7 +36,8 @@ public class Rating implements Comparable<Rating>, Serializable {
 	@Id
 	private String provider = null;
 	
-	
+	@Column(name="ratings_count")
+	private Long ratingsCount = null;
 	
 	public Double getRating() {
 		return rating;
@@ -46,8 +55,8 @@ public class Rating implements Comparable<Rating>, Serializable {
 		this.priority = priority;
 	}
 	
-	public String getProvider() {
-		return provider;
+	public String getProvider() {		
+		return this.provider;
 	}
 
 	public void setProvider(String provider) {
@@ -60,6 +69,18 @@ public class Rating implements Comparable<Rating>, Serializable {
 
 	public void setProduct(Product product) {
 		this.product = product;
+	}
+	
+	public String toString(){
+		return "{" + this.getProvider() + "- "+this.getRating() + "}";
+	}
+
+	public Long getRatingsCount() {
+		return ratingsCount;
+	}
+
+	public void setRatingsCount(Long ratingsCount) {
+		this.ratingsCount = ratingsCount;
 	}
 
 	@Override
@@ -88,25 +109,26 @@ public class Rating implements Comparable<Rating>, Serializable {
 	}
 	
 	@Override
-	public int compareTo(Rating o) {
+	public int compareTo(Rating oR) {		
 		if (this.getPriority()==null){
 			return -1;
-		} else if (o.getPriority()==null ){
+		} else if ( oR.getPriority()==null ){
 			return 1;
 		} else {
-			int comparison = this.getPriority().compareTo(o.getPriority());
+			int comparison = this.getPriority().compareTo( oR.getPriority());
 			if (comparison == 0){
-				if (this.getProvider()!=null && this.getProvider().equals(o.getProvider()) || (this.getProvider()==null && o.getProvider()==null)){
+				if (this.equals(oR)){
 					return 0;
 				} else{
 					return -1;
 				}
 			} else{
-				return comparison;
+				return -1*comparison;
 			}
 		}		
 		
 	}
+
 
 	
 }

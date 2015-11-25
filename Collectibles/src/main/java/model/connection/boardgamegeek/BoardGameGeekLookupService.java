@@ -58,7 +58,10 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	
 	private final String ratingDocPathBayesAverage = "/items/item/statistics/ratings/bayesaverage";
 	private final String ratingDocPathAverage = "/items/item/statistics/ratings/average";
+	private final String ratingDocPathCount = "/items/item/statistics/ratings/usersrated";
 	private final String ratingAttribute = "value";	
+	private final String ratingCountAttribute = "value";
+	
 	
 	private final String referenceDocPath = "/items/item";
 	private final String referenceAttribute = "id";
@@ -260,7 +263,9 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	@Override
 	public Rating getRating(Document doc) throws TooFastConnectionException {
 		Double rating = null;
-		String ratingString = super.getAttribute(doc, ratingDocPathBayesAverage,ratingAttribute);		
+		Long ratingCount = null;
+		String ratingString = super.getAttribute(doc, ratingDocPathBayesAverage,ratingAttribute);
+		String ratingCountString = super.getAttribute(doc, ratingDocPathCount,ratingCountAttribute);		
 		if (ratingString!=null){
 			try{
 				rating = Double.parseDouble(ratingString);
@@ -276,15 +281,26 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 				logger.error("Rating is not a double", e);
 			}
 		}
+		if (ratingCountString!=null && !"".equals(ratingCountString)){
+			try {
+				ratingCount = Long.parseLong(ratingCountString);
+			}catch (Exception ex){
+				ex.printStackTrace();
+			}
+			
+		}
+		
+		
 		if (rating!=null && rating<=0.0){
 			rating = null;
-		}		
+		}				
 		
 		Rating ratingObject = null;
 		if (rating!=null){
 			ratingObject = new Rating();
 			ratingObject.setPriority(RATING_PRIORITY);
 			ratingObject.setProvider(this.getIdentifier());
+			ratingObject.setRatingsCount(ratingCount);
 			ratingObject.setRating(rating);
 		}
 		return ratingObject;

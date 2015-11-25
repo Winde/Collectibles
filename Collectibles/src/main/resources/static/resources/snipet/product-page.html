@@ -142,7 +142,7 @@
 						<div ng-bind-html="product.description"></div>
 					</div>
 									
-					<div class="priceBlock">
+					<div class="dataBlock priceBlock">
 						<div ng-show="product.dollarPrice && !isEmptyObject(product.dollarPrice)">
 							<p><b>Price: </b></p>
 							<div class="blockContent">							
@@ -156,20 +156,25 @@
 					</div>
 					
 					
-					<div class="ratingsBlock" ng-show="product.ratings && !isEmptyObject(product.ratings)">
+					<div class="dataBlock ratingsBlock" ng-show="product.ratings && product.ratings.length && product.ratings.length>0">
 						<p><b>Ratings: </b></p>
-						<div class="blockContent">							
-							<p ng-if="product.ratings" ng-repeat="ratingObject in product.ratings" >
-								<span ng-if="ratingObject.rating && ratingObject.rating > 0.0">				
-									<span ng-if="ratingObject.provider">{{ratingObject.provider}}: </span>
+						<div class="blockContent">																				
+							<div class="row" ng-if="product.ratings && product.ratings.length && product.ratings.length>0" ng-repeat="ratingObject in product.ratings" >
+								<div class="col-md-2 col-sm-4 col-xs-12" ng-if="ratingObject.rating && ratingObject.rating > 0.0">
+									{{ratingObject.provider}}									
+								</div>
+								<div class="col-md-10 col-sm-8 col-xs-12" ng-if="ratingObject.rating && ratingObject.rating > 0.0">
 									<uib-rating ng-model="ratingObject.rating" max="10" readonly="true" aria-labelledby="default-rating"></uib-rating>
-								</span>															
-							</p>							
+									<span ng-if="ratingObject.ratingsCount && ratingObject.ratingsCount>0">({{ratingObject.ratingsCount}} reviews)</span>									
+								</div>															
+							</div>							
 						</div>						
 					</div>	
-					<p ng-if="product.publisher"><b>Publisher:</b> <span>{{product.publisher}}</span></p>							
-					<div>
-						<span class="btn btn-default" ng-if="product && product.id && isLoggedIn()" ng-click="productCtrl.updatePrices(product.id)">Update prices</span>
+					<div class="dataBlock publisherBlock">
+						<p ng-if="product.publisher"><b>Publisher:</b> <span>{{product.publisher}}</span></p>
+					</div>							
+					<div class="dataBlock">
+						<span class="btn btn-default" ng-if="product && product.id && isLoggedIn()" ng-click="productCtrl.updatePrices(product.id)">Update</span>
 					</div>	
 						
 									

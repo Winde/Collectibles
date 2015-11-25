@@ -245,7 +245,7 @@ public class SteamItemLookupService extends AbstractProductInfoLookupService<Jso
 			}
 		}
 		
-		Rating ratingObject = null;
+		Rating ratingObject = null;		
 		if (ratingOverTen!=null){
 			ratingObject = new Rating();
 			ratingObject.setPriority(RATING_PRIORITY);

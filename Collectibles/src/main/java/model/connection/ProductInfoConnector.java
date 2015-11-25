@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import model.dataobjects.Product;
+import model.dataobjects.Rating;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,4 +48,6 @@ public interface ProductInfoConnector {
 	public List<String> getMultipleReferences(String criteria) throws TooFastConnectionException;
 
 	public boolean guaranteeUnivocalResponse(Product product);
+
+
 }

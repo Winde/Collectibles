@@ -31,7 +31,7 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	private static final Logger logger = LoggerFactory.getLogger(GoodReadsItemLookupService.class);
 		
 	private static final String IDENTIFIER = "Goodreads";
-	
+	private static final long RATING_PRIORITY = 2;
 	
 	private final String imageUrlDocPath = "/GoodreadsResponse/book/image_url";
 	private final String descriptionDocPath = "/GoodreadsResponse/book/description";
@@ -40,7 +40,9 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	private final String authorDocPath = "/GoodreadsResponse/book/authors/author";
 	private final String goodreadsRelatedUrlDocPath = "/GoodreadsResponse/book/series_works/series_work/series/id";
 	private final String goodreadsPublisherDocPath = "/GoodreadsResponse/book/publisher";
-	private final String goodreadsReferenceDocPath = "/GoodreadsResponse/book/id";
+	private final String goodreadsReferenceDocPath = "/GoodreadsResponse/book/id";	
+	private final String ratingDocPath = "/GoodreadsResponse/book/average_rating";
+	private final String ratingCountDocPath = "/GoodreadsResponse/book/ratings_count";
 	
 	private String key = null;
 	private String entryPointQueryOne = null;
@@ -202,7 +204,34 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 
 	@Override
 	public Rating getRating(Document doc) throws TooFastConnectionException {
-		return null;
+		String ratingString = super.getField(doc, ratingDocPath);
+		String ratingCountString = super.getField(doc, ratingCountDocPath);
+		
+		Long ratingCount = null;
+		Double rating = null;
+		if (ratingString!=null && !"".equals(ratingString.trim())){
+			try {
+				rating = Double.parseDouble(ratingString)*2;
+			}catch (Exception ex){
+				ex.printStackTrace();
+			}
+		}
+		if (ratingCountString!=null && !"".equals(ratingCountString)){
+			try {
+				ratingCount = Long.parseLong(ratingCountString);
+			}catch (Exception ex){
+				ex.printStackTrace();
+			}
+		}
+		Rating ratingObject = null;		
+		if (rating!=null){
+			ratingObject = new Rating();
+			ratingObject.setPriority(RATING_PRIORITY);
+			ratingObject.setProvider(this.getIdentifier());
+			ratingObject.setRatingsCount(ratingCount);
+			ratingObject.setRating(rating);
+		}
+		return ratingObject;
 	}
 
 	@Override

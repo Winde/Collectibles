@@ -82,7 +82,7 @@
 	border-radius: 5px;
 }
 
-.product .priceBlock {	
+.product .dataBlock {	
 	margin-top: 15px;
 }
 
@@ -109,9 +109,6 @@
 
 .msd-elastic {
 	max-height: 250px;
-}
-.product .priceBlock {
-	margin-bottom: 15px;
 }
 
 .product .blockContent{
@@ -200,6 +197,10 @@ select.ng-invalid,.ng-invalid.ng-dirty:not(.btn),.ng-invalid:not(.btn) {
 
 .productGrid .productListEntry .imageContainer {
     text-align: center;
+}
+
+.productGrid .productListEntry .ownerShipBlock{
+	min-height: 72px;
 }
 
 .productGrid .productListEntry .imageContainer img{

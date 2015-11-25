@@ -45,6 +45,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	@Autowired
 	private AuthorRepository authorRepository;
 	
+
 	@Override	
 	public boolean updateTransitionalTransaction(Product product) throws TooFastConnectionException{
 		AbstractProductInfoConnector connector = this;		
@@ -96,7 +97,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 							}
 						}
 						if (modifiedMinPrice){
-							product.calculateMinDollarPrice();
+							product.setMinPrice(product.calculateMinDollarPrice());
 						}
 					}
 					
@@ -122,9 +123,14 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					if (rating!=null){
 						rating.setProduct(product);
 						product.addRating(rating);
+						updated = true;
 					} else {
 						product.removeRating(this.getIdentifier());
+						updated = true;
 					}
+					
+					logger.info("Saving product with ratings: " + product.getRatings());
+					logger.info("Saving product with prices: " + product.getDollarPrice());
 				}
 			}
 		}catch (Exception e){
@@ -362,8 +368,9 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 								key = key + " - " + priceEntry.getKey(); 
 							}
 							product.setDollarPrice(key,priceEntry.getValue());
-						}
+						}						
 					}
+					product.setMinPrice(product.calculateMinDollarPrice());
 					
 					logger.debug(this.getIdentifier() + " Checking Rating");
 					Rating rating = null;					

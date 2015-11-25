@@ -12,6 +12,7 @@ import model.connection.TooFastConnectionException;
 import model.dataobjects.Author;
 import model.dataobjects.Image;
 import model.dataobjects.Product;
+import model.dataobjects.Rating;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +76,6 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 	@Override
 	public List<String> getOwnedReferences(String userId)
 			throws TooFastConnectionException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -86,7 +86,7 @@ public class GoodReadsConnector extends AbstractProductInfoConnector{
 
 	@Override
 	public boolean supportsRating() {
-		return false;
+		return true;
 	}
 
 }
