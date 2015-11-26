@@ -511,7 +511,8 @@ public class ProductController  extends CollectiblesController{
 					product.setHierarchyPlacement(productInDb.getHierarchyPlacement());
 				} 	
 								
-				product.setDollarPrice(productInDb.getDollarPrice());
+				product.setRatings(productInDb.getRatings());
+				product.setPrices(productInDb.getPrices());
 				product.setOwners(productInDb.getOwners());
 				product.setOwnersOtherLanguage(productInDb.getOwnersOtherLanguage());
 				product.setWishers(productInDb.getWishers());
@@ -767,11 +768,7 @@ public class ProductController  extends CollectiblesController{
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth!=null){
 			String username = auth.getName();
-			List<Product> products = productRepository.findAll();
-			for (Product product: products){
-				product.setDollarPrice(null);
-				product.setMinPrice(null);			
-			}
+			List<Product> products = productRepository.findAll();			
 			productRepository.save(products);
 			Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(true);						
 			List<ScrapeRequest> scrapeRequests = new ArrayList<>();

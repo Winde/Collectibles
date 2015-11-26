@@ -1,15 +1,10 @@
 package model.connection;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -26,7 +21,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLookupService<Document> {
+public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLookupService<Node> {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProductInfoLookupServiceXML.class);	
 	
@@ -56,11 +51,11 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
         return doc;
     }
 	
-	protected String getField(Document doc,String xpath){
+	protected String getField(Node nodeToStart,String xpath){
 		String field = null;
 		XPath xPath = XPathFactory.newInstance().newXPath();	
 		try {
-			NodeList nodes = (NodeList)xPath.evaluate(xpath, doc.getDocumentElement(),XPathConstants.NODESET);
+			NodeList nodes = (NodeList)xPath.evaluate(xpath, nodeToStart,XPathConstants.NODESET);
 			if (nodes!=null && nodes.getLength()>0){
 				field = nodes.item(0).getTextContent();
 			}
@@ -71,11 +66,11 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
 		return field;
 	}
 	
-	protected NodeList getNodes(Document doc,String xpath){
+	protected NodeList getNodes(Node nodeToStart,String xpath){
 		NodeList nodes = null;
 		XPath xPath = XPathFactory.newInstance().newXPath();	
 		try {
-			nodes = (NodeList)xPath.evaluate(xpath, doc.getDocumentElement(),XPathConstants.NODESET);
+			nodes = (NodeList)xPath.evaluate(xpath, nodeToStart,XPathConstants.NODESET);
 			
 		} catch (XPathExpressionException e) {			
 			logger.error("Exception obtaining field from XPath", e);
@@ -86,11 +81,11 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
 		return nodes;
 	}
 	
-	protected List<String> getFields(Document doc,String xpath){
+	protected List<String> getFields(Node nodeToStart,String xpath){
 		List<String> fields = null;
 		XPath xPath = XPathFactory.newInstance().newXPath();	
 		try {
-			NodeList nodes = (NodeList)xPath.evaluate(xpath, doc.getDocumentElement(),XPathConstants.NODESET);
+			NodeList nodes = (NodeList)xPath.evaluate(xpath, nodeToStart,XPathConstants.NODESET);
 			if (nodes!=null && nodes.getLength()>0){
 				fields = new ArrayList<>();
 				for (int i=0;i<nodes.getLength();i++){
@@ -107,11 +102,11 @@ public abstract class ProductInfoLookupServiceXML extends AbstractProductInfoLoo
 		return fields;
 	}
 	
-	public String getAttribute(Document doc, String xpath, String attributeToReturn) {
+	public String getAttribute(Node nodeToStart, String xpath, String attributeToReturn) {
 		String result = null;
 		XPath xPath = XPathFactory.newInstance().newXPath();			
 		try {
-			NodeList nodes = (NodeList)xPath.evaluate(xpath, doc.getDocumentElement(),XPathConstants.NODESET);
+			NodeList nodes = (NodeList)xPath.evaluate(xpath, nodeToStart,XPathConstants.NODESET);
 			if (nodes!=null && nodes.getLength()>0) {
 				for (int i=0;i<nodes.getLength();i++){
 					Node node = nodes.item(i);

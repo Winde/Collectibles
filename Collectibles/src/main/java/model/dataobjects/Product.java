@@ -108,10 +108,9 @@ public class Product extends SimpleIdDao{
 	@Column(name="connector")	
 	private Collection<String> processedConnectors;
 	
-	@ElementCollection(fetch = FetchType.LAZY)
-	@CollectionTable(name="product_dollar_price", joinColumns=@JoinColumn(name="id"))
-	@Column(name="dollar_price")
-	private Map<String,Long> dollarPrice = null;
+	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.ALL})
+	@OrderBy("price")
+	private SortedSet<Price> prices = null;
 		
 	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.ALL})
 	@OrderBy("rating")
@@ -130,8 +129,7 @@ public class Product extends SimpleIdDao{
 	@Column(name="main_rating")
 	private Double mainRating = null;
 	
-	public Product(){
-		dollarPrice = new HashMap<>();
+	public Product(){		
 	}
 
 	public String getDescription() {
@@ -289,18 +287,50 @@ public class Product extends SimpleIdDao{
 		this.processedConnectors = processedConnectors;
 	}
 
-	public Map<String, Long> getDollarPrice() {
-		return dollarPrice;
-	}
-
-	public void setDollarPrice(Map<String, Long> dollarPrice) {
-		this.dollarPrice = dollarPrice;
+ 
+	public void setPrices(SortedSet<Price> prices) {
+		this.prices = prices;		
 	}
 	
+	public SortedSet<Price> getPrices() {
+		return prices;
+	}
+
+	public void removePrice(String provider){				
+		if (provider!=null){
+			if (this.getPrices()!=null){
+				Iterator<Price> iterator = this.getPrices().iterator();
+				while (iterator.hasNext()){
+					Price priceInSet = iterator.next();
+					if (provider.equals(priceInSet.getConnectorName())){
+						iterator.remove();
+					}
+				}
+			}
+			this.minPrice = this.calculateMinDollarPrice();			
+		}		
+	}
+	
+	
+	public void addPrice(Price price){	
+		if (this.getPrices()==null){
+			this.prices = new TreeSet<>();
+		}
+		if (price!=null && price.getConnectorName()!=null){
+			prices.add(price);
+			this.minPrice = this.calculateMinDollarPrice();
+		}				
+	}
+	
+
 	public SortedSet<Rating> getRatings() {
 		return ratings;
 	}
 
+	public void setRatings(SortedSet<Rating> ratings) {
+		this.ratings = ratings;		
+	}
+	
 	public Rating removeRating(String provider){		
 		Rating removed = null;
 		if (provider!=null){
@@ -342,32 +372,11 @@ public class Product extends SimpleIdDao{
 
 	public Long calculateMinDollarPrice() {
 		Long newMinPrice = null;
-		Map<String, Long> map = this.getDollarPrice();
-		for (Long dollarPrice : map.values()) {
-			if (dollarPrice!=null && (newMinPrice == null || dollarPrice < newMinPrice)){
-				newMinPrice = dollarPrice;
-			}	
+		if (prices!=null && prices.size()>0){			
+			this.minPrice = prices.first().getPrice();
 		}
-		this.minPrice = newMinPrice;
 		return newMinPrice;
 	}
-	
-	public void setDollarPrice(String provider, Long dollarPrice) {
-		Map<String, Long> map = this.getDollarPrice();
-		if (map == null){
-			map = new HashMap<>();
-			this.setDollarPrice(map);
-		}
-		map.put(provider, dollarPrice);
-		
-		if (dollarPrice!=null){
-			this.setLastPriceUpdate(new Date());
-		}
-		
-		if (dollarPrice!=null && (minPrice == null || dollarPrice < minPrice)){
-			this.setMinPrice(dollarPrice);
-		}
-	}	
 	
 	public Long getMinPrice() {
 		return minPrice;
@@ -426,6 +435,9 @@ public class Product extends SimpleIdDao{
 	public void setMainRating(Double mainRating) {
 		this.mainRating = mainRating;
 	}
+
+
+
 
 
 }

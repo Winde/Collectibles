@@ -3,6 +3,7 @@ package model.connection.drivethrurpg;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Set;
 import model.connection.AbstractProductInfoLookupService;
 import model.connection.ProductInfoLookupService;
 import model.connection.TooFastConnectionException;
+import model.dataobjects.Price;
 import model.dataobjects.Product;
 import model.dataobjects.Rating;
 
@@ -229,10 +231,19 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 		return priceLong;
 	}
 	
-	public Map<String,Long> getDollarPrice(DrivethrurpgData doc) throws TooFastConnectionException{
+	private Price createPrice(String key, String link, Long priceAmount){
+		Price price = new Price();
+		price.setConnectorName(this.getIdentifier());
+		price.setLink(link);
+		price.setPrice(priceAmount);
+		price.setType(key);
+		return price;
+	}
+	
+	public Collection<Price> getPrices(DrivethrurpgData doc) throws TooFastConnectionException{
 		Long priceLong = null;
 		String priceString = null;
-		Map<String,Long> result = null;
+		Collection<Price> result = null;
 		if (doc!=null && doc.getDoc()!=null){
 			
 			Elements priceEntries = doc.getDoc().getElementsByClass("product-price-item");
@@ -302,24 +313,32 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 					}
 				}
 				
-				result = new HashMap<>();
-				if (hardcoverColorPremiumPrice!=null) { 
-					result.put("Hardcover Premium Color", hardcoverColorPremiumPrice);
+				String link = this.getExternalUrlLink(doc);
+				result = new ArrayList<>();
+				Price price = null;
+				if (hardcoverColorPremiumPrice!=null) {
+					price = createPrice("Hardcover Premium Color",link,hardcoverColorPremiumPrice);
+					result.add(price);
 				}
-				if (hardcoverPremiumPrice!=null) {
-					result.put("Hardcover Premium", hardcoverPremiumPrice);					
+				if (hardcoverPremiumPrice!=null) {					
+					price = createPrice("Hardcover Premium",link,hardcoverPremiumPrice);
+					result.add(price);
 				}
 				if (hardcoverPrice!=null) {
-					result.put("Hardcover", hardcoverPrice);					
+					price = createPrice("Hardcover",link,hardcoverPrice);
+					result.add(price);		
 				}
 				if (softcoverColorPremiumPrice!=null) {
-					result.put("Softcover Premium Color", softcoverColorPremiumPrice);					
+					price = createPrice("Softcover Premium Color",link,softcoverColorPremiumPrice);
+					result.add(price);		
 				}
 				if (softcoverPremiumPrice!=null) {
-					result.put("Softcover Premium", softcoverPremiumPrice);					
+					price = createPrice("Softcover Premium",link,softcoverPremiumPrice);
+					result.add(price);		
 				}
 				if (softcoverPrice!=null) {
-					result.put("Softcover", softcoverPrice);
+					price = createPrice("Softcover",link,softcoverPrice);
+					result.add(price);		
 				}
 				if (result.isEmpty()){
 					result = null;

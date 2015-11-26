@@ -16,6 +16,7 @@ import java.util.TreeMap;
 
 import model.dataobjects.Author;
 import model.dataobjects.Image;
+import model.dataobjects.Price;
 import model.dataobjects.Product;
 import model.dataobjects.Rating;
 import model.persistence.AuthorRepository;
@@ -57,6 +58,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 			logger.error("Too fast connection to: "+connector.getIdentifier() , e);
 		}
 		if (updated){
+			
 			productRepository.save(productInDb);
 		}
 		return updated;
@@ -76,64 +78,13 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 				Object doc = itemLookup.fetchDocFromProduct(product);
 				if (doc!=null){
 					
-					Map<String,Long> prices = null;
-					if (connector.guaranteeUnivocalResponse(product)){
-						prices = itemLookup.getDollarPrice(doc);
-						logger.info(this.getIdentifier()+" obtained prices: " + prices +" for " + product);
-					} else {
-						logger.info(this.getIdentifier() + " Skip prices for" + product);
-					}
-					if (product.getDollarPrice()!=null){
-						boolean modifiedMinPrice = false;
-						Set<Entry<String, Long>> entries = product.getDollarPrice().entrySet();
-						if (entries!=null){
-							Iterator<Entry<String, Long>> iterator = entries.iterator();
-							while (iterator.hasNext()){
-								String key = iterator.next().getKey();
-								if (key!=null && key.startsWith(this.getIdentifier())){
-									iterator.remove();
-									modifiedMinPrice = true;
-								}
-							}
-						}
-						if (modifiedMinPrice){
-							product.setMinPrice(product.calculateMinDollarPrice());
-						}
-					}
+				
+					updated = updated || updatePrice(product,doc);
 					
-					if (prices!=null){
-						for (Entry<String,Long> priceEntry: prices.entrySet()){
-							String key = connector.getIdentifier();
-							if (priceEntry.getKey()!=null && !"".equals(priceEntry.getKey().trim())){
-								key = key + " - " + priceEntry.getKey(); 
-							}
-							product.setDollarPrice(key,priceEntry.getValue());
-						}
-						updated = true;
-					} 
-					
-					logger.debug(this.getIdentifier() + " Checking Rating");
-					Rating rating = null;
-					if (connector.guaranteeUnivocalResponse(product)){
-						rating = itemLookup.getRating(doc);						
-						logger.info(this.getIdentifier() + " Obtained rating"+ rating +"for" + product);
-					} else {
-						logger.info(this.getIdentifier() + " Skip rating for" + product);
-					}
-					if (rating!=null){
-						rating.setProduct(product);
-						if (product.getRatings()==null){
-							product.setMainRating(rating.getRating());
-						}
-						product.addRating(rating);
-						updated = true;
-					} else {
-						product.removeRating(this.getIdentifier());
-						updated = true;
-					}
+					updated = updated || updateRating(product,doc);
 					
 					logger.info("Saving product with ratings: " + product.getRatings());
-					logger.info("Saving product with prices: " + product.getDollarPrice());
+					logger.info("Saving product with prices: " + product.getPrices());
 				}
 			}
 		}catch (Exception e){
@@ -198,6 +149,234 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		productRepository.save(product);		
 	}
 	
+	
+	private void updateName(Product product, Object doc) throws TooFastConnectionException{
+		if (product.getName()==null || "".equals(product.getName().trim())){
+			String name = this.getProductInfoLookupService().getName(doc);
+			logger.info(this.getIdentifier() + " Obtained name for" + product);
+			product.setName(name);
+		}					
+	}
+	
+	private void updateDescription(Product product, Object doc) throws TooFastConnectionException{
+		String obtainedDescription = null;					
+		obtainedDescription = this.getProductInfoLookupService().getDescription(doc);					
+		if (obtainedDescription!=null){
+			logger.info(this.getIdentifier() + " Obtained Description from Service for " + product);
+			if (product.getDescription()==null || "".equals(product.getDescription().trim()) || !product.isLengthyDescription()){
+				if (product.getDescription()!=null){
+					if (obtainedDescription.length()>product.getDescription().length()){
+						product.setDescription(obtainedDescription);
+					}
+				} else {
+					product.setDescription(obtainedDescription);
+				}
+			}
+		}
+	}
+	
+	private void updateExternalLinks(Product product, Object doc) throws TooFastConnectionException{
+		String externalLink = null;
+		if (product.getExternalLinks()!=null){
+			externalLink = product.getExternalLinks().get(this.getIdentifier());
+		}
+		if (externalLink==null || "".equals(externalLink.trim()) ){
+			
+			
+			externalLink = this.getProductInfoLookupService().getExternalUrlLink(doc);
+			logger.info(this.getIdentifier()+ " Obtained Url for "+ product +": " + externalLink);
+				
+			if (externalLink!=null){
+				SortedMap<String, String> externalLinks = product.getExternalLinks();
+				if (externalLinks==null){
+					externalLinks = new TreeMap<>();
+					product.setExternalLinks(externalLinks);								
+				}
+				externalLinks.put(this.getIdentifier(), externalLink);
+			}
+		} else {
+			logger.debug("Already got url? : " + product.getExternalLinks().get(this.getIdentifier()));
+		}
+	}
+	
+	private void updateRelatedLinks(Product product, Object doc) throws TooFastConnectionException{
+		logger.debug(this.getIdentifier() + " Checking related links");
+		String seriesKey = this.getIdentifier() + "Series";
+		String externalRelatedLink = null;
+		if (product.getExternalLinks()!=null){
+			externalRelatedLink = product.getExternalLinks().get(seriesKey);
+		}
+		if (externalRelatedLink == null || "".equals(externalRelatedLink.trim())){
+			String seriesUrl = null;
+			seriesUrl = this.getProductInfoLookupService().getSeriesUrl(doc);
+			logger.info(this.getIdentifier() + "Obtained for product" +product +" series url :" + seriesUrl);
+			if (seriesUrl!=null){
+				SortedMap<String, String> externalLinks = product.getExternalLinks();
+				if (externalLinks==null){
+					externalLinks = new TreeMap<>();
+					product.setExternalLinks(externalLinks);								
+				}
+				externalLinks.put(seriesKey, seriesUrl);
+			}
+		}
+	}
+	
+	private void updatePublisher(Product product, Object doc) throws TooFastConnectionException{
+
+		logger.debug(this.getIdentifier() + " Checking Publisher");
+		if (product.getPublisher()==null || "".equals(product.getPublisher().trim())){
+			String publisher = null;
+			
+			publisher = this.getProductInfoLookupService().getPublisher(doc);
+			logger.info(this.getIdentifier()+" obtained publisher: " + publisher);
+				
+			if (publisher!=null && !"".equals(publisher.trim())){
+				product.setPublisher(publisher);
+			}
+		}
+	}
+	
+	private void updateMainImage(Product product, Object doc, Collection<Image> imagesAdd, Collection<Image> imagesRemove ) throws TooFastConnectionException{
+		logger.debug(this.getIdentifier() + " Checking Main image");
+		byte [] imageData = null;
+		if (doc!=null){
+			imageData = this.getProductInfoLookupService().getMainImageData(doc);
+		}
+		if (imageData!=null 
+				&& (product.getImages()==null 
+						|| product.getImages().size()==0 
+						|| product.getImages().size()==1)){
+			
+			Image newImage = new Image();
+			newImage.setData(imageData);
+			newImage.setMain(true);
+			newImage.setProduct(product);
+			
+			boolean executeChange = true;
+			if (product.getImages()!=null && product.getImages().size()==1 && product.getImages().get(0).isBigger(newImage)){
+				executeChange = false;
+			}
+			
+			if (executeChange){
+				if (product.getImages()!=null && product.getImages().size()>0){
+					logger.info(this.getIdentifier() + " Substituting images for product " +product+": " + product.getImages());
+					imagesRemove.addAll(product.getImages());
+				}						
+																		
+				List<Image> images = new ArrayList<>();
+				images.add(newImage);
+				imagesAdd.add(newImage);
+				product.setImages(images);
+			}
+		}
+	}
+
+	private void updateAdditionalImages(Product product, Object doc, Collection<Image> imagesAdd ) throws TooFastConnectionException{
+		logger.debug(this.getIdentifier() + " Checking Additional images");
+		if (product.getImages()!=null && product.getImages().size()==1){
+			List<byte []> imagesData = this.getProductInfoLookupService().getAdditionalImageData(doc);
+			if (imagesData!=null){
+				logger.info(this.getIdentifier() + " Obtained additinal images for " +product+" (" + imagesData.size()+")");
+				for (byte[] imageBytes : imagesData) {
+					Image image = new Image();							
+					image.setData(imageBytes);								
+					imagesAdd.add(image);								
+					product.addImage(image);							
+				}
+			}
+		}		
+	}
+	
+	private void updateReleaseDate(Product product, Object doc) throws TooFastConnectionException{
+		logger.debug(this.getIdentifier() + " Checking Release date");
+		if (product.getReleaseDate()==null){
+			Date date = null;
+			date = this.getProductInfoLookupService().getPublicationDate(doc);
+			logger.info(this.getIdentifier() + "Obtained publication date :" + date);
+			if (date!=null){							
+				product.setReleaseDate(date);
+			}
+		}
+		
+	}
+	
+	private void updateAuthors(Product product, Object doc, Collection<Author> authorsAdd) throws TooFastConnectionException{
+		logger.debug(this.getIdentifier() + " Checking Authors");					
+		if (product.getAuthors()==null || product.getAuthors().size()==0){
+			Set<Author> authors = null;
+			authors = this.getProductInfoLookupService().getAuthors(doc);						
+			if (authors!=null && authors.size()>0){
+				logger.info(this.getIdentifier() + "obtained authors for product "+product+ ":" + authors);
+				product.setAuthors(authors);
+				authorsAdd.addAll(authors);
+			}						
+		}
+	}
+	
+	private boolean  updatePrice(Product product, Object doc) throws TooFastConnectionException{
+		boolean updated = false;
+		logger.debug(this.getIdentifier() + " Checking Dollar Price");					
+		Collection<Price> prices = this.getProductInfoLookupService().getPrices(doc);
+		product.removePrice(this.getIdentifier());
+		if (prices!=null){
+			logger.info(this.getIdentifier() + " obtained prices for product "+product+":" + prices);
+			Iterator<Price> iterator = prices.iterator();			
+			Price price = null;			
+			while (iterator.hasNext()){
+				price  = iterator.next();
+				price.setProduct(product);
+				product.addPrice(price);
+				updated = true;
+			}						
+		}		
+		return updated;
+	}
+	
+	private boolean updateRating(Product product, Object doc) throws TooFastConnectionException{
+		logger.debug(this.getIdentifier() + " Checking Rating");
+		boolean updated = false;
+		Rating rating = null;
+		if (this.guaranteeUnivocalResponse(product)){
+			rating = this.getProductInfoLookupService().getRating(doc);						
+			logger.info(this.getIdentifier() + " Obtained rating"+ rating +"for" + product);
+		} else {
+			logger.info(this.getIdentifier() + " Skip rating for" + product);
+		}
+		if (rating!=null){
+			rating.setProduct(product);
+			if (product.getRatings()==null){
+				product.setMainRating(rating.getRating());
+			}
+			product.addRating(rating);
+			updated = true;
+		} else {
+			product.removeRating(this.getIdentifier());
+			updated = true;
+		}
+		return updated;
+	}
+	
+	private void updateReference(Product product, Object doc) throws TooFastConnectionException{
+		logger.debug(this.getIdentifier() + " Checking Reference");					
+		String connectorReference = null;
+		if (product.getConnectorReferences()!=null){
+			connectorReference = product.getConnectorReferences().get(this.getIdentifier());
+		}
+		if (connectorReference== null || "".equals(connectorReference.trim())){
+			String reference = this.getProductInfoLookupService().getReference(doc);
+			logger.info(this.getIdentifier() + " obtained reference for product "+product +":" + reference);
+			if (reference!=null){
+				Map<String, String> references = product.getConnectorReferences();
+				if (references==null){
+					references = new HashMap<>();
+					product.setConnectorReferences(references);
+				}
+				references.put(this.getIdentifier(), reference);
+			}
+		}
+		
+	}
+	
 	protected boolean updateProductDo(Product product, Collection<Image> imagesAdd, Collection<Image> imagesRemove, Set<Author> authorsAdd) throws TooFastConnectionException, FileNotFoundException{
 		boolean processed = false;
 		ProductInfoLookupService itemLookup = this.getProductInfoLookupService();		
@@ -213,199 +392,30 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 				if (doc!=null){
 					
 					
-					if (product.getName()==null || "".equals(product.getName().trim())){
-						String name = itemLookup.getName(doc);
-						logger.info(this.getIdentifier() + " Obtained name for" + product);
-						product.setName(name);
-					}					
+					updateName(product,doc);
 					
-					String obtainedDescription = null;					
-					obtainedDescription = itemLookup.getDescription(doc);					
-					if (obtainedDescription!=null){
-						logger.info(this.getIdentifier() + " Obtained Description from Service for " + product);
-						if (product.getDescription()==null || "".equals(product.getDescription().trim()) || !product.isLengthyDescription()){
-							if (product.getDescription()!=null){
-								if (obtainedDescription.length()>product.getDescription().length()){
-									product.setDescription(obtainedDescription);
-								}
-							} else {
-								product.setDescription(obtainedDescription);
-							}
-						}
-					}				
+					updateDescription(product,doc);				
 					
-					String externalLink = null;
-					if (product.getExternalLinks()!=null){
-						externalLink = product.getExternalLinks().get(this.getIdentifier());
-					}
-					if (externalLink==null || "".equals(externalLink.trim()) ){
-						
-						
-						externalLink = itemLookup.getExternalUrlLink(doc);
-						logger.info(this.getIdentifier()+ " Obtained Url for "+ product +": " + externalLink);
-							
-						if (externalLink!=null){
-							SortedMap<String, String> externalLinks = product.getExternalLinks();
-							if (externalLinks==null){
-								externalLinks = new TreeMap<>();
-								product.setExternalLinks(externalLinks);								
-							}
-							externalLinks.put(this.getIdentifier(), externalLink);
-						}
-					} else {
-						logger.debug("Already got url? : " + product.getExternalLinks().get(this.getIdentifier()));
-					}
+					updateExternalLinks(product,doc);
+										
+					updateRelatedLinks(product,doc);
 					
+					updatePublisher(product,doc);
 					
-					logger.debug(this.getIdentifier() + " Checking related links");
-					String seriesKey = this.getIdentifier() + "Series";
-					String externalRelatedLink = null;
-					if (product.getExternalLinks()!=null){
-						externalRelatedLink = product.getExternalLinks().get(seriesKey);
-					}
-					if (externalRelatedLink == null || "".equals(externalRelatedLink.trim())){
-						String seriesUrl = null;
-						seriesUrl = itemLookup.getSeriesUrl(doc);
-						logger.info(this.getIdentifier() + "Obtained for product" +product +" series url :" + seriesUrl);
-						if (seriesUrl!=null){
-							SortedMap<String, String> externalLinks = product.getExternalLinks();
-							if (externalLinks==null){
-								externalLinks = new TreeMap<>();
-								product.setExternalLinks(externalLinks);								
-							}
-							externalLinks.put(seriesKey, seriesUrl);
-						}
-					}
+					updateMainImage(product,doc,imagesAdd,imagesRemove);
 					
-					logger.debug(this.getIdentifier() + " Checking Publisher");
-					if (product.getPublisher()==null || "".equals(product.getPublisher().trim())){
-						String publisher = null;
-						
-						publisher = itemLookup.getPublisher(doc);
-						logger.info(this.getIdentifier()+" obtained publisher: " + publisher);
-							
-						if (publisher!=null && !"".equals(publisher.trim())){
-							product.setPublisher(publisher);
-						}
-					}
+					updateAdditionalImages(product,doc,imagesAdd);
 					
-					logger.debug(this.getIdentifier() + " Checking Main image");
-					byte [] imageData = null;
-					if (doc!=null){
-						imageData = itemLookup.getMainImageData(doc);
-					}
-					if (imageData!=null 
-							&& (product.getImages()==null 
-									|| product.getImages().size()==0 
-									|| product.getImages().size()==1)){
-						
-						Image newImage = new Image();
-						newImage.setData(imageData);
-						newImage.setMain(true);
-						newImage.setProduct(product);
-						
-						boolean executeChange = true;
-						if (product.getImages()!=null && product.getImages().size()==1 && product.getImages().get(0).isBigger(newImage)){
-							executeChange = false;
-						}
-						
-						if (executeChange){
-							if (product.getImages()!=null && product.getImages().size()>0){
-								logger.info(this.getIdentifier() + " Substituting images for product " +product+": " + product.getImages());
-								imagesRemove.addAll(product.getImages());
-							}						
-																					
-							List<Image> images = new ArrayList<>();
-							images.add(newImage);
-							imagesAdd.add(newImage);
-							product.setImages(images);
-						}
-					}
+					updateReleaseDate(product,doc);
+										
+					updateAuthors(product,doc,authorsAdd);	
 					
-					logger.debug(this.getIdentifier() + " Checking Additional images");
-					if (product.getImages()!=null && product.getImages().size()==1){
-						List<byte []> imagesData = itemLookup.getAdditionalImageData(doc);
-						if (imagesData!=null){
-							logger.info(this.getIdentifier() + " Obtained additinal images for " +product+" (" + imagesData.size()+")");
-							for (byte[] imageBytes : imagesData) {
-								Image image = new Image();							
-								image.setData(imageBytes);								
-								imagesAdd.add(image);								
-								product.addImage(image);							
-							}
-						}
-					}
+					updatePrice(product,doc);
 					
-					logger.debug(this.getIdentifier() + " Checking Release date");
-					if (product.getReleaseDate()==null){
-						Date date = null;
-						date = itemLookup.getPublicationDate(doc);
-						logger.info(this.getIdentifier() + "Obtained publication date :" + date);
-						if (date!=null){							
-							product.setReleaseDate(date);
-						}
-					}
+					updateRating(product,doc);
 					
-					
-					
-					logger.debug(this.getIdentifier() + " Checking Authors");
-					
-					if (product.getAuthors()==null || product.getAuthors().size()==0){
-						Set<Author> authors = null;
-						authors = itemLookup.getAuthors(doc);						
-						if (authors!=null && authors.size()>0){
-							logger.info(this.getIdentifier() + "obtained authors for product "+product+ ":" + authors);
-							product.setAuthors(authors);
-							authorsAdd.addAll(authors);
-						}						
-					}	
-					
-					logger.debug(this.getIdentifier() + " Checking Dollar Price");
-					
-					Map<String,Long> prices = itemLookup.getDollarPrice(doc);					
-					if (prices!=null){
-						logger.info(this.getIdentifier() + "obtained prices for product "+product+":" + prices);
-						for (Entry<String,Long> priceEntry: prices.entrySet()){
-							String key = this.getIdentifier();
-							if (priceEntry.getKey()!=null && !"".equals(priceEntry.getKey().trim())){
-								key = key + " - " + priceEntry.getKey(); 
-							}
-							product.setDollarPrice(key,priceEntry.getValue());
-						}						
-					}
-					product.setMinPrice(product.calculateMinDollarPrice());
-					
-					logger.debug(this.getIdentifier() + " Checking Rating");
-					Rating rating = null;					
-					rating = itemLookup.getRating(doc);
-					logger.info(this.getIdentifier() + " Obtained rating"+ rating +"for" + product);				
-					if (rating!=null){		
-						rating.setProduct(product);
-						if (product.getRatings()==null){
-							product.setMainRating(rating.getRating());
-						}
-						product.addRating(rating);
-					} else {
-						product.removeRating(this.getIdentifier());
-					}
-					
-					logger.debug(this.getIdentifier() + " Checking Reference");					
-					String connectorReference = null;
-					if (product.getConnectorReferences()!=null){
-						connectorReference = product.getConnectorReferences().get(this.getIdentifier());
-					}
-					if (connectorReference== null || "".equals(connectorReference.trim())){
-						String reference = itemLookup.getReference(doc);
-						logger.info(this.getIdentifier() + " obtained reference for product "+product +":" + reference);
-						if (reference!=null){
-							Map<String, String> references = product.getConnectorReferences();
-							if (references==null){
-								references = new HashMap<>();
-								product.setConnectorReferences(references);
-							}
-							references.put(this.getIdentifier(), reference);
-						}
-					}										
+					updateReference(product,doc);
+															
 					
 				} else {
 					logger.info(this.getIdentifier() + " obtained null doc for product: "+ product.getName());

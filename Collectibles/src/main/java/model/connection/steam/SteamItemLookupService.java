@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,6 +18,7 @@ import java.util.Set;
 import model.connection.AbstractProductInfoLookupService;
 import model.connection.TooFastConnectionException;
 import model.dataobjects.Author;
+import model.dataobjects.Price;
 import model.dataobjects.Product;
 import model.dataobjects.Rating;
 
@@ -210,9 +212,8 @@ public class SteamItemLookupService extends AbstractProductInfoLookupService<Jso
 	
 
 	@Override
-	public Map<String, Long> getDollarPrice(JsonNode doc)
-			throws TooFastConnectionException {
-		Map<String,Long> map = null;
+	public Collection<Price> getPrices(JsonNode doc)throws TooFastConnectionException {
+		Collection<Price> result = null;
 		Long price = null;
 		String priceText = doc.path("data").path("price_overview").path("final").asText();
 		if (priceText!=null && !"".equals(priceText)){
@@ -223,10 +224,15 @@ public class SteamItemLookupService extends AbstractProductInfoLookupService<Jso
 			}
 		}
 		if (price!=null){
-			map = new HashMap<>();
-			map.put("", price);
+			result = new ArrayList<>();
+			Price priceObject = new Price();
+			priceObject.setConnectorName(this.getIdentifier());
+			priceObject.setLink(this.getExternalUrlLink(doc));
+			priceObject.setPrice(price);
+			priceObject.setType("");
+			result.add(priceObject);
 		}
-		return map;
+		return result;
 	}
 
 	@Override

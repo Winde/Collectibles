@@ -23,6 +23,7 @@ package model.connection.amazon;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import java.util.Set;
 import model.connection.ProductInfoLookupServiceXML;
 import model.connection.TooFastConnectionException;
 import model.dataobjects.Author;
+import model.dataobjects.Price;
 import model.dataobjects.Product;
 import model.dataobjects.Rating;
 
@@ -220,26 +222,26 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	}
 
 	@Override
-	public String getExternalUrlLink(Document doc){
-		return this.getField(doc, externalLinkUrlDocPath);		    	
+	public String getExternalUrlLink(Node node){
+		return this.getField(node, externalLinkUrlDocPath);		    	
 	}
     
-	public String getDescription(Document doc ) throws TooFastConnectionException{
-		return this.getField(doc, descriptionDocPath);
+	public String getDescription(Node node) throws TooFastConnectionException{
+		return this.getField(node, descriptionDocPath);
 	}
     
-	private String parseImageUrl(Document doc) throws TooFastConnectionException{
-		return this.getField(doc, imageUrlDocPath);       
+	private String parseImageUrl(Node node) throws TooFastConnectionException{
+		return this.getField(node, imageUrlDocPath);       
 	}
     
 	@Override
-	public String getPublisher(Document doc) throws TooFastConnectionException {
-		return this.getField(doc, publisherDocPath);
+	public String getPublisher(Node node) throws TooFastConnectionException {
+		return this.getField(node, publisherDocPath);
 	}
     
-	public byte[] getMainImageData(Document doc) throws TooFastConnectionException{
+	public byte[] getMainImageData(Node node) throws TooFastConnectionException{
 		byte [] data = null;
-		String url = parseImageUrl(doc);
+		String url = parseImageUrl(node);
 		if (url!=null){
 			data = fetchImage(url);
 		}
@@ -247,7 +249,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	}
 	
 	@Override
-	public Document fetchDocFromProduct(Product product) throws TooFastConnectionException, FileNotFoundException {		
+	public Node fetchDocFromProduct(Product product) throws TooFastConnectionException, FileNotFoundException {		
 		String reference = null;
 		reference = this.getReferenceFromProduct(product);
 		if (reference==null){			
@@ -261,38 +263,41 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 			return null;
 		}
 		String url = this.getMultipleUseUrl(reference);
-		return this.fetchDocFromUrl(url);
+		Node node = null;
+		Document doc = this.fetchDocFromUrl(url);
+		if (doc!=null){
+			node = doc.getDocumentElement();
+		}
+		return node;
 	}
 
 	@Override
-	public Date getPublicationDate(Document doc)
-			throws TooFastConnectionException {
+	public Date getPublicationDate(Node node) throws TooFastConnectionException {
 		return null;
 	}
 
 	@Override
-	public Set<Author> getAuthors(Document doc)
-			throws TooFastConnectionException {
+	public Set<Author> getAuthors(Node node) throws TooFastConnectionException {
 		return null;
 	}
 
 	@Override
-	public String getSeriesUrl(Document doc) throws TooFastConnectionException {
+	public String getSeriesUrl(Node node) throws TooFastConnectionException {
 		return null;
 	}
 
 	@Override
-	public Map<String, Long> getDollarPrice(Document doc) throws TooFastConnectionException {
-		Map<String,Long> result = null;
+	public Collection<Price> getPrices(Node node) throws TooFastConnectionException {
+		Collection<Price> result = null;
 		Map<String,String> stringPrices = new HashMap<>();		
-		String newField = this.getField(doc, dollarPriceNewPath);
-		String usedField = this.getField(doc, dollarPriceUsedPath);
-		String collectibleField = this.getField(doc, dollarPriceCollectiblePath);
+		String newField = this.getField(node, dollarPriceNewPath);
+		String usedField = this.getField(node, dollarPriceUsedPath);
+		String collectibleField = this.getField(node, dollarPriceCollectiblePath);
 		if (newField!=null) { stringPrices.put("New", newField); }
 		if (usedField!=null) { stringPrices.put("Used", usedField); }
 		if (collectibleField!=null) { stringPrices.put("Collectible", collectibleField); }
 		if (stringPrices!=null && !stringPrices.isEmpty()){
-			result = new HashMap<>();
+			result = new ArrayList<>();
 			for (Entry<String,String> entry : stringPrices.entrySet()){
 				Long price = null;
 				try {
@@ -301,7 +306,13 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 					logger.error("Amazon price is not long? ", e);
 				}
 				if (price!=null){
-					result.put(entry.getKey(), price);
+					Price priceObject = new Price();
+					priceObject.setConnectorName(this.getIdentifier());
+					priceObject.setLink(this.getExternalUrlLink(node));
+					priceObject.setType(entry.getKey());
+					priceObject.setPrice(price);
+					logger.info("PriceObject adding: " + priceObject);				
+					result.add(priceObject);
 				}
 			}			
 		}
@@ -314,24 +325,23 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	}
 
 	@Override
-	public Rating getRating(Document doc) throws TooFastConnectionException {
+	public Rating getRating(Node node) throws TooFastConnectionException {
 		return null;
 	}
 
 	@Override
-	public String getReference(Document doc) throws TooFastConnectionException {
-		return super.getField(doc, amazonReferencePath);
+	public String getReference(Node node) throws TooFastConnectionException {
+		return super.getField(node, amazonReferencePath);
 	}
 
 	@Override
-	public List<byte[]> getAdditionalImageData(Document doc)
-			throws TooFastConnectionException {
+	public List<byte[]> getAdditionalImageData(Node node) throws TooFastConnectionException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String getName(Document doc) throws TooFastConnectionException {
+	public String getName(Node node) throws TooFastConnectionException {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -15,6 +15,7 @@ import model.dataobjects.Author;
 import model.dataobjects.Author.AuthorView;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
+import model.dataobjects.Price;
 import model.dataobjects.Rating;
 import model.dataobjects.HierarchyNode.HierarchySimpleView;
 import model.dataobjects.Image;
@@ -94,7 +95,8 @@ public class SerializableProduct {
 	//private Collection<String> processedConnectors;
 	
 	@JsonView(ProductComplexView.class)
-	private Map<String,Long> dollarPrice = null;
+	@JsonIgnoreProperties({ "product" })
+	private SortedSet<Price> prices = null;
 	
 	@JsonView(ProductSimpleView.class)
 	private Long minPrice = null;	
@@ -308,15 +310,15 @@ public class SerializableProduct {
 	public void setUser(User user) {
 		this.user = user;
 	}
-
-	public Map<String, Long> getDollarPrice() {
-		return dollarPrice;
-	}
-
-	public void setDollarPrice(Map<String, Long> dollarPrice) {
-		this.dollarPrice = dollarPrice;
-	}
 	
+	public SortedSet<Price> getPrices() {
+		return prices;
+	}
+
+	public void setPrices(SortedSet<Price> prices) {
+		this.prices = prices;
+	}
+
 	public Long getMinPrice() {
 		return minPrice;
 	}

@@ -29,7 +29,7 @@ public class ContinuousScrapper implements ContinuousScrapperInterface {
 
 	private static final Logger logger = LoggerFactory.getLogger(ContinuousScrapper.class);	
 	
-	private static final int MAX_ATTEMPTS_NUMBER = 12;
+	private static final int MAX_ATTEMPTS_NUMBER = 2;
 	
 	@Autowired
 	private ProductRepository productRepository;

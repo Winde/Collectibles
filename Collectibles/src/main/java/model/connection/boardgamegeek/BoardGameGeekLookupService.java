@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import model.connection.ProductInfoLookupServiceXML;
 import model.connection.TooFastConnectionException;
 import model.connection.amazon.AmazonItemLookupService;
 import model.dataobjects.Author;
+import model.dataobjects.Price;
 import model.dataobjects.Product;
 import model.dataobjects.Rating;
 
@@ -156,7 +158,7 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	}
 	
 	@Override
-	public Document fetchDocFromProduct(Product product)
+	public Node fetchDocFromProduct(Product product)
 			throws TooFastConnectionException, FileNotFoundException {
 		String reference = this.getReferenceFromProduct(product);
 		
@@ -174,14 +176,19 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 		url = url + "&"+this.OPERATION_THING_PARAMETER+"=" + reference;
 		logger.info("BoardgameGeek url for fetch data: " + url);
 		
-		return super.fetchDocFromUrl(url);
+		Document doc = super.fetchDocFromUrl(url);
+		Node node = null;
+		if (doc!=null){
+			node = doc.getDocumentElement();
+		}
+		return node;
 		
 	}
 
 	@Override
-	public byte[] getMainImageData(Document doc) throws TooFastConnectionException {
+	public byte[] getMainImageData(Node node) throws TooFastConnectionException {
 		byte[] image = null;
-		String imageUrl = super.getField(doc, imageUrlDocPath);
+		String imageUrl = super.getField(node, imageUrlDocPath);
 		if (imageUrl!=null) {
 			if (imageUrl.startsWith("//")){
 				imageUrl = "http:"+imageUrl;
@@ -193,15 +200,15 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	}
 
 	@Override
-	public String getDescription(Document doc) throws TooFastConnectionException {
-		return super.getField(doc, itemDescriptionDocPath);
+	public String getDescription(Node node) throws TooFastConnectionException {
+		return super.getField(node, itemDescriptionDocPath);
 	}
 
 	@Override
-	public Date getPublicationDate(Document doc) throws TooFastConnectionException {
+	public Date getPublicationDate(Node node) throws TooFastConnectionException {
 		Date date = null;
 		Integer year = null;
-		String yearString = super.getAttribute(doc, yearPublishedDocPath, yearPublishedAttribute);
+		String yearString = super.getAttribute(node, yearPublishedDocPath, yearPublishedAttribute);
 		if (yearString!=null){
 			try {
 				year = Integer.parseInt(yearString);
@@ -216,25 +223,22 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	}
 
 	@Override
-	public Set<Author> getAuthors(Document doc)
-			throws TooFastConnectionException {
-		// TODO Auto-generated method stub
+	public Set<Author> getAuthors(Node node) throws TooFastConnectionException {
 		return null;
 	}
 
 	@Override
-	public String getSeriesUrl(Document doc) throws TooFastConnectionException {
-		// TODO Auto-generated method stub
+	public String getSeriesUrl(Node node) throws TooFastConnectionException {
 		return null;
 	}
 
 	@Override
-    public String getExternalUrlLink(Document doc) throws TooFastConnectionException{
-		String reference = this.getReference(doc);
+    public String getExternalUrlLink(Node node) throws TooFastConnectionException{
+		String reference = this.getReference(node);
 		String url = null;
 		if (reference!=null){	
 			url = DEFAULT_PRODUCT_URL + reference + "/";
-			String typeString = super.getAttribute(doc, typeDocPath,typeAttribute);		
+			String typeString = super.getAttribute(node, typeDocPath,typeAttribute);		
 			if (typeString!=null){
 				if ("boardgame".equals(typeString)){
 					url = BOARDGAME_PRODUCT_URL + reference + "/";
@@ -247,25 +251,23 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	}
 
 	@Override
-	public String getPublisher(Document doc) throws TooFastConnectionException {
+	public String getPublisher(Node node) throws TooFastConnectionException {
 		//String publisher = super.getAttribute(doc, "/items/item/link[@type='boardgamepublisher']","value");		
 		return null;
 	}
 
 	@Override
-	public Map<String, Long> getDollarPrice(Document doc)
-			throws TooFastConnectionException {
-		// TODO Auto-generated method stub
+	public Collection<Price> getPrices(Node node) throws TooFastConnectionException {
 		return null;
 	}
 	
 
 	@Override
-	public Rating getRating(Document doc) throws TooFastConnectionException {
+	public Rating getRating(Node node) throws TooFastConnectionException {
 		Double rating = null;
 		Long ratingCount = null;
-		String ratingString = super.getAttribute(doc, ratingDocPathBayesAverage,ratingAttribute);
-		String ratingCountString = super.getAttribute(doc, ratingDocPathCount,ratingCountAttribute);		
+		String ratingString = super.getAttribute(node, ratingDocPathBayesAverage,ratingAttribute);
+		String ratingCountString = super.getAttribute(node, ratingDocPathCount,ratingCountAttribute);		
 		if (ratingString!=null){
 			try{
 				rating = Double.parseDouble(ratingString);
@@ -274,7 +276,7 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 			}
 		}
 		if (rating==null || rating<=0.0){
-			ratingString = super.getAttribute(doc, ratingDocPathAverage,ratingAttribute);
+			ratingString = super.getAttribute(node, ratingDocPathAverage,ratingAttribute);
 			try{
 				rating = Double.parseDouble(ratingString);
 			}catch (Exception e){
@@ -311,19 +313,19 @@ public class BoardGameGeekLookupService extends ProductInfoLookupServiceXML {
 	}
 
 	@Override
-	public String getReference(Document doc) throws TooFastConnectionException {
-		return super.getAttribute(doc, referenceDocPath, referenceAttribute);
+	public String getReference(Node node) throws TooFastConnectionException {
+		return super.getAttribute(node, referenceDocPath, referenceAttribute);
 	}
 
 	@Override
-	public List<byte[]> getAdditionalImageData(Document doc)
+	public List<byte[]> getAdditionalImageData(Node node)
 			throws TooFastConnectionException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String getName(Document doc) throws TooFastConnectionException {
+	public String getName(Node node) throws TooFastConnectionException {
 		// TODO Auto-generated method stub
 		return null;
 	}

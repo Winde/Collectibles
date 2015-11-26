@@ -1,6 +1,7 @@
 package model.connection.goodreads;
 
 import java.io.FileNotFoundException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +12,7 @@ import model.connection.ProductInfoLookupServiceXML;
 import model.connection.TooFastConnectionException;
 import model.connection.drivethrurpg.DrivethrurpgData;
 import model.dataobjects.Author;
+import model.dataobjects.Price;
 import model.dataobjects.Product;
 import model.dataobjects.Rating;
 
@@ -63,27 +65,27 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 		return url;
 	}
 			
-	public String getImageUrl(Document doc){		
-		return this.getField(doc, imageUrlDocPath);		
+	public String getImageUrl(Node node){		
+		return this.getField(node, imageUrlDocPath);		
 	}
 	
-	public byte [] getMainImageData(Document doc) throws TooFastConnectionException{
+	public byte [] getMainImageData(Node node) throws TooFastConnectionException{
 		byte [] data = null;
-		String url = this.getImageUrl(doc);
+		String url = this.getImageUrl(node);
 		if (url!=null && url.indexOf("/nophoto/")<0){
 			data = this.fetchImage(url);
 		}
 		return data;
 	}
 	
-	public String getDescription(Document doc){
-		return this.getField(doc, descriptionDocPath);		
+	public String getDescription(Node node){
+		return this.getField(node, descriptionDocPath);		
 	}
 	
-	public Date getPublicationDate(Document doc){
+	public Date getPublicationDate(Node node){
 		Date result = null;
 		Integer year = null;
-		String pubYear = this.getField(doc, publicationYearDocPath);
+		String pubYear = this.getField(node, publicationYearDocPath);
 		if (pubYear!=null && !"".equals(pubYear)){
 			try{
 				year = Integer.parseInt(pubYear);
@@ -98,13 +100,13 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	}
 	
 	@Override
-	 public String getExternalUrlLink(Document doc) throws TooFastConnectionException {
-		return this.getField(doc, goodreadsLinkDocPath);
+	 public String getExternalUrlLink(Node node) throws TooFastConnectionException {
+		return this.getField(node, goodreadsLinkDocPath);
 	}
 	
-	public Set<Author> getAuthors(Document doc){
+	public Set<Author> getAuthors(Node rootNode){
 		Set<Author> authors = new HashSet<>();
-		NodeList authorNodes = this.getNodes(doc, authorDocPath);
+		NodeList authorNodes = this.getNodes(rootNode, authorDocPath);
 		if (authorNodes!=null && authorNodes.getLength()>0){
 			for (int i=0;i<authorNodes.getLength();i++){
 				Node node = authorNodes.item(i);
@@ -159,9 +161,9 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 		}
 	}
 	
-	public String getSeriesUrl(Document doc){
+	public String getSeriesUrl(Node rootNode){
 		String url = null;		
-		String series = this.getField(doc, goodreadsRelatedUrlDocPath);
+		String series = this.getField(rootNode, goodreadsRelatedUrlDocPath);
 		if (series !=null) {
 			url = baseUrlSeries + series;
 		}
@@ -169,8 +171,8 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	}
 	
 	@Override
-	public String getPublisher(Document doc) throws TooFastConnectionException {
-		return this.getField(doc, goodreadsPublisherDocPath);
+	public String getPublisher(Node rootNode) throws TooFastConnectionException {
+		return this.getField(rootNode, goodreadsPublisherDocPath);
 	}
 
 	@Override
@@ -193,7 +195,7 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	}
 
 	@Override
-	public Map<String,Long> getDollarPrice(Document doc) throws TooFastConnectionException {
+	public Collection<Price> getPrices(Node rootNode) throws TooFastConnectionException {
 		return null;
 	}
 
@@ -203,9 +205,9 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	}
 
 	@Override
-	public Rating getRating(Document doc) throws TooFastConnectionException {
-		String ratingString = super.getField(doc, ratingDocPath);
-		String ratingCountString = super.getField(doc, ratingCountDocPath);
+	public Rating getRating(Node rootNode) throws TooFastConnectionException {
+		String ratingString = super.getField(rootNode, ratingDocPath);
+		String ratingCountString = super.getField(rootNode, ratingCountDocPath);
 		
 		Long ratingCount = null;
 		Double rating = null;
@@ -235,20 +237,18 @@ public class GoodReadsItemLookupService extends ProductInfoLookupServiceXML {
 	}
 
 	@Override
-	public String getReference(Document doc) throws TooFastConnectionException {
-		return super.getField(doc, goodreadsReferenceDocPath);
+	public String getReference(Node rootNode) throws TooFastConnectionException {
+		return super.getField(rootNode, goodreadsReferenceDocPath);
 	}
 
 	@Override
-	public List<byte[]> getAdditionalImageData(Document doc)
+	public List<byte[]> getAdditionalImageData(Node rootNode)
 			throws TooFastConnectionException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String getName(Document doc) throws TooFastConnectionException {
-		// TODO Auto-generated method stub
+	public String getName(Node rootNode) throws TooFastConnectionException {
 		return null;
 	}
 

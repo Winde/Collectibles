@@ -63,6 +63,7 @@ import configuration.security.jwt.TokenAuthenticationService;
 @PropertySource("classpath:amazon.properties")
 @PropertySource("classpath:goodreads.properties")
 @PropertySource("classpath:boardgamegeek.properties")
+@PropertySource("classpath:ebay.properties")
 @PropertySource("classpath:steam.properties")
 @PropertySource("classpath:reddis.properties")
 @PropertySource(value = {

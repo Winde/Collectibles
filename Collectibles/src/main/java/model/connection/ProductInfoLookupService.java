@@ -1,12 +1,14 @@
 package model.connection;
 
 import java.io.FileNotFoundException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import model.dataobjects.Author;
+import model.dataobjects.Price;
 import model.dataobjects.Product;
 import model.dataobjects.Rating;
 
@@ -30,7 +32,7 @@ public interface ProductInfoLookupService<E> {
 
 	public String getPublisher(E doc)  throws TooFastConnectionException;
 	
-	public Map<String, Long> getDollarPrice(E doc) throws TooFastConnectionException;
+	public Collection<Price> getPrices(E doc) throws TooFastConnectionException;
 	
 	public Rating getRating(E doc) throws TooFastConnectionException;
 	
