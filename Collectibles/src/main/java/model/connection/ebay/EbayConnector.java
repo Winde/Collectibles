@@ -43,7 +43,7 @@ public class EbayConnector extends AbstractProductInfoConnector{
 
 	@Override
 	public boolean canCreateLinks() {
-		return true;
+		return false;
 	}
 
 	@Override

@@ -17,7 +17,8 @@
 	</div>
 	<div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
 		<h3>
-			<span class="label label-success" ng-if="product.minPrice">{{(product.minPrice/100) | currency}}</span>
+			
+			<a href="{{product.minPriceLink}}" class="label label-success" ng-if="product.minPrice">{{(product.minPrice/100) | currency}}</a>
 			<span class="label label-info" ng-if="!product.minPrice">No price</span>
 		</h3>
 		

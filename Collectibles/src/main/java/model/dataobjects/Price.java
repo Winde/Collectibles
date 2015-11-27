@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 class PricePK implements Serializable {
 	private Product product = null;	
@@ -20,12 +21,14 @@ class PricePK implements Serializable {
 }
 
 @Entity(name="Price")
+@Table(name="product_price")
 @IdClass(PricePK.class)
 public class Price implements Serializable, Comparable<Price>{
 	
 	
 	
 	@Column(name="connector")
+	@Id
 	private String connectorName;
 	
 	@ManyToOne
@@ -34,6 +37,7 @@ public class Price implements Serializable, Comparable<Price>{
 	private Product product;
 	
 	@Column(name="type")
+	@Id
 	private String type = null;
 	
 	@Column(name="price")
@@ -83,30 +87,29 @@ public class Price implements Serializable, Comparable<Price>{
 		this.link = link;
 	}
 	
+	@Override
 	public int hashCode(){
-		if (this.getPrice()!=null){
-			return this.getPrice().hashCode();
-		} else {
-			return 0;
-		}
+		Integer hash = null;
+		if (this.getConnectorName()!=null){
+			hash = this.getConnectorName().hashCode();
+		} else{
+			hash = 0;
+		}		
+		return hash;
 	}
 	
 	@Override
 	public boolean equals(Object o){
 		if (o instanceof Price){
-			Price oP = (Price) o;
-			if (this.getConnectorName()!=null 
-					&& this.getProduct()!=null 
-					&& this.getType()!=null
-					&& this.getConnectorName().equals(oP.getConnectorName())
-					&& this.getProduct().equals(oP.getProduct())
-					&& this.getType().equals(oP.getType())){
-				return true;
-			}							
+			Price oP = (Price) o;			
+				return this.getConnectorName()!=null && this.getType()!=null && this.getProduct()!=null &&
+						this.getConnectorName().equals(oP.getConnectorName()) &&
+						this.getType().equals(oP.getType()) &&
+						this.getProduct().equals(oP.getProduct());			
 		} 
-		
 		return false;
 	}
+	
 
 	@Override
 	public int compareTo(Price o) {
@@ -114,8 +117,12 @@ public class Price implements Serializable, Comparable<Price>{
 			return -1;
 		} else {
 			int comparison = this.getPrice().compareTo(o.getPrice());
-			if (comparison == 0){
-				return -1;
+			if (comparison ==0){
+				if (this.equals(o)){
+					return 0;
+				} else{
+					return -1;
+				}
 			} else {
 				return comparison;
 			}

@@ -13,16 +13,14 @@ public interface ProductInfoConnector {
 	public ProductInfoLookupService getProductInfoLookupService();
 
 	@Transactional
-	public boolean updateProductTransaction(Product product) throws TooFastConnectionException;
+	public boolean updateProductTransaction(Long productId) throws TooFastConnectionException;
 	
 	@Transactional
-	public boolean updateProductWithoutSave(Product product) throws TooFastConnectionException;
+	public boolean updateProductWithoutSave(Long productId) throws TooFastConnectionException;
 	
 	@Transactional
-	boolean updateTransitionalTransaction(Product product) throws TooFastConnectionException;
-	
-	public boolean updateTransitional(Product product)  throws TooFastConnectionException;
-	
+	boolean updateTransitionalTransaction(Long productId) throws TooFastConnectionException;
+
 	public List<String> getOwnedReferences(String userId) throws TooFastConnectionException;
 			
 	public String getIdentifier();

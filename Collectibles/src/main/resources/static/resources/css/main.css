@@ -56,6 +56,8 @@
     margin-bottom: 12px;
 }
 
+
+
 .productGrid .productListEntry .btn {
 	/*margin-top: 10px;*/	
 }
@@ -89,6 +91,10 @@
 
 .product .images {
 	margin-bottom: 15px;
+}
+
+.product .priceEntry {
+	margin-bottom: 10px;
 }
 
 .product .mainImage {

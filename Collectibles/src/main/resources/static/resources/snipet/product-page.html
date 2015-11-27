@@ -143,15 +143,18 @@
 					</div>
 									
 					<div class="dataBlock priceBlock">
-						<div ng-show="product.dollarPrice && !isEmptyObject(product.dollarPrice)">
+						<div ng-show="product.prices && product.prices.length && product.prices.length > 0">
 							<p><b>Price: </b></p>
 							<div class="blockContent">							
-								<p ng-if="product.dollarPrice" ng-repeat="(key, value) in product.dollarPrice">
-									<span ng-if="value===0.0 || value">{{(value/100) | currency}}</span>
-									<span ng-if="key">({{key}})</span>
-								</p>
-								<p ng-if="product.lastPriceUpdate">Last updated: {{product.lastPriceUpdate | date:'yyyy-MM-dd HH:mm:ss'}}</p>
+								<div class="row priceEntry" ng-repeat="priceObject in product.prices" >									
+									<div class="col-md-4 col-sm-6 col-xs-6">
+										<a class="btn btn-default btn-block" ng-class="{ disabled : !priceObject.link }" href="{{priceObject.link}}">
+											<span>{{(priceObject.price/100) | currency}}</span> <span ng-if="priceObject.connectorName">{{priceObject.connectorName}} {{priceObject.type}}</span>																												
+										</a>
+									</div>
+								</div>
 							</div>
+							<p ng-if="product.lastPriceUpdate">Last updated: {{product.lastPriceUpdate | date:'yyyy-MM-dd HH:mm:ss'}}</p>
 						</div>												
 					</div>
 					
@@ -160,10 +163,10 @@
 						<p><b>Ratings: </b></p>
 						<div class="blockContent">																				
 							<div class="row" ng-if="product.ratings && product.ratings.length && product.ratings.length>0" ng-repeat="ratingObject in product.ratings" >
-								<div class="col-md-2 col-sm-4 col-xs-12" ng-if="ratingObject.rating && ratingObject.rating > 0.0">
+								<div class=" col-lg-2 col-md-3 col-sm-4 col-xs-12" ng-if="ratingObject.rating && ratingObject.rating > 0.0">
 									{{ratingObject.provider}}									
 								</div>
-								<div class="col-md-10 col-sm-8 col-xs-12" ng-if="ratingObject.rating && ratingObject.rating > 0.0">
+								<div class="col-lg-10 col-md-9 col-sm-8 col-xs-12" ng-if="ratingObject.rating && ratingObject.rating > 0.0">
 									<uib-rating ng-model="ratingObject.rating" max="10" readonly="true" aria-labelledby="default-rating"></uib-rating>
 									<span ng-if="ratingObject.ratingsCount && ratingObject.ratingsCount>0">({{ratingObject.ratingsCount}} reviews)</span>									
 								</div>															

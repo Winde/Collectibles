@@ -61,17 +61,14 @@ public class ContinuousScrapper implements ContinuousScrapperInterface {
 		try{
 			if (scrapeReq!=null && scrapeReq.getProductId()!=null){										
 				try {
-					long start = new Date().getTime();
-					Product product = productRepository.findOne(scrapeReq.getProductId());
-					if (product!=null){
-						if (scrapeReq.isOnlyTransient()){					
-							connector.updateTransitionalTransaction(product);
-						} else{
-							connector.updateProductTransaction(product);
-						}
-					} else {
-						logger.error(identifier + " product is null");
+					long start = new Date().getTime();					
+					
+					if (scrapeReq.isOnlyTransient()){					
+						connector.updateTransitionalTransaction(scrapeReq.getProductId());
+					} else{
+						connector.updateProductTransaction(scrapeReq.getProductId());
 					}
+					
 					logger.info(identifier + " Execution took : " + (new Date().getTime()-start) + " ms");
 				} catch (TooFastConnectionException e) {
 					logger.error("Too Fast connection" + e);
@@ -118,7 +115,7 @@ public class ContinuousScrapper implements ContinuousScrapperInterface {
 							updated  = true;
 							accessedRemoteConnector = false;
 						} else {
-							updated = connector.updateProductWithoutSave(product);
+							updated = connector.updateProductWithoutSave(scrapeReq.getProductId());
 						}
 						if (updated){																
 							processed = true;								

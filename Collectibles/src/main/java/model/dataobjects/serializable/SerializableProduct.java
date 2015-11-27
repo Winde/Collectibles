@@ -102,6 +102,9 @@ public class SerializableProduct {
 	private Long minPrice = null;	
 	
 	@JsonView(ProductSimpleView.class)
+	private String minPriceLink = null;
+	
+	@JsonView(ProductSimpleView.class)
 	private Double mainRating = null;
 	
 	@JsonView(ProductSimpleView.class)
@@ -386,6 +389,13 @@ public class SerializableProduct {
 	public void setExternalLinks(SortedMap<String, String> externalLinks) {		
 		this.externalLinks = externalLinks;
 	}
-	
 
+	public String getMinPriceLink() {
+		return minPriceLink;
+	}
+
+	public void setMinPriceLink(String minPriceLink) {
+		this.minPriceLink = minPriceLink;
+	}
+		
 }

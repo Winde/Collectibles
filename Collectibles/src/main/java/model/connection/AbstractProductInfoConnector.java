@@ -48,23 +48,23 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	
 
 	@Override	
-	public boolean updateTransitionalTransaction(Product product) throws TooFastConnectionException{
+	public boolean updateTransitionalTransaction(Long productId) throws TooFastConnectionException{
 		AbstractProductInfoConnector connector = this;		
-		Product productInDb = productRepository.findOne(product.getId());
+		Product productInDb = productRepository.findOne(productId);
 		boolean updated = false;
-		try {
-			updated = connector.updateTransitional(productInDb);
-		} catch (TooFastConnectionException e) {
-			logger.error("Too fast connection to: "+connector.getIdentifier() , e);
-		}
-		if (updated){
-			
-			productRepository.save(productInDb);
+		if (productInDb!=null){			
+			try {
+				updated = connector.updateTransitional(productInDb);
+			} catch (TooFastConnectionException e) {
+				logger.error("Too fast connection to: "+connector.getIdentifier() , e);
+			}
+			if (updated){
+				productRepository.save(productInDb);
+			}
 		}
 		return updated;
 	}
-	
-	@Override	
+		
 	public boolean updateTransitional(Product product) throws TooFastConnectionException{
 		AbstractProductInfoConnector connector = this;
 		boolean result = true; 		
@@ -99,44 +99,51 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	}
 	
 	@Override
-	public boolean updateProductWithoutSave(Product product) throws TooFastConnectionException{
-		return updateProductTransaction(product,false);
+	public boolean updateProductWithoutSave(Long productId) throws TooFastConnectionException{
+		return updateProductTransaction(productId,false);
 	}
 	
 	@Override
-	public boolean updateProductTransaction(Product product) throws TooFastConnectionException{
-		return updateProductTransaction(product,true);
+	public boolean updateProductTransaction(Long productId) throws TooFastConnectionException{
+		return updateProductTransaction(productId,true);
 	}
 	
 		
-	private boolean updateProductTransaction(Product product, boolean save) throws TooFastConnectionException{		
+	private boolean updateProductTransaction(Long productId, boolean save) throws TooFastConnectionException{		
 		AbstractProductInfoConnector connector = this;
 		boolean result = true; 		
-		
-		logger.info("Starting access to provider : " + connector.getIdentifier());
 		boolean updated = false;
-		try {
-			Collection<Image> imagesAdd = new ArrayList<>();
-			Collection<Image> imagesRemove = new ArrayList<>();
-			Set<Author> authorsAdd = new HashSet<>();				
-			logger.debug("Looking for product in database:" + product);
-			if (product.getId()!=null){
-				product = productRepository.findOne(product.getId());					
-				logger.debug("Product found in database:" + product);				
+		
+		Product product = productRepository.findOne(productId);
+		if (product!=null){
+			logger.info("Starting access to provider : " + connector.getIdentifier());
+			
+			try {
+				Collection<Image> imagesAdd = new ArrayList<>();
+				Collection<Image> imagesRemove = new ArrayList<>();
+				Set<Author> authorsAdd = new HashSet<>();				
+				logger.debug("Looking for product in database:" + product);
+				if (product.getId()!=null){
+					product = productRepository.findOne(product.getId());					
+					logger.debug("Product found in database:" + product);				
+				}
+				updated = updateProductDo(product, imagesAdd, imagesRemove,authorsAdd);
+				if (updated && save){	
+					logger.info("Saving product " + product);
+					productRepository.save(product);
+					imageRepository.delete(imagesRemove);
+					//storeAfterSuccess(productInDb,productRepository);
+				}
+			}catch (Exception e){
+				logger.error("Exception when scraping", e);
+				updated = false;			
 			}
-			updated = updateProductDo(product, imagesAdd, imagesRemove,authorsAdd);
-			if (updated && save){	
-				logger.info("Saving product " + product);
-				productRepository.save(product);
-				imageRepository.delete(imagesRemove);
-				//storeAfterSuccess(productInDb,productRepository);
-			}
-		}catch (Exception e){
-			logger.error("Exception when scraping", e);
-			updated = false;			
+			
+			logger.info("Finishing access to provider "+ connector.getIdentifier()+", was updated?  : " + updated );
+		} else{
+			logger.error("Trying to update non existing product? " + productId);
 		}
 		
-		logger.info("Finishing access to provider "+ connector.getIdentifier()+", was updated?  : " + updated );
 		return updated;
 	}
 

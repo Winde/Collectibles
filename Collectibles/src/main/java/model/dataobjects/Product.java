@@ -126,6 +126,9 @@ public class Product extends SimpleIdDao{
 	@Column(name="min_price")
 	private Long minPrice = null;	
 
+	@Column(name="min_price_link")
+	private String minPriceLink = null;
+	
 	@Column(name="main_rating")
 	private Double mainRating = null;
 	
@@ -296,7 +299,8 @@ public class Product extends SimpleIdDao{
 		return prices;
 	}
 
-	public void removePrice(String provider){				
+	public void removePrice(String provider){		
+		logger.info("Cleaning prices for "+provider+": " + this.getPrices());
 		if (provider!=null){
 			if (this.getPrices()!=null){
 				Iterator<Price> iterator = this.getPrices().iterator();
@@ -307,8 +311,9 @@ public class Product extends SimpleIdDao{
 					}
 				}
 			}
-			this.minPrice = this.calculateMinDollarPrice();			
+			this.calculateMinPrice();						
 		}		
+		logger.info("Cleaned prices for "+provider+": " + this.getPrices());
 	}
 	
 	
@@ -318,7 +323,8 @@ public class Product extends SimpleIdDao{
 		}
 		if (price!=null && price.getConnectorName()!=null){
 			prices.add(price);
-			this.minPrice = this.calculateMinDollarPrice();
+			this.calculateMinPrice();
+			logger.info("Calculated min price: " + this.minPrice);
 		}				
 	}
 	
@@ -370,12 +376,16 @@ public class Product extends SimpleIdDao{
 		}
 	}
 
-	public Long calculateMinDollarPrice() {
-		Long newMinPrice = null;
+	public void calculateMinPrice() {
+		Price newMinPrice = null;
 		if (prices!=null && prices.size()>0){			
-			this.minPrice = prices.first().getPrice();
+			newMinPrice = prices.first();
+			this.minPrice = newMinPrice.getPrice();
+			this.minPriceLink = newMinPrice.getLink();
+		} else {
+			this.minPrice = null;
+			this.minPriceLink = null;
 		}
-		return newMinPrice;
 	}
 	
 	public Long getMinPrice() {
@@ -394,14 +404,6 @@ public class Product extends SimpleIdDao{
 		} else {
 			return true;
 		}
-	}
-
-	public synchronized boolean updateWithConnector(ProductInfoConnector connector) throws TooFastConnectionException {
-		return connector.updateProductTransaction(this);
-	}
-
-	public synchronized boolean updateSuperficialWithConnector(ProductInfoConnector connector) throws TooFastConnectionException {
-		return connector.updateTransitionalTransaction(this);
 	}
 
 	public Date getLastPriceUpdate() {
@@ -436,8 +438,13 @@ public class Product extends SimpleIdDao{
 		this.mainRating = mainRating;
 	}
 
+	public String getMinPriceLink() {
+		return minPriceLink;
+	}
 
-
+	public void setMinPriceLink(String minPriceLink) {
+		this.minPriceLink = minPriceLink;
+	}
 
 
 }
