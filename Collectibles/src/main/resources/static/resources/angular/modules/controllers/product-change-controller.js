@@ -117,7 +117,6 @@
 		
 		this.refreshConnectors = function(){
 			$scope.connectors = Hierarchy.calculateConnectors($scope.hierarchy);
-			console.log($scope.connectors.length)
 			if ($scope.connectors && $scope.connectors.length && $scope.connectors.length == 1){				
 				$scope.connector = $scope.connectors[0];
 			}

@@ -17,6 +17,7 @@ import javax.persistence.EntityManager;
 
 import model.connection.ProductInfoConnector;
 import model.connection.ProductInfoConnectorFactory;
+import model.connection.ScrapeRequestorService;
 import model.dataobjects.Category;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
@@ -90,6 +91,10 @@ public class ProductController  extends CollectiblesController{
 	@Autowired
 	private ProductInfoConnectorFactory connectorFactory;
 	
+	@Autowired
+	private ScrapeRequestorService scrapeRequestorService;
+	
+	
 	private static final int MAX_PARSE_CHECKS = 20;//6;
 	private static final int MILISECONDS_BETWEEN_PARSE_CHECKS = 900; 
 	
@@ -123,33 +128,6 @@ public class ProductController  extends CollectiblesController{
 		}
 		
 	}
-		
-	private ScrapeRequest createScrapeForProduct(String username, Product product,String connector, boolean  liveRequest,boolean onlyTransient){
-		ScrapeRequest scrape = new ScrapeRequest();		
-		scrape.setProductId(product.getId());
-		scrape.setOnlyTransient(onlyTransient);
-		scrape.setLiveRequest(liveRequest);
-		scrape.setConnector(connector);
-		scrape.setUserId(username);
-		scrape.setRequestTime(new Date());
-		return scrape;
-	}
-	
-	private List<ScrapeRequest> scrapeProduct(String username, Product product, boolean liveRequest, boolean onlyTransient){
-		Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(product,onlyTransient);
-		List<ScrapeRequest> requests = new ArrayList<>();
-		if (connectors!=null) {
-			logger.info("Connectors: " + connectors);
-			ScrapeRequest scrape = null;
-			for (ProductInfoConnector connector: connectors) {											
-				scrape = createScrapeForProduct(username, product, connector.getIdentifier(), liveRequest, onlyTransient);
-				scrapeRequestRepository.save(scrape);
-				requests.add(scrape);
-			}									
-		}
-		
-		return requests;		
-	}
 	
 	@RequestMapping(value="/product/find/{id}", method = RequestMethod.GET)
 	public SerializableProduct product(@PathVariable String id) throws CollectiblesException {
@@ -181,7 +159,7 @@ public class ProductController  extends CollectiblesController{
 			}
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (auth!=null){
-				List<ScrapeRequest> requestIds = this.scrapeProduct(auth.getName(),product,true,false);
+				List<ScrapeRequest> requestIds =scrapeRequestorService.scrapeProduct(auth.getName(),product,true,false);
 				product = checkProduct(product, requestIds);
 			}
 			return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));			
@@ -256,19 +234,7 @@ public class ProductController  extends CollectiblesController{
 						if (auth!=null){
 							String username = null;						
 							username = auth.getName();
-							Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(hierarchyNode);						
-							List<ScrapeRequest> scrapeRequests = new ArrayList<>();
-							if (connectors!=null){							
-								for (ProductInfoConnector connector: connectors){
-									String identifier = connector.getIdentifier();
-									for (Product product : products){
-										ScrapeRequest scrape = createScrapeForProduct(username, product, identifier, false, false);
-										scrapeRequests.add(scrape);
-										
-									}
-								}
-							}
-							scrapeRequestRepository.save(scrapeRequests);
+							scrapeRequestorService.request(products, username, false,false);							
 						}
 						
 						
@@ -308,7 +274,7 @@ public class ProductController  extends CollectiblesController{
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 				if (auth!=null){
 					String username = auth.getName();
-					this.scrapeProduct(username,result,true,false);
+					scrapeRequestorService.scrapeProduct(username,result,true,false);
 				}
 				return SerializableProduct.cloneProduct(result,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(result)));
 			} else {
@@ -386,7 +352,7 @@ public class ProductController  extends CollectiblesController{
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (auth!=null){
 				String username = null;
-				List<ScrapeRequest> requests = this.scrapeProduct(username, product,true,true);
+				List<ScrapeRequest> requests =  scrapeRequestorService.scrapeProduct(username, product,true,true);
 				product = checkProduct(product, requests);
 			}
 			return SerializableProduct.cloneProduct(product,ConnectorInfo.createConnectorInfo(connectorFactory.getConnectors(product)));			
@@ -580,7 +546,7 @@ public class ProductController  extends CollectiblesController{
 				if (scrape){					
 					if (user!=null){
 						String username = user.getUsername();
-						List<ScrapeRequest> requests = this.scrapeProduct(username,result,true,false);
+						List<ScrapeRequest> requests = scrapeRequestorService.scrapeProduct(username,result,true,false);
 						result = checkProduct(result, requests);
 					}
 				}
@@ -742,22 +708,7 @@ public class ProductController  extends CollectiblesController{
 			String username = auth.getName();
 			logger.info("Querying all products in database");
 			List<Product> products = productRepository.findAll();			
-			Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors();						
-			List<ScrapeRequest> scrapeRequests = new LinkedList<>();
-			double i=0;
-			if (connectors!=null && products!=null){			
-				
-				logger.info("Preparing to process "+products.size()+" products for "+ connectors.size() + " connectors");
-								
-				for (ProductInfoConnector connector: connectors){
-					String identifier = connector.getIdentifier();					
-					for (Product product: products){																		
-						ScrapeRequest scrape = createScrapeForProduct(username, product, identifier, false, false);
-						scrapeRequests.add(scrape);												
-					}										
-				}
-			}
-			scrapeRequestRepository.save(scrapeRequests);
+			scrapeRequestorService.request(products, username, false,false);			
 		}
 		return Boolean.TRUE;
 	}
@@ -769,19 +720,7 @@ public class ProductController  extends CollectiblesController{
 		if (auth!=null){
 			String username = auth.getName();
 			List<Product> products = productRepository.findAll();			
-			productRepository.save(products);
-			Collection<ProductInfoConnector> connectors = connectorFactory.getConnectors(true);						
-			List<ScrapeRequest> scrapeRequests = new ArrayList<>();
-			if (connectors!=null){							
-				for (ProductInfoConnector connector: connectors){
-					String identifier = connector.getIdentifier();
-					for (Product product : products){
-						ScrapeRequest scrape = createScrapeForProduct(username, product, identifier, false, true);
-						scrapeRequests.add(scrape);					
-					}
-				}
-			}
-			scrapeRequestRepository.save(scrapeRequests);
+			scrapeRequestorService.request(products, username, false,true);
 		}
 		return Boolean.TRUE;
 	}

@@ -42,9 +42,8 @@
 				});
 			}
 			
-			console.log($scope.seller);
-			if ($scope.seller){ searchObject.seller = $scope.seller; }
-			console.log(searchObject.seller);
+			
+			if ($scope.seller){ searchObject.seller = $scope.seller; }			
 			
 			if ($scope.searchTerm){ searchObject.search = $scope.searchTerm; }			
 			
@@ -69,8 +68,7 @@
 				searchObject.page = 0;
 				$scope.page = 0;
 			}			
-			
-			console.log(searchObject);
+						
 			$location.search(searchObject);					
 		}
 		
@@ -135,8 +133,7 @@
 			} else {	searchObject.sortOrder = ""; }
 			
 			if (searchObject.store){	$scope.store.identifier = searchObject.store; } else { $scope.store.identifier = null } 
-			if (searchObject.seller){	$scope.seller = searchObject.seller; }
-			console.log(searchObject);
+			if (searchObject.seller){	$scope.seller = searchObject.seller; }			
 			
 		};
 		
@@ -155,10 +152,7 @@
 			});
 		}
 		
-		this.updateSeller = function(seller){
-			console.log($scope.seller);
-			console.log(seller);
-			
+		this.updateSeller = function(seller){						
 			if (seller==undefined){
 				$scope.seller = null;	
 				return true;

@@ -17,7 +17,7 @@
 						var token = JSON.parse(split[0]);
 						return token.expires;
 					}catch (err){
-						console.log(err);
+						//console.log(err);
 					}
 				}
 			}

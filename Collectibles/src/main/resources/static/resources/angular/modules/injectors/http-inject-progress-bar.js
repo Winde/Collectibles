@@ -16,7 +16,7 @@
 						if (!$rootScope.progressBarInstance){ 
 							$rootScope.progressBarInstance = ngProgressFactory.createInstance();
 							$rootScope.progressBarInstance.setColor(factory.progressBarColor);
-						}												
+						}							
 						$rootScope.progressBarInstance.start();
 					 }
 				 }
