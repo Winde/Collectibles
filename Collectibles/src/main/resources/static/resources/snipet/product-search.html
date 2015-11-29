@@ -113,10 +113,15 @@
 		</div>
 		
 		<div class="form-group optionsSearch col-xs-12" ng-if="connectors && connectors.length>0">
+			<label class="disabled visible-xs">Available</label>			
 			<div class="btn-group">
-				<label class="btn btn-default disabled">Available</label>		
+				<label class="btn btn-default disabled hidden-xs">Available</label>		
+				<label class="btn btn-default" uib-btn-radio="null" ng-model="store.identifier" ng-change="productListCtrl.updateSearch(true)">
+					Any
+				</label>
 				<label ng-repeat="connector in connectors | filter:{supportsPrices: true}" class="btn btn-default" uib-btn-radio="connector.identifier" ng-model="store.identifier" ng-change="productListCtrl.updateSearch(true)">
-					{{connector.identifier}}
+					<span class="hidden-xs">{{connector.identifier}}</span>
+					<span class="visible-xs">{{connector.identifier | limitTo:10}}...</span>
 				</label>
 						
 			</div>

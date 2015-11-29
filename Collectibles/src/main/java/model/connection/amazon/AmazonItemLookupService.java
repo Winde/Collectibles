@@ -182,7 +182,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		Map<String,String> params = new HashMap<>();
 		params.put("ItemId", id);
 		params.put("ResponseGroup", "OfferFull,Large");
-		
+		params.put("Condition", "All");
 		
 		//String url = getUrl("ItemLookup","Large",id);		
 		String url = getUrl("ItemLookup",params);

@@ -1,8 +1,8 @@
 (function(){
 	
 	angular.module('product')
-	.controller('ProductListController',['$scope','$filter','$location','Image','Product','Hierarchy','User','Message','smoothScroll',
-	                                        function($scope,$filter,$location,Image,Product,Hierarchy,User,Message,smoothScroll){
+	.controller('ProductListController',['$scope','$filter','$location','Image','Product','Hierarchy','User','Message',
+	                                        function($scope,$filter,$location,Image,Product,Hierarchy,User,Message){
 		var controller = this;
 				
 		$scope.editMode = false;
@@ -134,7 +134,7 @@
 			if (searchObject.sortOrder){	$scope.sortOrder = searchObject.sortOrder;
 			} else {	searchObject.sortOrder = ""; }
 			
-			if (searchObject.store){	$scope.store.value = searchObject.store; } 
+			if (searchObject.store){	$scope.store.identifier = searchObject.store; } else { $scope.store.identifier = null } 
 			if (searchObject.seller){	$scope.seller = searchObject.seller; }
 			console.log(searchObject);
 			

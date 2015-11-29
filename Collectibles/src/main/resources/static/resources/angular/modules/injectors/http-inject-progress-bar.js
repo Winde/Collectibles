@@ -13,11 +13,11 @@
 					 
 				 } else {
 					 if (request && request && request.progressbar){						 
-						if (!request.progressBarInstance){ 
-							request.progressBarInstance = ngProgressFactory.createInstance();
-							request.progressBarInstance.setColor(factory.progressBarColor);
+						if (!$rootScope.progressBarInstance){ 
+							$rootScope.progressBarInstance = ngProgressFactory.createInstance();
+							$rootScope.progressBarInstance.setColor(factory.progressBarColor);
 						}												
-						request.progressBarInstance.start();
+						$rootScope.progressBarInstance.start();
 					 }
 				 }
 				 return request;
@@ -25,8 +25,8 @@
 	    	'response': function(response){
 	    		
 	    		if (response && response.config && response.config.progressbar){
-	    			if (response.config.progressBarInstance){		    				
-	    				response.config.progressBarInstance.complete();		    				
+	    			if ($rootScope.progressBarInstance){		    				
+	    				$rootScope.progressBarInstance.complete();		    				
 	    			}
 	    		}
 	    		
@@ -35,8 +35,8 @@
 			 'responseError': function(responseError){								
 	        			    	        		
         		if (responseError && responseError.config && responseError.config.progressbar){
-        			if (responseError.config.progressBarInstance){		    				
-        				responseError.config.progressBarInstance.complete();		    				
+        			if ($rootScope.progressBarInstance){		    				
+	    				$rootScope.progressBarInstance.complete();		    				
 	    			}
 	    		}	        		            
 	        	
