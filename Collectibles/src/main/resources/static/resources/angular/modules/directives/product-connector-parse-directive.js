@@ -5,7 +5,7 @@
 		return {
 			restrict: 'E',
 			scope: {},
-			templateUrl: '/app/snipet/product-connector-parse.html',
+			templateUrl: 'snipet/product-connector-parse.html',
 			controller: 'ProductChangeController',
 			controllerAs: 'productChangeCtrl'			
 		};		

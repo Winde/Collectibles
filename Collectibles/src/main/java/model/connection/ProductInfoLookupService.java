@@ -16,6 +16,8 @@ public interface ProductInfoLookupService<E> {
 
 	public E fetchDocFromProduct(Product product) throws TooFastConnectionException, FileNotFoundException;
 	
+	public E fetchDocFromProductForTransient(Product product) throws TooFastConnectionException, FileNotFoundException;
+	
 	public byte [] getMainImageData(E doc) throws TooFastConnectionException;
 	
 	public List<byte []> getAdditionalImageData(E doc) throws TooFastConnectionException;

@@ -2,6 +2,7 @@ package model.connection;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,6 +24,11 @@ public abstract class AbstractProductInfoLookupService<E> implements ProductInfo
 	
 	private static final int MAXIMUM_DISTANCE_TO_CONSIDER_MULTIPLE_RESULTS = 8;		
 	private static final int MAXIMUM_DISTANCE_TO_CONSIDER_SINGLE_RESULTS = 15;
+	
+	public E fetchDocFromProductForTransient(Product product) throws TooFastConnectionException, FileNotFoundException {
+		return this.fetchDocFromProduct(product);
+	}
+	
 	
 	protected Date getDateFromYear(Integer year){
 		Date date = null;

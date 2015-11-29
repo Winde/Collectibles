@@ -9,7 +9,7 @@
 				isAuthenticated: "&",
 				isAdmin: "&"
 			},
-			templateUrl: '/app/snipet/hierarchy-tree.html',
+			templateUrl: 'snipet/hierarchy-tree.html',
 			controllerAs: 'hierarchyCtrl',
 			controller: 'HierarchyCreateController'			
 		};		

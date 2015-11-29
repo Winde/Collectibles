@@ -75,7 +75,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 								
 			ProductInfoLookupService itemLookup = connector.getProductInfoLookupService();										
 			if (itemLookup!=null){
-				Object doc = itemLookup.fetchDocFromProduct(product);
+				Object doc = itemLookup.fetchDocFromProductForTransient(product);
 				if (doc!=null){
 					
 				
@@ -456,5 +456,14 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	public boolean guaranteeUnivocalResponse(Product product){
 		String reference = this.getProductInfoLookupService().getReferenceFromProduct(product);
 		return reference!=null;
+	}
+	
+	@Override
+	public int compareTo(ProductInfoConnector o) {
+		if (this.getIdentifier()==null || o.getIdentifier()==null){
+			return -1;
+		} else{
+			return this.getIdentifier().compareTo(o.getIdentifier());
+		}
 	}
 }

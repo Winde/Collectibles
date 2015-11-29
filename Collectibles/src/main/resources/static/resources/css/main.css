@@ -62,6 +62,17 @@
 	/*margin-top: 10px;*/	
 }
 
+.productGrid .productListEntry .priceBlock .btn {
+	overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+} 
+
+.productGrid .productListEntry .priceBlock .priceButton {
+	font-size: 18px;
+    font-weight: bold;
+    line-height: 20px;
+}
 .productGrid .productListEntry .label {
 	line-height: 20px;
 	padding-top: 6px;
@@ -95,6 +106,12 @@
 
 .product .priceEntry {
 	margin-bottom: 10px;
+}
+
+.product .priceEntry .btn {
+	overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .product .mainImage {

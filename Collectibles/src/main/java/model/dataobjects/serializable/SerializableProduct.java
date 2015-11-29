@@ -105,6 +105,9 @@ public class SerializableProduct {
 	private String minPriceLink = null;
 	
 	@JsonView(ProductSimpleView.class)
+	private String minPriceSeller = null;
+	
+	@JsonView(ProductSimpleView.class)
 	private Double mainRating = null;
 	
 	@JsonView(ProductSimpleView.class)
@@ -397,5 +400,15 @@ public class SerializableProduct {
 	public void setMinPriceLink(String minPriceLink) {
 		this.minPriceLink = minPriceLink;
 	}
+
+	public String getMinPriceSeller() {
+		return minPriceSeller;
+	}
+
+	public void setMinPriceSeller(String minPriceSeller) {
+		this.minPriceSeller = minPriceSeller;
+	}
 		
+	
+	
 }

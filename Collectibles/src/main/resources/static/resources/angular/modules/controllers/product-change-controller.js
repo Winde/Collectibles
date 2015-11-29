@@ -116,16 +116,16 @@
 		}
 		
 		this.refreshConnectors = function(){
-			$scope.connectorNames = Hierarchy.calculateConnectorNames($scope.hierarchy);
-			console.log($scope.connectorNames.length)
-			if ($scope.connectorNames && $scope.connectorNames.length && $scope.connectorNames.length == 1){				
-				$scope.connector = $scope.connectorNames[0];
+			$scope.connectors = Hierarchy.calculateConnectors($scope.hierarchy);
+			console.log($scope.connectors.length)
+			if ($scope.connectors && $scope.connectors.length && $scope.connectors.length == 1){				
+				$scope.connector = $scope.connectors[0];
 			}
 			
 		};
 		
 		this.importFromScrapUser = function(){
-			Product.importFromScrapUser($scope.connector,$scope.userIdToScrape,$scope.hierarchy.id)
+			Product.importFromScrapUser($scope.connector.identifier,$scope.userIdToScrape,$scope.hierarchy.id)
 			.success(function(data){
 				Message.success("Success; " + data + " products to be imported",true);	
 			})

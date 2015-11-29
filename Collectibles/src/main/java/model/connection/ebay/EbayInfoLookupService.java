@@ -128,7 +128,9 @@ public class EbayInfoLookupService extends ProductInfoLookupServiceXML {
 				"REST-PAYLOAD" + "&" +
 				"paginationInput.entriesPerPage=" + ENTRIES_PER_PAGE + "&" +
 				"productId.@type=" + productType + "&"+
-				"productId=" + productId;
+				"productId=" + productId + "&" + 
+				"outputSelector=" + "SellerInfo";
+				
 		}
 		logger.info(this.getIdentifier() + " connecting to url: " + url);
 		Node result = null;
@@ -234,6 +236,7 @@ public class EbayInfoLookupService extends ProductInfoLookupServiceXML {
 
 	@Override
 	public Collection<Price> getPrices(Node node) throws TooFastConnectionException {
+		String sellerString = super.getField(node,"sellerInfo/sellerUserName");
 		String priceString = super.getField(node,"sellingStatus/convertedCurrentPrice");
 		String link = super.getField(node,"viewItemURL");
 		logger.debug(this.getIdentifier() + " PriceString: " + priceString);
@@ -253,6 +256,7 @@ public class EbayInfoLookupService extends ProductInfoLookupServiceXML {
 			priceObject.setLink(link);
 			priceObject.setPrice(price);
 			priceObject.setType("");
+			priceObject.setSeller(sellerString);
 			result.add(priceObject);
 		}
 		

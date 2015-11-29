@@ -46,6 +46,8 @@ public class Price implements Serializable, Comparable<Price>{
 	@Column(name="link")
 	private String link;
 
+	@Column(name="seller")
+	private String seller;
 	
 	public String getConnectorName() {
 		return connectorName;
@@ -87,6 +89,14 @@ public class Price implements Serializable, Comparable<Price>{
 		this.link = link;
 	}
 	
+	public String getSeller() {
+		return seller;
+	}
+
+	public void setSeller(String seller) {
+		this.seller = seller;
+	}
+
 	@Override
 	public int hashCode(){
 		Integer hash = null;
@@ -131,6 +141,6 @@ public class Price implements Serializable, Comparable<Price>{
 	
 	
 	public String toString(){
-		return "{" + this.getProduct() + "; " + this.getConnectorName() + " - " + this.getType() + "; " + this.getPrice() + "}";
+		return "{" + this.getProduct() + "; " + this.getConnectorName() + " - " + this.getType() + "; " + this.getPrice() + " ("+this.getSeller() +") }";
 	}
 }

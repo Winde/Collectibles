@@ -21,6 +21,8 @@ public class ProductSearch implements SearchObject {
 	private Integer maxResults = null;
 	private Integer page = null;
 	private Boolean withPrice = null;
+	private String store = null;
+	private String seller = null;
 	private String sortBy = null;
 	private String sortOrder = null;
 	
@@ -142,20 +144,32 @@ public class ProductSearch implements SearchObject {
 		}
 		this.wishers.add(user);		
 	}
+	
+	public String getStore() {
+		return store;
+	}
+
+	public void setStore(String store) {
+		this.store = store;
+	}
+
+	public String getSeller() {
+		return seller;
+	}
+
+	public void setSeller(String seller) {
+		this.seller = seller;
+	}
 
 	@Override
 	public Collection<String> errors() {
 		Collection<String> errors = new ArrayList<>();
-		if (hierarchy==null && searchTerm==null){
+		if (hierarchy==null && searchTerm==null && seller==null){
 			errors.add("hierarchy");
 		}
 
 		return errors;
 	}
-
-
-
-	
 
 
 }

@@ -1,12 +1,13 @@
 (function(){
 	
 	angular.module('product')
-	.controller('ProductListController',['$scope','$filter','$location','Image','Product','Hierarchy','User','Message',
-	                                        function($scope,$filter,$location,Image,Product,Hierarchy,User,Message){
+	.controller('ProductListController',['$scope','$filter','$location','Image','Product','Hierarchy','User','Message','smoothScroll',
+	                                        function($scope,$filter,$location,Image,Product,Hierarchy,User,Message,smoothScroll){
 		var controller = this;
 				
 		$scope.editMode = false;
-		
+		$scope.store = {}; 
+			
 		this.defaultPaginationSize = 50;
 		
 		if ($scope.$parent && $scope.$parent.root) {
@@ -27,7 +28,23 @@
 		this.updateSearch = function(newSearch){
 			var searchObject = {};
 
-			if ($scope.hierarchy && $scope.hierarchy.id){ searchObject.hierarchy = $scope.hierarchy.id;}			
+
+			if ($scope.hierarchy && $scope.hierarchy.id){ 
+				searchObject.hierarchy = $scope.hierarchy.id;
+				$scope.connectors = Hierarchy.calculateConnectors(Hierarchy.find($scope.hierarchy.id, $scope.root));
+			}
+						
+			if ($scope.store && $scope.store.identifier && $scope.connectors && $scope.connectors.length>0) {
+				$scope.connectors.forEach(function(element){
+					if (element && element.identifier && (element.identifier == $scope.store.identifier)){
+						searchObject.store = $scope.store.identifier;		
+					}
+				});
+			}
+			
+			console.log($scope.seller);
+			if ($scope.seller){ searchObject.seller = $scope.seller; }
+			console.log(searchObject.seller);
 			
 			if ($scope.searchTerm){ searchObject.search = $scope.searchTerm; }			
 			
@@ -52,8 +69,9 @@
 				searchObject.page = 0;
 				$scope.page = 0;
 			}			
-			$location.search(searchObject);
-			controller.search();
+			
+			console.log(searchObject);
+			$location.search(searchObject);					
 		}
 		
 		this.obtainSearchParameters = function(){
@@ -61,8 +79,8 @@
 		};
 		
 		this.setSearchParameters = function(){
-			var searchObject = controller.obtainSearchParameters();
-
+			var searchObject = controller.obtainSearchParameters();			
+			
 			if (searchObject.ownedBy){
 				searchObject.ownedBy = parseInt(searchObject.ownedBy);
 			}
@@ -74,12 +92,13 @@
 				var hierarchy = parseInt(searchObject.hierarchy)
 				if (!isNaN(hierarchy)){
 					$scope.hierarchy = {id: hierarchy};
-				}
+					$scope.connectors = Hierarchy.calculateConnectors(Hierarchy.find(hierarchy, $scope.root));
+				}				
+				
 			} else if ($scope.hierarchy == null || $scope.hierarchy == undefined){				
 				$scope.hierarchy = {};
-			}
-
-						
+			}			
+			
 			if (searchObject.search){		$scope.searchTerm = searchObject.search;
 			} else {	$scope.searchTerm = "";}
 			
@@ -115,9 +134,12 @@
 			if (searchObject.sortOrder){	$scope.sortOrder = searchObject.sortOrder;
 			} else {	searchObject.sortOrder = ""; }
 			
-
-		};
+			if (searchObject.store){	$scope.store.value = searchObject.store; } 
+			if (searchObject.seller){	$scope.seller = searchObject.seller; }
+			console.log(searchObject);
 			
+		};
+		
 		this.updatePriceSearch = function(){
 			Message.confirm("Are you sure?", function(){
 				var searchObject = controller.obtainSearchParameters();
@@ -132,11 +154,34 @@
 				});
 			});
 		}
-				
+		
+		this.updateSeller = function(seller){
+			console.log($scope.seller);
+			console.log(seller);
+			
+			if (seller==undefined){
+				$scope.seller = null;	
+				return true;
+			} else{
+				if ($scope.seller == seller) {
+					return false;
+				} else{
+					$scope.seller = seller
+					return true;
+				}
+			}			
+		}
+		
+		
+		
 		this.search = function() {
 			var searchObject = controller.obtainSearchParameters();
 		
-			if (searchObject.hierarchy || (searchObject.searchTerm && searchObject.searchTerm!="" && searchObject.searchTerm.length>2) ){
+			if (searchObject.hierarchy 
+					|| (searchObject.searchTerm && searchObject.searchTerm!="" && searchObject.searchTerm.length>2)
+					|| (searchObject.seller && searchObject.seller!="")
+					
+			){
 				$scope.processingSearch = true;
 				if (searchObject.hierarchy!=null){
 					var hierarchyId = parseInt(searchObject.hierarchy);
@@ -159,9 +204,9 @@
 					if (data && data.hasNext!=null){
 						$scope.hasNext = data.hasNext;
 					}	
-					setTimeout(function () {
-				        window.scrollTo(0, $('.productGrid') - 100)
-				    }, 20);
+					if ($scope.positionInitialGrid){
+						$scope.positionInitialGrid();
+					}
 				})
 				.catch(function(data){
 					Message.alert("There was an error");
@@ -214,6 +259,9 @@
              }
          );
 		*/
+		$scope.$on('$locationChangeSuccess', function() {
+			controller.search();
+		}); 
 		
 		if ($scope.root == undefined || $scope.root == null){
 			Hierarchy.root()
@@ -276,6 +324,8 @@
 			}
 		}
 		
+		
+		
 
 		$scope.selectHierarchy = function(hierarchy){
 			$scope.hierarchy = hierarchy;
@@ -336,9 +386,9 @@
 			$scope.page = parseInt($scope.page) +1;
 			controller.updateSearch();
 			
-			setTimeout(function () {
-		        window.scrollTo(0, $('.productGrid') - 100)
-		    }, 20);
+			if ($scope.positionInitialGrid){
+				$scope.positionInitialGrid();
+			}
 		}
 		
 		this.previousPage = function(){
@@ -349,9 +399,9 @@
 				$scope.page = parseInt($scope.page) -1;
 				controller.updateSearch();
 			}
-			setTimeout(function () {
-		        window.scrollTo(0, $('.productGrid') - 100)
-		    }, 20);
+			if ($scope.positionInitialGrid){
+				$scope.positionInitialGrid();
+			}
 		}
 		
 		this.hasNext = function(){

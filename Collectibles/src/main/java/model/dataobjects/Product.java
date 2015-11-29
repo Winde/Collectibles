@@ -129,6 +129,9 @@ public class Product extends SimpleIdDao{
 	@Column(name="min_price_link")
 	private String minPriceLink = null;
 	
+	@Column(name="min_price_seller")
+	private String minPriceSeller = null;
+		
 	@Column(name="main_rating")
 	private Double mainRating = null;
 	
@@ -382,9 +385,11 @@ public class Product extends SimpleIdDao{
 			newMinPrice = prices.first();
 			this.minPrice = newMinPrice.getPrice();
 			this.minPriceLink = newMinPrice.getLink();
+			this.minPriceSeller = newMinPrice.getSeller();
 		} else {
 			this.minPrice = null;
 			this.minPriceLink = null;
+			this.minPriceSeller = null;
 		}
 	}
 	
@@ -446,6 +451,13 @@ public class Product extends SimpleIdDao{
 		this.minPriceLink = minPriceLink;
 	}
 
+	public String getMinPriceSeller() {
+		return minPriceSeller;
+	}
+
+	public void setMinPriceSeller(String minPriceSeller) {
+		this.minPriceSeller = minPriceSeller;
+	}
 
 }
 

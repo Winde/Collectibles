@@ -27,7 +27,7 @@ public class HierarchyRepositoryImpl implements HierarchyRepositoryCustom{
 	
 	@PersistenceContext
 	private EntityManager entityManager;
-	
+		
 	
 	public HierarchyNode addChild(HierarchyNode father,HierarchyNode child ) {		
 		child.setFather(father);		

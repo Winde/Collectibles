@@ -13,8 +13,10 @@
 					 
 				 } else {
 					 if (request && request && request.progressbar){						 
-						request.progressBarInstance = ngProgressFactory.createInstance();
-						request.progressBarInstance.setColor(factory.progressBarColor);						
+						if (!request.progressBarInstance){ 
+							request.progressBarInstance = ngProgressFactory.createInstance();
+							request.progressBarInstance.setColor(factory.progressBarColor);
+						}												
 						request.progressBarInstance.start();
 					 }
 				 }

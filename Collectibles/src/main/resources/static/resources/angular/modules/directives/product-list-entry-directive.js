@@ -1,10 +1,10 @@
 (function(){	
 	
 	angular.module('product')
-	.directive('productListEntry', function(){
+	.directive('productListEntry', function(Domain){
 		return {
 			restrict: 'E',	
-			templateUrl: '/app/snipet/product-list-entry.html',
+			templateUrl: 'snipet/product-list-entry.html',
 			controller: 'ProductDetailsController',
 			controllerAs: 'productManagementCtrl',			
 			require: '^productSearch',
@@ -12,6 +12,7 @@
 				scope.remove = function(){
 					productSearchCtrl.remove(scope.product);
 				}
+				scope.domain = Domain.base();
 			}
 				
 		};		

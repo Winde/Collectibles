@@ -33,9 +33,10 @@
 		<label>Connector</label>
 		<select class="form-control"		
 			selectpicker
-			ng-model="connector"						
-			data-collection-name="connectorNames"			 
-			ng-options="item as item for item in connectorNames"									
+			ng-model="connector.identifier"
+			data-collection-attribute="identifier"						
+			data-collection-name="connectors"			 
+			ng-options="item.identifier as item.identifier for item in connectors"									
 			required					
 			>				
 		</select>		

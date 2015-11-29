@@ -1,10 +1,10 @@
 (function(){	
 	
 	angular.module('product')
-	.directive('productPage', function(){
+	.directive('productPage', function(Domain){
 		return {			
 			restrict: 'E',
-			templateUrl: '/app/snipet/product-page.html',	
+			templateUrl: 'snipet/product-page.html',	
 			scope: {
 				product: "=",
 				editable: "=",
@@ -14,6 +14,7 @@
 				isAdmin: "&"
 			},
 			link: function(scope,element,attrs){
+				scope.domain = Domain.base();				
 			},
 			controllerAs: 'productCtrl',
 			controller: 'ProductDetailsController'

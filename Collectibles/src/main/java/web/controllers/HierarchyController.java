@@ -1,7 +1,10 @@
 package web.controllers;
 
+import model.connection.ProductInfoConnectorFactory;
 import model.dataobjects.HierarchyNode;
-import model.dataobjects.HierarchyNode.HierarchyTreeView;
+import model.dataobjects.serializable.SerializableHierarchyNode;
+import model.dataobjects.serializable.SerializableHierarchyNode.HierarchyTreeView;
+import model.dataobjects.serializable.services.SerializableHierarchyNodeService;
 import model.persistence.HierarchyRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import web.supporting.error.exceptions.CollectiblesException;
-import web.supporting.error.exceptions.GenericException;
 import web.supporting.error.exceptions.IncorrectParameterException;
 import web.supporting.error.exceptions.NotFoundException;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 @RestController
 public class HierarchyController extends CollectiblesController{
@@ -26,14 +28,21 @@ public class HierarchyController extends CollectiblesController{
 	@Autowired
 	private HierarchyRepository hierarchyRepository;
 	
+	@Autowired
+	private ProductInfoConnectorFactory connectorFactory;
+	
+	@Autowired
+	private SerializableHierarchyNodeService serializableHierarchyService;
+	
+	
 	@JsonView(HierarchyTreeView.class)
 	@RequestMapping(value="/hierarchy/root/", method = RequestMethod.GET)
-	public HierarchyNode hierarchyRoot() throws CollectiblesException{
-		HierarchyNode hierarchyNode = hierarchyRepository.findRoot();
-		if (hierarchyNode==null) {
+	public SerializableHierarchyNode hierarchyRoot() throws CollectiblesException{
+		SerializableHierarchyNode root = serializableHierarchyService.getRoot(hierarchyRepository, connectorFactory);
+		if (root == null){
 			throw new NotFoundException();
-		} else {
-			return hierarchyNode;
+		} else{
+			return root;
 		}
 	}
 	

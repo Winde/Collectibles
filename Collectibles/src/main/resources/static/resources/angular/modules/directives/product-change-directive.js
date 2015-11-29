@@ -4,7 +4,7 @@
 	.directive('productChange', function(){
 		return {
 			restrict: 'E',
-			templateUrl: '/app/snipet/product-change.html',
+			templateUrl: 'snipet/product-change.html',
 			scope: {
 				product: "=",
 				createnew: "@",

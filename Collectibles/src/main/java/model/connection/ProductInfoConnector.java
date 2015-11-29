@@ -1,14 +1,15 @@
 package model.connection;
 
-import java.util.Collection;
 import java.util.List;
 
 import model.dataobjects.Product;
-import model.dataobjects.Rating;
+import model.dataobjects.serializable.SerializableHierarchyNode.HierarchyTreeView;
 
 import org.springframework.transaction.annotation.Transactional;
 
-public interface ProductInfoConnector {
+import com.fasterxml.jackson.annotation.JsonView;
+
+public interface ProductInfoConnector extends Comparable<ProductInfoConnector>{
 
 	public ProductInfoLookupService getProductInfoLookupService();
 
@@ -22,7 +23,8 @@ public interface ProductInfoConnector {
 	boolean updateTransitionalTransaction(Long productId) throws TooFastConnectionException;
 
 	public List<String> getOwnedReferences(String userId) throws TooFastConnectionException;
-			
+	
+	@JsonView(HierarchyTreeView.class)
 	public String getIdentifier();
 	
 	public boolean isApplicable(Product product);
@@ -35,6 +37,7 @@ public interface ProductInfoConnector {
 
 	public boolean supportsTransientData();
 	
+	@JsonView(HierarchyTreeView.class)
 	public boolean supportsPrices();
 	
 	public boolean supportsRating();

@@ -174,6 +174,17 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			}
 			needsAnd = true;			
 		}
+		
+		if (search.getStore()!=null){
+			if (needsAnd){ hql = hql + " AND ";}
+			hql = hql + " ( :store in (SELECT price.connectorName from Price price WHERE price.product = p) )  ";
+			needsAnd = true;
+		}
+		if (search.getSeller()!=null){
+			if (needsAnd){ hql = hql + " AND ";}
+			hql = hql + " ( :seller in (SELECT price.seller from Price price WHERE price.product = p) )  ";
+			needsAnd = true;
+		}
 
 		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
 			hql = hql + "GROUP BY p having count(categoryValues)=:sizeCategoryValues "; 			
@@ -237,8 +248,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 				i=i+1;
 			}
 		}
-
-			
+		if (search.getStore()!=null){
+			query.setParameter("store", search.getStore());
+		}
+		if (search.getSeller()!=null){
+			query.setParameter("seller", search.getSeller());
+		}	
 		
 		
 		if (search.getMaxResults()!=null && search.getPage()!=null) {

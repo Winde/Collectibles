@@ -3,6 +3,7 @@ package model.connection.amazon;
 import java.util.List;
 
 import model.connection.AbstractProductInfoConnector;
+import model.connection.ProductInfoConnector;
 import model.connection.ProductInfoLookupService;
 import model.connection.TooFastConnectionException;
 import model.dataobjects.Product;

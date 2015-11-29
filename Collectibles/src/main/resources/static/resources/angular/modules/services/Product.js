@@ -1,7 +1,7 @@
 (function(){
 	
 	angular.module('product')
-	.factory('Product', function ProductFactory($http,Upload,$httpParamSerializer){
+	.factory('Product', function ProductFactory(Domain,$http,Upload,$httpParamSerializer){
 		var factory = this;
 		
 		this.cleanUpProduct = function cleanUpProduct(product){
@@ -12,16 +12,16 @@
 		
 		return {		
 			one: function(id) {				
-				return $http({ 
+				return $http({ 					
+					url: Domain.base()+'/product/find/'+id,
 					method: 'GET', 
-					url: '/product/find/'+id, 
 					progressbar: true 
 				});
 			},
 			refresh: function(product) {				
 				return $http({ 
 					method: 'PUT', 
-					url: '/product/refresh/', 
+					url: Domain.base()+'/product/refresh/', 
 					data: product,
 					progressbar: true 
 				});
@@ -30,7 +30,7 @@
 				factory.cleanUpProduct(product);
 				return $http({ 
 					method: 'POST', 
-					url: '/product/create/'+product.hierarchyPlacement.id, 
+					url: Domain.base()+'/product/create/'+product.hierarchyPlacement.id, 
 					data: product,
 					progressbar: true
 				});				
@@ -38,7 +38,7 @@
 			modifyLite: function(product){
 				return $http({ 
 					method: 'PUT', 
-					url: '/product/modify/minor/', 
+					url: Domain.base()+'/product/modify/minor/', 
 					data: product,
 					progressbar: true
 				});
@@ -47,25 +47,25 @@
 				factory.cleanUpProduct(product);
 				return $http({ 
 					method: 'PUT', 
-					url: '/product/modify/', 
+					url: Domain.base()+'/product/modify/', 
 					data: product,
 					progressbar: true
 				});
 			},
 			remove: function(product){
-				return $http.post('/product/remove/'+product.id,{
+				return $http.post(Domain.base()+'/product/remove/'+product.id,{
 					progressbar: true
 				});
 			},
 			updatePrice: function(id){
 				return $http({ 
 					method: 'PUT', 
-					url: '/product/update/price/'+id, 
+					url: Domain.base()+'/product/update/price/'+id, 
 					progressbar: true 
 				});
 			},
 			search: function(searchObject){				
-				var url = "/product/search/";
+				var url = Domain.base()+"/product/search/";
 
 				if ( searchObject && searchObject.hierarchy){
 					url = url + searchObject.hierarchy + "/";
@@ -76,7 +76,7 @@
 				});
 			},
 			updatePricesForSearch: function(searchObject){
-				var url = "/product/update/prices/";
+				var url = Domain.base()+"/product/update/prices/";
 
 				if ( searchObject && searchObject.hierarchy){
 					url = url + searchObject.hierarchy + "/";
@@ -93,7 +93,7 @@
 			},
 			addImage: function(product,file){
 				var upload = Upload.upload({
-					url: '/product/'+product.id+'/image/add/',
+					url: Domain.base()+'/product/'+product.id+'/image/add/',
 					data: { images: file },
 					progressbar: true
 				});
@@ -102,13 +102,13 @@
 			removeImage: function(product,image){
 				return $http({
 					method: 'POST', 
-					url: '/product/'+product.id+'/image/remove/'+image.id,
+					url: Domain.base()+'/product/'+product.id+'/image/remove/'+image.id,
 					progressbar: true
 				});
 			},
 			uploadFile: function(hierarchy,file){
 				var upload = Upload.upload({
-		            url: '/product/create/from/file/'+hierarchy.id,
+		            url: Domain.base()+'/product/create/from/file/'+hierarchy.id,
 		            data: {file: file},
 		            progressbar: true
 				});
@@ -119,7 +119,7 @@
 				
 				return $http({
 					method: 'POST', 
-					url: '/product/create/from/'+connector+'/user/'+userId+'/tohierarchy/'+hierarchyId,
+					url: Domain.base()+'/product/create/from/'+connector+'/user/'+userId+'/tohierarchy/'+hierarchyId,
 					progressbar: true
 				});
 			},

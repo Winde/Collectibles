@@ -80,7 +80,7 @@
 	
 								<ul class='hardcover_front'>
 									<li>
-										<img ng-id="image.id" ng-src="/image/content/{{product.selectedImage.id}}" width="100%" height="100%">
+										<img ng-id="image.id" ng-src="{{domain}}/image/content/{{product.selectedImage.id}}" width="100%" height="100%">
 									</li>
 									<li></li>
 								</ul>
@@ -111,11 +111,11 @@
 						
 						</div>
 						<a href="/image/content/{{product.selectedImage.id}}">
-							<img fluidbox class="hidden-lg hidden-md img-responsive mainImage" ng-id="image.id" ng-src="/image/content/{{product.selectedImage.id}}">
+							<img fluidbox class="hidden-lg hidden-md img-responsive mainImage" ng-id="image.id" ng-src="{{domain}}/image/content/{{product.selectedImage.id}}">
 						</a>
 					</div>
 					<a href="/image/content/{{product.selectedImage.id}}">
-						<img fluidbox ng-if="!product.hierarchyPlacement.isBook || product.selectedImage.notBook" class="img-responsive mainImage" ng-id="image.id" ng-src="/image/content/{{product.selectedImage.id}}">
+						<img fluidbox ng-if="!product.hierarchyPlacement.isBook || product.selectedImage.notBook" class="img-responsive mainImage" ng-id="image.id" ng-src="{{domain}}/image/content/{{product.selectedImage.id}}">
 					</a>
 				</div>
 			
@@ -123,11 +123,10 @@
 					<div class="row">
 						<div class="col-xs-4" ng-repeat="image in product.images" ng-if="product.selectedImage.id != image.id">							
 							<a href ng-if="productCtrl.isEditable() && isAdmin()" ng-click="productCtrl.removeImage(image)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>			
-							<a href="/image/content/{{image.id}}">
+							<a href="{{domain}}/image/content/{{image.id}}">
 								<img class="img-responsive img-thumbnail" fluidbox 								
 								ng-id="image.id" 
-								ng-src="/image/content/{{image.id}}">
-								<!-- ng-click="productCtrl.setSelectedImage(image)" -->
+								ng-src="{{domain}}/image/content/{{image.id}}">
 							</a>									
 						</div>
 					</div>
@@ -147,11 +146,18 @@
 							<p><b>Price: </b></p>
 							<div class="blockContent">							
 								<div class="row priceEntry" ng-repeat="priceObject in product.prices" >									
-									<div class="col-md-4 col-sm-6 col-xs-6">
-										<a class="btn btn-default btn-block" ng-class="{ disabled : !priceObject.link }" href="{{priceObject.link}}">
+									<div class="btn-group col-lg-8 col-sm-12 hidden-xs">
+										<a class="col-sm-6 btn btn-success" ng-class="{ disabled : !priceObject.link }" href="{{priceObject.link}}">
 											<span>{{(priceObject.price/100) | currency}}</span> <span ng-if="priceObject.connectorName">{{priceObject.connectorName}} {{priceObject.type}}</span>																												
 										</a>
+										<a class="col-sm-6 btn btn-info" ng-if="priceObject.seller" ng-href="#/products/?store={{priceObject.connectorName}}&seller={{priceObject.seller}}">{{priceObject.seller}}</a>
 									</div>
+									<div class="btn-group-vertical visible-xs col-xs-12">
+										<a class="btn btn-success" ng-class="{ disabled : !priceObject.link }" href="{{priceObject.link}}">
+											<span>{{(priceObject.price/100) | currency}}</span> <span ng-if="priceObject.connectorName">{{priceObject.connectorName}} {{priceObject.type}}</span>																												
+										</a>
+										<a class="btn btn-info" ng-if="priceObject.seller"  ng-href="#/products/?store={{priceObject.connectorName}}&seller={{priceObject.seller}}">{{priceObject.seller}}</a>
+									</div>									
 								</div>
 							</div>
 							<p ng-if="product.lastPriceUpdate">Last updated: {{product.lastPriceUpdate | date:'yyyy-MM-dd HH:mm:ss'}}</p>
@@ -197,7 +203,7 @@
 				<div class="col-lg-1 col-md-2 col-sm-2 col-xs-3 authorEntry" ng-repeat="author in product.authors">															
 						<a href="{{author.goodreadsAuthorLink}}">																		
 							<span class="authorContainer">
-								<img class="img-responsive img-thumbnail " ng-if="author.id && author.hasImage" ng-src="/image/author/{{author.id}}" />											
+								<img class="img-responsive img-thumbnail " ng-if="author.id && author.hasImage" ng-src="{{domain}}/image/author/{{author.id}}" />											
 								<img class="img-responsive img-thumbnail" ng-if="!author.id || !author.hasImage" src="https://s.gr-assets.com/assets/nophoto/user/u_200x266-e183445fd1a1b5cc7075bb1cf7043306.png" />
 							</span>
 							<span>{{author.name}}</span>											

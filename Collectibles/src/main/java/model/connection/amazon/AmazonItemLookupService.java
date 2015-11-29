@@ -142,8 +142,8 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		return reference;
 		
 	}
-    
-	private String getSearchByNameUrl(String operation,String searchIndex, String responseGroup, String title){
+	
+	private String getUrl(String operation, Map<String,String> params){
 		/*
 		Set up the signed requests helper 
 		 */
@@ -162,65 +162,47 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		/*
 		 * Here is an example in map form, where the request parameters are stored in a map.
 		 */        
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("Service", SERVICE);
-		params.put("Version", VERSION);
-		params.put("Operation", operation);
-		params.put("Keywords", title);
-		params.put("SearchIndex", searchIndex);        
-		params.put("ResponseGroup", responseGroup);
-		params.put("AssociateTag", ASSOCIATE_TAG);
+		Map<String, String> webParams = new HashMap<String, String>();
+		webParams.put("Service", SERVICE);
+		webParams.put("Version", VERSION);
+		webParams.put("Operation", operation);		
+		webParams.put("AssociateTag", ASSOCIATE_TAG);
 
-		requestUrl = helper.sign(params);
+		for (Entry<String, String> param: params.entrySet()){
+			webParams.put(param.getKey(), param.getValue());
+		}
+		
+		requestUrl = helper.sign(webParams);
         
 		return requestUrl;
 
 	}
     
-	private String getUrl(String operation,String responseGroup, String id){
-		/*
-		 * Set up the signed requests helper 
-		 */
-		SignedRequestsHelper helper;
-		try {
-			helper = SignedRequestsHelper.getInstance(PROTOCOL,ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY);
-		} catch (Exception e) {
-			logger.error("Can't create Amazon signer helper", e);
-			return null;
-		}
-
-		String requestUrl = null;
-
-		/* The helper can sign requests in two forms - map form and string form */
-        
-		/*
-		 * Here is an example in map form, where the request parameters are stored in a map.
-		 */        
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("Service", SERVICE);
-		params.put("Version", VERSION);
-		params.put("Operation", operation);
-		params.put("ItemId", id);
-		params.put("ResponseGroup", responseGroup);
-		params.put("AssociateTag", ASSOCIATE_TAG);
-
-		requestUrl = helper.sign(params);
-        
-		return requestUrl;
-    }
-    
 	public String getMultipleUseUrl(String id) {
-		String url = getUrl("ItemLookup","Large",id);
+		Map<String,String> params = new HashMap<>();
+		params.put("ItemId", id);
+		params.put("ResponseGroup", "OfferFull,Large");
+		
+		
+		//String url = getUrl("ItemLookup","Large",id);		
+		String url = getUrl("ItemLookup",params);
 		logger.info("Amazon url for fetch data: " + url);
 		return url;
 	}
 	
 	public String getSearchByName(String name) {
-		String url = getSearchByNameUrl("ItemSearch","All","Small",name);
+		Map<String,String> params = new HashMap<>();
+		params.put("Keywords", name);
+		params.put("SearchIndex", "All");        
+		params.put("ResponseGroup", "Small");
+		
+		String url = getUrl("ItemSearch",params);
+		//String url = getSearchByNameUrl("ItemSearch","All","Small",name);
 		logger.info("Amazon url for fetch data by name: " + url);
 		return url;
 	}
 
+	
 	@Override
 	public String getExternalUrlLink(Node node){
 		return this.getField(node, externalLinkUrlDocPath);		    	
@@ -262,6 +244,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		if (reference == null){
 			return null;
 		}
+		
 		String url = this.getMultipleUseUrl(reference);
 		Node node = null;
 		Document doc = this.fetchDocFromUrl(url);
@@ -285,6 +268,16 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	public String getSeriesUrl(Node node) throws TooFastConnectionException {
 		return null;
 	}
+	
+	
+	private String getMerchant(Node conditionNode){
+		String name = null;
+		if (conditionNode!=null){
+			Node offerNode = conditionNode.getParentNode().getParentNode();
+			name = super.getField(offerNode, "Merchant/Name");
+		}
+		return name;
+	}
 
 	@Override
 	public Collection<Price> getPrices(Node node) throws TooFastConnectionException {
@@ -296,6 +289,9 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		if (newField!=null) { stringPrices.put("New", newField); }
 		if (usedField!=null) { stringPrices.put("Used", usedField); }
 		if (collectibleField!=null) { stringPrices.put("Collectible", collectibleField); }
+		
+		NodeList merchantNodesCondition = super.getNodes(node, "/ItemLookupResponse/Items/Item/Offers/Offer/OfferAttributes/Condition");
+
 		if (stringPrices!=null && !stringPrices.isEmpty()){
 			result = new ArrayList<>();
 			for (Entry<String,String> entry : stringPrices.entrySet()){
@@ -311,6 +307,16 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 					priceObject.setLink(this.getExternalUrlLink(node));
 					priceObject.setType(entry.getKey());
 					priceObject.setPrice(price);
+					if (merchantNodesCondition!=null) {
+						for (int i=0;i<merchantNodesCondition.getLength();i++){
+							Node currentMerchant = merchantNodesCondition.item(i);
+							if (entry.getKey().equals(currentMerchant.getTextContent())){
+								priceObject.setSeller(getMerchant(currentMerchant));
+								break;
+							}
+						}
+					}
+					
 					logger.info("PriceObject adding: " + priceObject);				
 					result.add(priceObject);
 				}

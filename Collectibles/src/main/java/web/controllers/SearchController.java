@@ -81,6 +81,8 @@ public class SearchController extends CollectiblesController{
 			String ownedString,
 			String ownedByString,
 			String wishedByString,
+			String store,
+			String seller,
 			String sortBy,
 			String sortOrder,
 			Integer page,
@@ -194,7 +196,9 @@ public class SearchController extends CollectiblesController{
 			
 			searchObject.setWithPrice(withPrice);
 			
-
+			searchObject.setStore(store);
+			searchObject.setSeller(seller);
+			
 			
 			searchObject.setHierarchy(hierarchyNode);
 			
@@ -280,11 +284,13 @@ public class SearchController extends CollectiblesController{
 			@RequestParam(required=false, name="ownedBy" ) String ownedBy,
 			@RequestParam(required=false, name="wishedBy" ) String wishedBy,
 			@RequestParam(required=false, name="withPrice") String withPrice,
+			@RequestParam(required=false, name="store") String store,
+			@RequestParam(required=false, name="seller") String seller,
 			@RequestParam(required=false, name="sortBy") String sortBy,
 			@RequestParam(required=false, name="sortOrder") String sortOrder,
 			@RequestParam(required=true, name="page") int page,
 			@RequestParam(required=false, name="maxResults", defaultValue=defaultPaginationSizeString) int maxResults) throws CollectiblesException{					
-		ObjectList<SerializableProduct> objects = findProduct(null,searchString,null,withImagesString,withPrice,owned,ownedBy,wishedBy,sortBy,sortOrder,page,maxResults,true);
+		ObjectList<SerializableProduct> objects = findProduct(null,searchString,null,withImagesString,withPrice,owned,ownedBy,wishedBy,store,seller,sortBy,sortOrder,page,maxResults,true);
 		return objects;
 	}
 	
@@ -294,15 +300,21 @@ public class SearchController extends CollectiblesController{
 			@PathVariable String hierarchy, 
 			@RequestParam(required=false, name="search") String searchString,
 			@RequestParam(required=false, name="withImages") String withImagesString,
+			@RequestParam(required=false, name="withPrice") String withPrice,
 			@RequestParam(required=false, name="owned" ) String owned,
 			@RequestParam(required=false, name="ownedBy" ) String ownedBy,
 			@RequestParam(required=false, name="wishedBy" ) String wishedBy,
-			@RequestParam(required=false, name="withPrice") String withPrice,
+			@RequestParam(required=false, name="store") String store,
+			@RequestParam(required=false, name="seller") String seller,
 			@RequestParam(required=false, name="categoryValues" ) List<String> categories,
 			@RequestParam(required=false, name="sortBy") String sortBy,
 			@RequestParam(required=false, name="sortOrder") String sortOrder,
 			@RequestParam(required=true, name="page") int page,
 			@RequestParam(required=false, name="maxResults", defaultValue=defaultPaginationSizeString) int maxResults) throws CollectiblesException{					
+		
+		
+		
+		
 		HierarchyNode node = null;
 		if (hierarchy!=null && !"".equals(hierarchy.trim())){
 			Long hierarchyId = this.getId(hierarchy);
@@ -317,7 +329,7 @@ public class SearchController extends CollectiblesController{
 			}
 		}
 		
-		ObjectList<SerializableProduct> objects = findProduct(node,searchString,categories,withImagesString,withPrice,owned,ownedBy,wishedBy,sortBy,sortOrder,page,maxResults,true);		
+		ObjectList<SerializableProduct> objects = findProduct(node,searchString,categories,withImagesString,withPrice,owned,ownedBy,wishedBy,store,seller,sortBy,sortOrder,page,maxResults,true);		
 		return objects;	
 	}
 	
@@ -328,11 +340,14 @@ public class SearchController extends CollectiblesController{
 			@PathVariable String hierarchy, 
 			@RequestParam(required=false, name="search") String searchString,
 			@RequestParam(required=false, name="withImages") String withImagesString,
+			@RequestParam(required=false, name="withPrice") String withPrice,
 			@RequestParam(required=false, name="owned" ) String owned,
 			@RequestParam(required=false, name="ownedBy" ) String ownedBy,
-			@RequestParam(required=false, name="wishedBy" ) String wishedBy,
-			@RequestParam(required=false, name="withPrice") String withPrice,
-			@RequestParam(required=false, name="categoryValues" ) List<String> categories) throws CollectiblesException{					
+			@RequestParam(required=false, name="wishedBy" ) String wishedBy,			
+			@RequestParam(required=false, name="store") String store,
+			@RequestParam(required=false, name="seller") String seller,			
+			@RequestParam(required=false, name="categoryValues" ) List<String> categories) throws CollectiblesException{						
+		
 		HierarchyNode node = null;
 		if (hierarchy!=null && !"".equals(hierarchy.trim())){
 			Long hierarchyId = this.getId(hierarchy);
@@ -353,7 +368,7 @@ public class SearchController extends CollectiblesController{
 		if (auth!=null){
 			String username = auth.getName();
 			
-			ObjectList<SerializableProduct> objects = findProduct(node,searchString,categories,withImagesString,withPrice,owned,ownedBy,wishedBy,null,null,null,null,false);
+			ObjectList<SerializableProduct> objects = findProduct(node,searchString,categories,withImagesString,withPrice,owned,ownedBy,wishedBy,store,seller,null,null,null,null,false);
 			if (objects!=null && objects.getObjects()!=null && objects.getObjects().size()>0){
 				
 				

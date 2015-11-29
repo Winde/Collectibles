@@ -1,10 +1,10 @@
 (function(){
 	
 	angular.module('image')
-	.factory('Image', function ImageFactory($http){
+	.factory('Image', function ImageFactory(Domain,$http){
 		return {
 			one: function(image){
-				return $http({method: 'GET', url: '/images/'+image.id});
+				return $http({method: 'GET', url: Domain.base()+'/images/'+image.id});
 			},
 			multiple: function(images){
 				var parameter = "";
@@ -16,12 +16,12 @@
 						parameter = parameter + ",";
 					}
 				}				
-				return $http({method: 'GET', url: '/images/'+parameter});
+				return $http({method: 'GET', url: Domain.base()+'/images/'+parameter});
 			},
 			modifyLite: function(image){
-				return $http({ 
-					method: 'PUT', 
-					url: '/image/modify/minor/', 
+				return $http({ 					 
+					url: Domain.base()+'/image/modify/minor/',
+					method: 'PUT',
 					data: image,
 					progressbar: true
 				});
