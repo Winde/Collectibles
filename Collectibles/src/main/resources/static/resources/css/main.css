@@ -239,3 +239,32 @@ select.ng-invalid,.ng-invalid.ng-dirty:not(.btn),.ng-invalid:not(.btn) {
 .carousel {
 	margin-top: 10px;
 }
+
+
+
+/***Animation ng-repeat*/
+.animate-enter, 
+.animate-leave
+{ 
+    -webkit-transition: 475ms cubic-bezier(0.420, 0.000, 0.580, 1.000) all;
+    -moz-transition: 475ms cubic-bezier(0.420, 0.000, 0.580, 1.000) all;
+    -ms-transition: 475ms cubic-bezier(0.420, 0.000, 0.580, 1.000) all;
+    -o-transition: 475ms cubic-bezier(0.420, 0.000, 0.580, 1.000) all;
+    transition: 475ms cubic-bezier(0.420, 0.000, 0.580, 1.000) all;
+    position: relative;
+    display: block;
+} 
+ 
+.animate-enter.animate-enter-active, 
+.animate-leave {
+    opacity: 1;
+    right: 0;
+    height: 30px;
+}
+ 
+.animate-leave.animate-leave-active,
+.animate-enter {
+    opacity: 0;
+    right: -50px;
+    height: 0px;
+}

@@ -65,7 +65,6 @@ public class ScrapeRequestorService {
 		return requests;		
 	}
 	
-	//@Scheduled(cron="0 2 * * *")
 	@Scheduled(cron="0 0 2 * * *")	
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void requestAllPrices(){

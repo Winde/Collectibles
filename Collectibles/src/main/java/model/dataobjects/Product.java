@@ -386,6 +386,7 @@ public class Product extends SimpleIdDao{
 			this.minPrice = newMinPrice.getPrice();
 			this.minPriceLink = newMinPrice.getLink();
 			this.minPriceSeller = newMinPrice.getSeller();
+			this.setLastPriceUpdate(new Date());
 		} else {
 			this.minPrice = null;
 			this.minPriceLink = null;
