@@ -133,7 +133,7 @@
 			} else {	searchObject.sortOrder = ""; }
 			
 			if (searchObject.store){	$scope.store.identifier = searchObject.store; } else { $scope.store.identifier = null } 
-			if (searchObject.seller){	$scope.seller = searchObject.seller; }			
+			if (searchObject.seller){	$scope.seller = searchObject.seller; } else { $scope.seller = null; }	
 			
 		};
 		
@@ -254,6 +254,7 @@
          );
 		*/
 		$scope.$on('$locationChangeSuccess', function() {
+			controller.setSearchParameters();
 			controller.search();
 		}); 
 		
