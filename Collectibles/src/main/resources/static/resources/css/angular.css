@@ -1,4 +1,26 @@
-/**fade**/
+/* ng-hide animation */
+.ng-hide-add, .ng-hide-remove {
+    /* ensure visibility during the transition */
+    display: block !important; /* yes, important */
+}
+
+.cssFade {
+    transition: 0.5s linear all;
+    opacity: 1;
+}
+.cssFade.ng-hide {
+    opacity: 0;
+}
+
+.cssSlideUp {
+    transition: .5s linear all;
+    height: 80px;
+    overflow: hidden;
+}
+.cssSlideUp.ng-hide {
+    height:0;
+}
+/*
 
 .fade {
     position: absolute;
@@ -26,8 +48,6 @@
     opacity: 0;
 }
 
-/**slide**/
-
 .slide {
     position: absolute;
     left: 0;
@@ -53,7 +73,6 @@
     left: -100%;
 }
 
-/**slidedown**/
 .slidedown {
     position: absolute;
     top: 0;
@@ -77,4 +96,4 @@
 }
 .slidedown.ng-leave-active {
     top: 100%;
-}
+}*/

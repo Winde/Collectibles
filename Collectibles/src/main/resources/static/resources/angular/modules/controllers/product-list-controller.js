@@ -5,6 +5,8 @@
 	                                        function($scope,$filter,$location,Image,Product,Hierarchy,User,Message){
 		var controller = this;
 				
+		$scope.isCollapsedSort= true;
+		$scope.isCollapsedFilter= true;
 		$scope.editMode = false;
 		$scope.store = {}; 
 			
@@ -171,6 +173,7 @@
 		this.search = function() {
 			var searchObject = controller.obtainSearchParameters();
 		
+						
 			if (searchObject.hierarchy 
 					|| (searchObject.searchTerm && searchObject.searchTerm!="" && searchObject.searchTerm.length>2)
 					|| (searchObject.seller && searchObject.seller!="")
@@ -190,7 +193,10 @@
 				Product.search(searchObject)
 				.success(function(data){ 
 					if (data && data.objects){
-						$scope.products = data.objects;	
+						$scope.products = data.objects;
+						if ($scope.products.length >0){
+							$scope.isCollapsedFilter= false;
+						}
 					}
 					if (data && data.maxResults){
 						$scope.maxResults = data.maxResults;

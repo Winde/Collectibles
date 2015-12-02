@@ -38,137 +38,140 @@
 	<!-- <ajax ng-show="processingSearch" ></ajax> -->
 	
 	<span class="btn btn-default" ng-if="isAdmin() && products && products.length && products.length>0" ng-click="productListCtrl.updatePriceSearch()" >Update</span>
-	
 	<div class="row">
-		
-		<h4 class="col-xs-1"><span class="btn btn-primary disabled">Filter</span></h4>
-		
-		<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12">
-			<div class="btn-group">
-				<label class="btn btn-default disabled">Images</label>		
-				<label class="btn btn-default" uib-btn-radio="''" ng-model="withImages" ng-change="productListCtrl.updateSearch(true)">
-					<!-- <input type="radio"
-						ng-model="withImages"			
-						ng-change="pro1ductListCtrl.updateSearch(true)" value=""/>  -->Any
-				</label>
-				
-				<label class="btn btn-default" uib-btn-radio="'true'" ng-model="withImages" ng-change="productListCtrl.updateSearch(true)">
-					<!-- <input type="radio" 
-						ng-model="withImages"			
-						ng-change="productListCtrl.updateSearch(true)" value="true"/> -->With			
-				</label>		
-				
-				<label class="btn btn-default" uib-btn-radio="'false'" ng-model="withImages" ng-change="productListCtrl.updateSearch(true)">
-					<!-- <input type="radio" 
-						ng-model="withImages"			
-						ng-change="productListCtrl.updateSearch(true)" value="false" />-->Without
-				</label>		
-			</div>
-		</div>
-		
- 		<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12" ng-show="isAuthenticated()">			
-			<div class="btn-group">
-				<label class="btn btn-default disabled">Owned by me</label>								
-				<label class="btn btn-default" uib-btn-radio="''" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
-					Any
-				</label>		
-				<label class="btn btn-default" uib-btn-radio="'true'" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
-					Yes
-				</label>				
-				<label class="btn btn-default" uib-btn-radio="'false'" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
-					No
-				</label>		
-			</div>
-		</div>		
-		
-		<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12">
-					
-				<div class="btn-group">
-					<label class="btn btn-default disabled">Price</label>	
-					<label class="btn btn-default" uib-btn-radio="''" ng-model="withPrice" ng-change="productListCtrl.updateSearch(true)">
-						<!-- <input type="radio"
-							ng-model="withImages"			
-							ng-change="pro1ductListCtrl.updateSearch(true)" value=""/>  -->Any
-					</label>
-					
-					<label class="btn btn-default" uib-btn-radio="'true'" ng-model="withPrice" ng-change="productListCtrl.updateSearch(true)">
-						<!-- <input type="radio" 
-							ng-model="withImages"			
-							ng-change="productListCtrl.updateSearch(true)" value="true"/> -->With			
-					</label>		
-					
-					<label class="btn btn-default" uib-btn-radio="'false'" ng-model="withPrice" ng-change="productListCtrl.updateSearch(true)">
-						<!-- <input type="radio" 
-							ng-model="withImages"			
-							ng-change="productListCtrl.updateSearch(true)" value="false" />-->Without
-					</label>		
-				</div>
-		</div>
-		
-		<div class="form-group optionsSearch col-lg-4 col-xs-6" ng-if="seller">
-			<div class="btn-group">
-				<label class="btn btn-default disabled">Seller</label>	
-				<label class="btn btn-default active" ng-click="productListCtrl.updateSeller() && productListCtrl.updateSearch(true)">{{seller}}</label>
-			</div>
-		</div>
-		
-		<div class="form-group optionsSearch col-xs-12" ng-if="connectors && connectors.length>0">
-			<label class="disabled visible-xs">Available</label>			
-			<div class="btn-group">
-				<label class="btn btn-default disabled hidden-xs">Available</label>		
-				<label class="btn btn-default" uib-btn-radio="null" ng-model="store.identifier" ng-change="productListCtrl.updateSearch(true)">
-					Any
-				</label>
-				<label ng-repeat="connector in connectors | filter:{supportsPrices: true}" class="btn btn-default" uib-btn-radio="connector.identifier" ng-model="store.identifier" ng-change="productListCtrl.updateSearch(true)">
-					<span class="hidden-xs">{{connector.identifier}}</span>
-					<span class="visible-xs">{{connector.identifier | limitTo:10}}...</span>
-				</label>
-						
-			</div>
-		</div>
-	</div>	
-	<div class="row">		
-		<div class="form-group optionsSearch col-lg-4 col-md-4 col-sm-12 col-xs-12">			
-				<select class="form-control"	
-				selectpicker	
-				ng-model="ownedBy"
-				data-collection-attribute="id"
-				data-collection-name="users"			 
-				ng-options="user.id as (user.id == '' ? 'Owned: Any' : 'Owned by ' + user.contactName) for user in users" 
-				ng-change="productListCtrl.updateSearch(true)">			
-				</select>
-		
-		</div>	
-		<div class="form-group optionsSearch col-lg-4 col-md-4 col-sm-12 col-xs-12">			
-				<select class="form-control"	
-				selectpicker	
-				ng-model="wishedBy"
-				data-collection-attribute="id"
-				data-collection-name="users"			 
-				ng-options="user.id as (user.id == '' ? 'Wishlist: Any' : 'In wishlist for ' + user.contactName) for user in users" 
-				ng-change="productListCtrl.updateSearch(true)">			
-				</select>		
-		</div>			
+		<h4 class="col-md-1 col-xs-3"><span class="btn btn-primary" ng-class="{active: !isCollapsedFilter}" ng-click="isCollapsedFilter = !isCollapsedFilter">Filter</span></h4>
+		<h4 class="col-md-1 col-xs-3"><span class="btn btn-primary" ng-class="{active: !isCollapsedSort}" ng-click="isCollapsedSort = !isCollapsedSort">Sort</span></h4>
 	</div>
 	
-	<div class="row">
-		
-		<h4 class="col-xs-1"><span class="btn btn-primary disabled">Sort</span></h4>
+	<div class="filters cssFade" ng-hide="isCollapsedFilter">
+		<div class="row">
+			
+				<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12">
+					<div class="btn-group">
+						<label class="btn btn-default disabled">Images</label>		
+						<label class="btn btn-default" uib-btn-radio="''" ng-model="withImages" ng-change="productListCtrl.updateSearch(true)">
+							<!-- <input type="radio"
+								ng-model="withImages"			
+								ng-change="pro1ductListCtrl.updateSearch(true)" value=""/>  -->Any
+						</label>
+						
+						<label class="btn btn-default" uib-btn-radio="'true'" ng-model="withImages" ng-change="productListCtrl.updateSearch(true)">
+							<!-- <input type="radio" 
+								ng-model="withImages"			
+								ng-change="productListCtrl.updateSearch(true)" value="true"/> -->With			
+						</label>		
+						
+						<label class="btn btn-default" uib-btn-radio="'false'" ng-model="withImages" ng-change="productListCtrl.updateSearch(true)">
+							<!-- <input type="radio" 
+								ng-model="withImages"			
+								ng-change="productListCtrl.updateSearch(true)" value="false" />-->Without
+						</label>		
+					</div>
+				</div>
+				
+		 		<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12" ng-show="isAuthenticated()">			
+					<div class="btn-group">
+						<label class="btn btn-default disabled">Owned by me</label>								
+						<label class="btn btn-default" uib-btn-radio="''" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
+							Any
+						</label>		
+						<label class="btn btn-default" uib-btn-radio="'true'" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
+							Yes
+						</label>				
+						<label class="btn btn-default" uib-btn-radio="'false'" ng-model="owned" ng-change="productListCtrl.updateSearch(true)">
+							No
+						</label>		
+					</div>
+				</div>		
+				
+				<div class="form-group optionsSearch col-lg-3 col-md-4 col-sm-12 col-xs-12">
+							
+						<div class="btn-group">
+							<label class="btn btn-default disabled">Price</label>	
+							<label class="btn btn-default" uib-btn-radio="''" ng-model="withPrice" ng-change="productListCtrl.updateSearch(true)">
+								<!-- <input type="radio"
+									ng-model="withImages"			
+									ng-change="pro1ductListCtrl.updateSearch(true)" value=""/>  -->Any
+							</label>
+							
+							<label class="btn btn-default" uib-btn-radio="'true'" ng-model="withPrice" ng-change="productListCtrl.updateSearch(true)">
+								<!-- <input type="radio" 
+									ng-model="withImages"			
+									ng-change="productListCtrl.updateSearch(true)" value="true"/> -->With			
+							</label>		
+							
+							<label class="btn btn-default" uib-btn-radio="'false'" ng-model="withPrice" ng-change="productListCtrl.updateSearch(true)">
+								<!-- <input type="radio" 
+									ng-model="withImages"			
+									ng-change="productListCtrl.updateSearch(true)" value="false" />-->Without
+							</label>		
+						</div>
+				</div>
+				
+				<div class="form-group optionsSearch col-lg-4 col-xs-6" ng-if="seller">
+					<div class="btn-group">
+						<label class="btn btn-default disabled">Seller</label>	
+						<label class="btn btn-default active" ng-click="productListCtrl.updateSeller() && productListCtrl.updateSearch(true)">{{seller}}</label>
+					</div>
+				</div>
+				
+				<div class="form-group optionsSearch col-xs-12" ng-if="connectors && connectors.length>0">
+					<label class="disabled visible-xs">Available</label>			
+					<div class="btn-group">
+						<label class="btn btn-default disabled hidden-xs">Available</label>		
+						<label class="btn btn-default" uib-btn-radio="null" ng-model="store.identifier" ng-change="productListCtrl.updateSearch(true)">
+							Any
+						</label>
+						<label ng-repeat="connector in connectors | filter:{supportsPrices: true}" class="btn btn-default" uib-btn-radio="connector.identifier" ng-model="store.identifier" ng-change="productListCtrl.updateSearch(true)">
+							<span class="hidden-xs">{{connector.identifier}}</span>
+							<span class="visible-xs">{{connector.identifier | limitTo:10}}...</span>
+						</label>
+								
+					</div>
+				</div>
+		</div>	
+		<div class="row">		
+			<div class="form-group optionsSearch col-lg-4 col-md-4 col-sm-12 col-xs-12">			
+					<select class="form-control"	
+					selectpicker	
+					ng-model="ownedBy"
+					data-collection-attribute="id"
+					data-collection-name="users"			 
+					ng-options="user.id as (user.id == '' ? 'Owned: Any' : 'Owned by ' + user.contactName) for user in users" 
+					ng-change="productListCtrl.updateSearch(true)">			
+					</select>
+			
+			</div>	
+			<div class="form-group optionsSearch col-lg-4 col-md-4 col-sm-12 col-xs-12">			
+					<select class="form-control"	
+					selectpicker	
+					ng-model="wishedBy"
+					data-collection-attribute="id"
+					data-collection-name="users"			 
+					ng-options="user.id as (user.id == '' ? 'Wishlist: Any' : 'In wishlist for ' + user.contactName) for user in users" 
+					ng-change="productListCtrl.updateSearch(true)">			
+				</select>		
+			</div>			
+		</div>
+	</div>	
+	<div class="sorts cssFade" ng-hide="isCollapsedSort">
+		<div class="row">
 	
-		<div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-			<div class="form-group optionsSearch btn-group ">			
-				<label class="btn btn-default disabled" >Sort by</label>
-		        <label class="btn btn-default" ng-model="sortBy" uib-btn-radio="'name'" ng-change="productListCtrl.updateSearch(true)">Name</label>
-		        <label class="btn btn-default" ng-model="sortBy" uib-btn-radio="'price'" ng-change="productListCtrl.updateSearch(true)">Price</label>	        	       
-		        <label class="btn btn-default" ng-model="sortBy" uib-btn-radio="'rating'" ng-change="productListCtrl.updateSearch(true)">Rating</label>
+			<div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+				<div class="form-group optionsSearch btn-group ">			
+					<label class="btn btn-default disabled" >Sort by</label>
+			        <label class="btn btn-default" ng-model="sortBy" uib-btn-radio="'name'" ng-change="productListCtrl.updateSearch(true)">Name</label>
+			        <label class="btn btn-default" ng-model="sortBy" uib-btn-radio="'price'" ng-change="productListCtrl.updateSearch(true)">Price</label>	        	       
+			        <label class="btn btn-default" ng-model="sortBy" uib-btn-radio="'rating'" ng-change="productListCtrl.updateSearch(true)">Rating</label>
+			    </div>
+			    <div class="form-group optionsSearch btn-group">	    	
+			    	<label class="btn btn-default disabled" >Sort order</label>
+			        <label class="btn btn-default" ng-model="sortOrder" uib-btn-radio="'asc'" ng-change="productListCtrl.updateSearch(true)">Ascendent</label>
+			        <label class="btn btn-default" ng-model="sortOrder" uib-btn-radio="'desc'" ng-change="productListCtrl.updateSearch(true)">Descendent</label>
+			        
+			    </div>
 		    </div>
-		    <div class="form-group optionsSearch btn-group">	    	
-		    	<label class="btn btn-default disabled" >Sort order</label>
-		        <label class="btn btn-default" ng-model="sortOrder" uib-btn-radio="'asc'" ng-change="productListCtrl.updateSearch(true)">Ascendent</label>
-		        <label class="btn btn-default" ng-model="sortOrder" uib-btn-radio="'desc'" ng-change="productListCtrl.updateSearch(true)">Descendent</label>
-		        
-		    </div>
-	    </div>
+		</div>
 	</div>
 </form>
 
