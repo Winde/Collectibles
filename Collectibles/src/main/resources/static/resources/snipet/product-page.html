@@ -218,7 +218,7 @@
 		<div class="col-md-4 col-sm-6 col-xs-12" ng-if="product.externalLinks" ng-repeat="(key, value) in product.externalLinks">
 			<a 	class="btn btn-block btn-lg" ng-href="{{value}}" 
 				ng-class="{
-					'btn-amazon': key == 'Amazon',
+					'btn-amazon': key == 'Amazon' || key == 'Amazon US' || key == 'Amazon ES',
 					'btn-yelp': key == 'DrivethruRPG',
 					'btn-intensedebate': key == 'BoardGameGeek',						
 					'btn-android': key == 'GoodreadsSeries' || key == 'Goodreads',							
