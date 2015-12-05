@@ -262,7 +262,10 @@
 		$scope.$on('$locationChangeSuccess', function() {
 			controller.setSearchParameters();
 			controller.search();
-		}); 
+		});
+		
+		$scope.$on('login', function() { controller.search();});
+		$scope.$on('logout', function() { controller.search();});
 		
 		if ($scope.root == undefined || $scope.root == null){
 			Hierarchy.root()

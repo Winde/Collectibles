@@ -1,7 +1,7 @@
 (function(){
 
 	angular.module('login')	
-	.factory('Auth', function HierarchyFactory(Domain,Message,$injector,$location){	
+	.factory('Auth', function HierarchyFactory(Domain,Message,$injector,$location, $rootScope){	
 		var factory = this;
 		
 		this.headerWithSessionRequest = "X-AUTH-TOKEN";
@@ -119,6 +119,7 @@
 						if (data!=null && data!=undefined){
 							factory.setRoles(JSON.stringify(data));
 						}						
+						$rootScope.$broadcast('login');
 						callbackSuccess();
 						//$location.path("/products/").replace();						
 					})
@@ -139,7 +140,8 @@
 				});
 				
 			},
-			logout: function(){								
+			logout: function(){			
+				$rootScope.$broadcast('logout');
 				factory.removeStoredSession();
 				factory.removeRoles();
 			},
