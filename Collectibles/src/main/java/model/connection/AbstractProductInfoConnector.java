@@ -9,11 +9,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import model.currencyconverter.CurrencyConverterService;
 import model.dataobjects.Author;
 import model.dataobjects.Image;
 import model.dataobjects.Price;
@@ -46,7 +46,10 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	@Autowired
 	private AuthorRepository authorRepository;
 	
-
+	@Autowired
+	private CurrencyConverterService currencyConverter;
+	
+	
 	@Override	
 	public boolean updateTransitionalTransaction(Long productId) throws TooFastConnectionException{
 		AbstractProductInfoConnector connector = this;		
@@ -332,6 +335,13 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 				Price price = null;			
 				while (iterator.hasNext()){
 					price  = iterator.next();
+					Long usdPrice = null;
+					if (!"USD".equals(price.getCurrency())){
+						usdPrice = currencyConverter.convert(price.getCurrency(), "USD", price.getPrice());
+					} else {
+						usdPrice = price.getPrice();
+					}
+					price.setUsdPrice(usdPrice);
 					price.setProduct(product);
 					product.addPrice(price);
 					updated = true;

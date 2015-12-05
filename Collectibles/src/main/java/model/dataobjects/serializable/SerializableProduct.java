@@ -15,12 +15,12 @@ import model.dataobjects.Author;
 import model.dataobjects.Author.AuthorView;
 import model.dataobjects.CategoryValue;
 import model.dataobjects.HierarchyNode;
-import model.dataobjects.Price;
-import model.dataobjects.Rating;
 import model.dataobjects.HierarchyNode.HierarchySimpleView;
 import model.dataobjects.Image;
 import model.dataobjects.Image.ImageSimpleView;
+import model.dataobjects.Price;
 import model.dataobjects.Product;
+import model.dataobjects.Rating;
 import model.dataobjects.SimpleIdDao.SimpleIdDaoView;
 import model.dataobjects.User;
 import model.dataobjects.supporting.ObjectList.ObjectListView;
@@ -115,6 +115,9 @@ public class SerializableProduct {
 	
 	@JsonView(ProductSimpleView.class)
 	private String minPriceCurrency = null;
+	
+	@JsonView(ProductSimpleView.class)
+	private Long minPriceUsd = null;
 	
 	@JsonIgnore
 	private User user;
@@ -419,7 +422,13 @@ public class SerializableProduct {
 	public void setMinPriceCurrency(String minPriceCurrency) {
 		this.minPriceCurrency = minPriceCurrency;
 	}
+
+	public Long getMinPriceUsd() {
+		return minPriceUsd;
+	}
+
+	public void setMinPriceUsd(Long minPriceUsd) {
+		this.minPriceUsd = minPriceUsd;
+	}
 		
-	
-	
 }

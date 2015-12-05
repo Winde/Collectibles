@@ -1,5 +1,7 @@
 package main;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.cache.guava.GuavaCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -37,6 +40,7 @@ import configuration.security.jwt.TokenAuthenticationService;
 	"web.controllers",
 	"configuration",
 	"model.authentication",
+	"model.currencyconverter",
 	"model.connection",
 	"model.dataobjects.events",
 	"model.persistence.queues",
@@ -70,15 +74,28 @@ public class CollectiblesApplication {
         SpringApplication.run(CollectiblesApplication.class, args);
     }
     
-    @Bean
+	@Primary
+    @Bean(name={"cacheManager"})    
     public CacheManager getCacheManager() {
     	GuavaCacheManager cacheManager = new GuavaCacheManager();
         cacheManager.setCacheBuilder(
             CacheBuilder.
-            newBuilder().            
+            newBuilder().                 
             maximumSize(200));
         return cacheManager;           
     }
+    
+    @Bean(name={"currencyRateCacheManager"})
+    public CacheManager getCurrencyRateCache() {
+    	GuavaCacheManager cacheManager = new GuavaCacheManager();
+        cacheManager.setCacheBuilder(
+            CacheBuilder.
+            newBuilder().     
+            expireAfterWrite(1, TimeUnit.DAYS).
+            maximumSize(200));
+        return cacheManager;           
+    }
+    
     
     @Bean
     public View jsonTemplate() {

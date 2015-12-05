@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class SerializableHierarchyNodeService {
 
 	
-	@Cacheable(value="root", key="'serializedRoot'")
+	@Cacheable(value="root", key="'serializedRoot'", cacheManager="cacheManager")
 	public SerializableHierarchyNode getRoot(HierarchyRepository hierarchyRepository, ProductInfoConnectorFactory connectorFactory) {
 		HierarchyNode hierarchyNode = hierarchyRepository.findRoot();
 		if (hierarchyNode==null) {

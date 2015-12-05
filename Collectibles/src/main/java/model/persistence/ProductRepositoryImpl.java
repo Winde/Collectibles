@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.SortedSet;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import model.dataobjects.HierarchyNode;
@@ -231,9 +230,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			if (search.getSortBy().toLowerCase().equals("name")){
 				hql = hql + " ORDER BY p.name";
 			} else if (search.getSortBy().toLowerCase().equals("price") && search.getStore()==null && search.getSeller()==null){
-				hql = hql + " ORDER BY p.minPrice";
+				hql = hql + " ORDER BY p.minPriceUsd";
 			} else if (search.getSortBy().toLowerCase().equals("price")){
-				hql = hql + " ORDER BY prices.price";	
+				hql = hql + " ORDER BY prices.usdPrice";	
 			} else if (search.getSortBy().toLowerCase().equals("rating")){
 				hql = hql + " ORDER BY p.mainRating";			
 			} else {
@@ -325,6 +324,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 								(currentMinPrice == null || (price.getPrice()!=null && price.getPrice()<currentMinPrice))
 							){
 							product.setMinPrice(price.getPrice());
+							product.setMinPriceUsd(price.getUsdPrice());
 							product.setMinPriceCurrency(price.getCurrency());
 							product.setMinPriceLink(price.getLink());
 							product.setMinPriceSeller(price.getSeller());		
@@ -334,6 +334,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 					}
 					if (!found){
 						product.setMinPrice(null);
+						product.setMinPriceUsd(null);
 						product.setMinPriceCurrency(null);
 						product.setMinPriceLink(null);
 						product.setMinPriceSeller(null);

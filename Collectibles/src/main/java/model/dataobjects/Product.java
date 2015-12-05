@@ -3,11 +3,9 @@ package model.dataobjects;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -28,18 +26,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
-import javax.persistence.PrePersist;
-import javax.persistence.Transient;
 
-import model.connection.ProductInfoConnector;
-import model.connection.ProductInfoConnectorFactory;
-import model.connection.TooFastConnectionException;
 import model.dataobjects.events.ProductSaveListener;
 
 import org.hibernate.annotations.BatchSize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -127,6 +119,9 @@ public class Product extends SimpleIdDao{
 	@Column(name="min_price")
 	private Long minPrice = null;	
 
+	@Column(name="min_price_usd")
+	private Long minPriceUsd = null;	
+	
 	@Column(name="min_price_link")
 	private String minPriceLink = null;
 	
@@ -389,6 +384,7 @@ public class Product extends SimpleIdDao{
 		if (prices!=null && prices.size()>0){			
 			newMinPrice = prices.first();
 			this.minPrice = newMinPrice.getPrice();
+			this.minPriceUsd = newMinPrice.getUsdPrice();
 			this.minPriceLink = newMinPrice.getLink();
 			this.minPriceSeller = newMinPrice.getSeller();
 			this.setMinPriceCurrency(newMinPrice.getCurrency());
@@ -398,6 +394,7 @@ public class Product extends SimpleIdDao{
 			this.minPriceLink = null;
 			this.minPriceSeller = null;
 			this.minPriceCurrency = null;
+			this.minPriceUsd = null;
 		}
 	}
 	
@@ -473,6 +470,14 @@ public class Product extends SimpleIdDao{
 
 	public void setMinPriceCurrency(String minPriceCurrency) {
 		this.minPriceCurrency = minPriceCurrency;
+	}
+
+	public Long getMinPriceUsd() {
+		return minPriceUsd;
+	}
+
+	public void setMinPriceUsd(Long minPriceUsd) {
+		this.minPriceUsd = minPriceUsd;
 	}
 
 	

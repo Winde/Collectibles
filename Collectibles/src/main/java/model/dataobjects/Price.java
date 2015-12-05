@@ -2,11 +2,8 @@ package model.dataobjects;
 
 import java.io.Serializable;
 
-import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
@@ -51,6 +48,9 @@ public class Price implements Serializable, Comparable<Price>{
 	
 	@Column(name="currency")
 	private String currency;
+	
+	@Column(name="usd_price")
+	private Long usdPrice;
 	
 	public String getConnectorName() {
 		return connectorName;
@@ -108,6 +108,14 @@ public class Price implements Serializable, Comparable<Price>{
 		this.currency = currency;
 	}
 
+	public Long getUsdPrice() {
+		return usdPrice;
+	}
+
+	public void setUsdPrice(Long usdPrice) {
+		this.usdPrice = usdPrice;
+	}
+
 	@Override
 	public int hashCode(){
 		Integer hash = null;
@@ -134,10 +142,12 @@ public class Price implements Serializable, Comparable<Price>{
 
 	@Override
 	public int compareTo(Price o) {
-		if (this.getPrice()==null || o.getPrice()==null){
+		if (this.getUsdPrice()==null){
+			return 1;
+		}else if (o.getUsdPrice()==null){
 			return -1;
 		} else {
-			int comparison = this.getPrice().compareTo(o.getPrice());
+			int comparison = this.getUsdPrice().compareTo(o.getUsdPrice());
 			if (comparison ==0){
 				if (this.equals(o)){
 					return 0;
@@ -152,6 +162,6 @@ public class Price implements Serializable, Comparable<Price>{
 	
 	
 	public String toString(){
-		return "{" + this.getProduct() + "; " + this.getConnectorName() + " - " + this.getType() + "; " + this.getPrice() + " ("+this.getSeller() +") }";
+		return "{" + this.getProduct() + "; " + this.getConnectorName() + " - " + this.getType() + "; " + this.getPrice() + " " + this.getCurrency() +" ("+this.getSeller() +") }";
 	}
 }

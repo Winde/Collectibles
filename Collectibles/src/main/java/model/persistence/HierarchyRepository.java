@@ -2,7 +2,6 @@ package model.persistence;
 
 import java.util.List;
 
-import model.dataobjects.Category;
 import model.dataobjects.HierarchyNode;
 
 import org.springframework.cache.annotation.CacheEvict;
@@ -18,7 +17,7 @@ public interface HierarchyRepository extends CrudRepository<HierarchyNode,Long>,
 	
 	public HierarchyNode findOne(Long id);
 	
-	@Cacheable(value="root")
+	@Cacheable(value="root", cacheManager="cacheManager")
 	@Query("select h from HierarchyNode h where h.father IS NULL")
 	public HierarchyNode findRoot();
 
