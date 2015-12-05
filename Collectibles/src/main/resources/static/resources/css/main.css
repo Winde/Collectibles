@@ -44,6 +44,10 @@
 	padding: 0px
 */}
 
+.noResultsSection {
+	margin-top: 50px;
+}
+
 .productGrid .row{
 	margin: 0px;
 }
