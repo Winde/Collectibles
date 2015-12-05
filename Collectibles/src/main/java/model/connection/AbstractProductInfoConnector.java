@@ -322,20 +322,26 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 	
 	private boolean  updatePrice(Product product, Object doc) throws TooFastConnectionException{
 		boolean updated = false;
-		logger.debug(this.getIdentifier() + " Checking Dollar Price");					
-		Collection<Price> prices = this.getProductInfoLookupService().getPrices(doc);
-		product.removePrice(this.getIdentifier());
-		if (prices!=null){
-			logger.info(this.getIdentifier() + " obtained prices for product "+product+":" + prices);
-			Iterator<Price> iterator = prices.iterator();			
-			Price price = null;			
-			while (iterator.hasNext()){
-				price  = iterator.next();
-				price.setProduct(product);
-				product.addPrice(price);
-				updated = true;
-			}						
-		}		
+		logger.debug(this.getIdentifier() + " Checking Price");
+		if (this.guaranteeUnivocalResponse(product)){								
+			Collection<Price> prices = this.getProductInfoLookupService().getPrices(doc);
+			product.removePrice(this.getIdentifier());
+			if (prices!=null){
+				logger.info(this.getIdentifier() + " obtained prices for product "+product+":" + prices);
+				Iterator<Price> iterator = prices.iterator();			
+				Price price = null;			
+				while (iterator.hasNext()){
+					price  = iterator.next();
+					price.setProduct(product);
+					product.addPrice(price);
+					updated = true;
+				}						
+			}		
+		} else {
+			product.removePrice(this.getIdentifier());
+			updated = true;
+			logger.info(this.getIdentifier() + " Price not checked due to lack of reference " + product);
+		}
 		return updated;
 	}
 	
@@ -417,11 +423,11 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 										
 					updateAuthors(product,doc,authorsAdd);	
 					
-					updatePrice(product,doc);
-					
-					updateRating(product,doc);
-					
 					updateReference(product,doc);
+										
+					updatePrice(product,doc);
+															
+					updateRating(product,doc);				
 															
 					
 				} else {
