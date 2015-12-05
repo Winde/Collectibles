@@ -18,7 +18,7 @@ public class CurrencyAPI {
 	private static final Logger logger = LoggerFactory.getLogger(CurrencyAPI.class);
 	
 	private String generateURL(String currencySource,String currencyTarget){
-		String url = "http://api.fixer.io/latest?base="+currencyTarget+"&symbols="+currencySource;
+		String url = "http://api.fixer.io/latest?base="+currencySource+"&symbols="+currencyTarget;
 		return url;
 	}
 	
@@ -34,7 +34,7 @@ public class CurrencyAPI {
 				ObjectMapper mapper = new ObjectMapper();					
 				JsonNode doc = mapper.readTree(json);
 				if (doc!=null){
-					doc = doc.path("rates").path(currencySource);
+					doc = doc.path("rates").path(currencyTarget);
 					rate = doc.asDouble();
 				}
 			}
