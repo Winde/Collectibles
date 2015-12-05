@@ -216,7 +216,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 
 		if (search.getStore()!=null || search.getSeller()!=null){
 			if (needsAnd){ hql = hql + " AND ";}
-			hql = hql + " (prices.price = (SELECT min(prices.price) from prices where prices.product = p)) ";
+			hql = hql + " (prices.price = (SELECT min(prices.price) from prices where prices.product = p AND prices.connectorName = :store)) ";
 			needsAnd = true;
 		}
 		
@@ -249,10 +249,10 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			} else if ("desc".equals(search.getSortOrder().toLowerCase())){
 				hql = hql + " DESC";
 			} else {
-				hql = hql + " DESC";
+				hql = hql + " ASC";
 			}
 		} else {
-			hql = hql + " DESC";
+			hql = hql + " ASC";
 		}
 			
 		logger.info("Executing HQL: "+ hql);
