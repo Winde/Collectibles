@@ -110,6 +110,7 @@ public class Product extends SimpleIdDao{
 	
 	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.ALL})
 	@OrderBy("price")
+	@BatchSize(size = 50)
 	private SortedSet<Price> prices = null;
 		
 	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.ALL})
@@ -131,7 +132,11 @@ public class Product extends SimpleIdDao{
 	
 	@Column(name="min_price_seller")
 	private String minPriceSeller = null;
-		
+
+	@Column(name="min_price_currency")
+	private String minPriceCurrency = null;
+
+	
 	@Column(name="main_rating")
 	private Double mainRating = null;
 	
@@ -386,11 +391,13 @@ public class Product extends SimpleIdDao{
 			this.minPrice = newMinPrice.getPrice();
 			this.minPriceLink = newMinPrice.getLink();
 			this.minPriceSeller = newMinPrice.getSeller();
-			this.setLastPriceUpdate(new Date());
+			this.setMinPriceCurrency(newMinPrice.getCurrency());
+			this.setLastPriceUpdate(new Date());			
 		} else {
 			this.minPrice = null;
 			this.minPriceLink = null;
 			this.minPriceSeller = null;
+			this.minPriceCurrency = null;
 		}
 	}
 	
@@ -460,5 +467,14 @@ public class Product extends SimpleIdDao{
 		this.minPriceSeller = minPriceSeller;
 	}
 
+	public String getMinPriceCurrency() {
+		return minPriceCurrency;
+	}
+
+	public void setMinPriceCurrency(String minPriceCurrency) {
+		this.minPriceCurrency = minPriceCurrency;
+	}
+
+	
 }
 

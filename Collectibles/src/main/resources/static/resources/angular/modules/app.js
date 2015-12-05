@@ -16,6 +16,7 @@
 	 'ngFileUpload',
 	 'afkl.lazyImage',
 	 'monospaced.elastic',
+	 'isoCurrency',
 	 //'ngCookies',	 
 	 'ui.bootstrap',
 	 'login',

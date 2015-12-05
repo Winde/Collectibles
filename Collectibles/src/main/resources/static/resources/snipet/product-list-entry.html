@@ -18,7 +18,7 @@
 	<div class="priceBlock col-lg-2 col-md-6 col-sm-6 col-xs-6">
 		<h3>
 			<span class="btn-group-vertical btn-block">			
-				<a href="{{product.minPriceLink}}" class="btn btn-success priceButton" ng-if="product.minPrice">{{(product.minPrice/100) | currency}}</a>
+				<a href="{{product.minPriceLink}}" class="btn btn-success priceButton" ng-if="product.minPrice">{{(product.minPrice/100) | isoCurrency: product.minPriceCurrency}}</a>
 				<span class="label label-info" ng-if="!product.minPrice">No price</span>
 				<span class="btn btn-info" ng-if="product.minPriceSeller" ng-click="productListCtrl.updateSeller(product.minPriceSeller) && productListCtrl.updateSearch(true)">{{product.minPriceSeller}}</a>
 			</span>

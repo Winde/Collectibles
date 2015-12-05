@@ -47,20 +47,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-@Service
-public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 
-	private static final Logger logger = LoggerFactory.getLogger(AmazonItemLookupService.class);
+public abstract class AbstractAmazonItemLookupService extends ProductInfoLookupServiceXML{
+
+	private static final Logger logger = LoggerFactory.getLogger(AbstractAmazonItemLookupService.class);
 	private static final String IDENTIFIER = "Amazon";	
 	
-	private String AWS_ACCESS_KEY_ID = null;
-	private String AWS_SECRET_KEY = null;
-	private String PROTOCOL = null;
-	private String ENDPOINT = null;
-	private String ASSOCIATE_TAG = null;
-	private String VERSION = null;
-	private String SERVICE = null;
-
+	
 	private final String externalLinkUrlDocPath = "/ItemLookupResponse/Items/Item/DetailPageURL";
 	private final String descriptionDocPath = "/ItemLookupResponse/Items/Item/EditorialReviews/EditorialReview/Content";
 	private final String imageUrlDocPath = "/ItemLookupResponse/Items/Item/LargeImage/URL";
@@ -71,9 +64,35 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	private final String amazonReferencePath = "/ItemLookupResponse/Items/Item/ASIN";
 	
 	private final int sleepTimeBetwenCheckByNameAndCheckById = 500;
+
+	@Value("${AMAZON.AWS_ACCESS_KEY_ID}")
+	private String AWS_ACCESS_KEY_ID;
 	
+	@Value("${AMAZON.AWS_SECRET_KEY}")
+	private String AWS_SECRET_KEY;
 	
+	@Value("${AMAZON.PROTOCOL}") 
+	private String PROTOCOL;
 	
+	@Value("${AMAZON.ASSOCIATE_TAG}")
+	private String ASSOCIATE_TAG;
+	
+	@Value("${AMAZON.SERVICE_VERSION}") 
+	private String VERSION;
+	
+	@Value("${AMAZON.SERVICE}") 
+	private String SERVICE; 
+	
+	public abstract String getENDPOINT();
+	public String getAWS_ACCESS_KEY_ID() { return AWS_ACCESS_KEY_ID;}
+	public String getAWS_SECRET_KEY() { return AWS_SECRET_KEY;}
+	public String getPROTOCOL(){  return PROTOCOL;}	
+	public String getASSOCIATE_TAG() { return ASSOCIATE_TAG; }
+	public String getVERSION() { return VERSION; } 
+	public String getSERVICE(){ return SERVICE;} 
+
+
+
 	private void sleepDueToAmazonMaxChecksPerMinute(){
 		try {
 			Thread.sleep(sleepTimeBetwenCheckByNameAndCheckById);
@@ -82,24 +101,6 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		}
 	}
 	
-	@Autowired
-	public AmazonItemLookupService(
-			@Value("${AMAZON.AWS_ACCESS_KEY_ID}")String AWS_ACCESS_KEY_ID,
-			@Value("${AMAZON.AWS_SECRET_KEY}")String AWS_SECRET_KEY,
-			@Value("${AMAZON.PROTOCOL}") String PROTOCOL,
-			@Value("${AMAZON.ENDPOINT}") String ENDPOINT,
-			@Value("${AMAZON.ASSOCIATE_TAG}")String ASSOCIATE_TAG,
-			@Value("${AMAZON.SERVICE_VERSION}") String VERSION,
-			@Value("${AMAZON.SERVICE}") String SERVICE ){
-
-		this.AWS_SECRET_KEY = AWS_SECRET_KEY;
-		this.AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID;
-		this.PROTOCOL  = PROTOCOL;
-		this.ENDPOINT = ENDPOINT;
-		this.ASSOCIATE_TAG = ASSOCIATE_TAG;
-		this.VERSION = VERSION;
-		this.SERVICE = SERVICE;
-	}    
 
 	private String getReferenceByName(String name) {
 		String reference = null;
@@ -149,7 +150,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		 */
 		SignedRequestsHelper helper;
 		try {
-			helper = SignedRequestsHelper.getInstance(PROTOCOL,ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY);
+			helper = SignedRequestsHelper.getInstance(this.getPROTOCOL(),this.getENDPOINT(), this.getAWS_ACCESS_KEY_ID(), this.getAWS_SECRET_KEY());
 		} catch (Exception e) {
 			logger.error("Can't create Amazon signer helper", e);
 			return null;
@@ -163,10 +164,10 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		 * Here is an example in map form, where the request parameters are stored in a map.
 		 */        
 		Map<String, String> webParams = new HashMap<String, String>();
-		webParams.put("Service", SERVICE);
-		webParams.put("Version", VERSION);
+		webParams.put("Service", this.getSERVICE());
+		webParams.put("Version", this.getVERSION());
 		webParams.put("Operation", operation);		
-		webParams.put("AssociateTag", ASSOCIATE_TAG);
+		webParams.put("AssociateTag", this.getASSOCIATE_TAG());
 
 		for (Entry<String, String> param: params.entrySet()){
 			webParams.put(param.getKey(), param.getValue());
@@ -278,6 +279,16 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 		}
 		return name;
 	}
+	
+	
+	private String getCurrency(Node conditionNode){
+		String currency = null;
+		if (conditionNode!=null){
+			Node offerNode = conditionNode.getParentNode().getParentNode();
+			currency = super.getField(offerNode, "OfferListing/Price/CurrencyCode");
+		}
+		return currency;
+	}
 
 	@Override
 	public Collection<Price> getPrices(Node node) throws TooFastConnectionException {
@@ -312,6 +323,7 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 							Node currentMerchant = merchantNodesCondition.item(i);
 							if (entry.getKey().equals(currentMerchant.getTextContent())){
 								priceObject.setSeller(getMerchant(currentMerchant));
+								priceObject.setCurrency(getCurrency(currentMerchant));
 								break;
 							}
 						}
@@ -326,9 +338,8 @@ public class AmazonItemLookupService extends ProductInfoLookupServiceXML{
 	}
 
 
-	public String getIdentifier(){
-		return IDENTIFIER;
-	}
+	public abstract String getIdentifier();
+	
 
 	@Override
 	public Rating getRating(Node node) throws TooFastConnectionException {

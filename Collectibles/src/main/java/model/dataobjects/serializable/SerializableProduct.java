@@ -113,6 +113,9 @@ public class SerializableProduct {
 	@JsonView(ProductSimpleView.class)
 	private Date lastPriceUpdate = null;
 	
+	@JsonView(ProductSimpleView.class)
+	private String minPriceCurrency = null;
+	
 	@JsonIgnore
 	private User user;
 
@@ -407,6 +410,14 @@ public class SerializableProduct {
 
 	public void setMinPriceSeller(String minPriceSeller) {
 		this.minPriceSeller = minPriceSeller;
+	}
+
+	public String getMinPriceCurrency() {
+		return minPriceCurrency;
+	}
+
+	public void setMinPriceCurrency(String minPriceCurrency) {
+		this.minPriceCurrency = minPriceCurrency;
 	}
 		
 	

@@ -12,16 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AmazonConnector extends AbstractProductInfoConnector {
+public abstract class AbstractAmazonConnector extends AbstractProductInfoConnector {
 
 	private static final int SLEEP_BETWEEN_CALLS = 1400;
 	
-	@Autowired
-	private AmazonItemLookupService itemLookup;
 	
-	public ProductInfoLookupService getProductInfoLookupService(){
-		return itemLookup;
-	}
+	public abstract ProductInfoLookupService getProductInfoLookupService();
 
 	public String toString(){
 		return "AmazonConnector";
@@ -29,7 +25,7 @@ public class AmazonConnector extends AbstractProductInfoConnector {
 
 	@Override
 	public boolean isApplicable(Product product) {
-		String reference = itemLookup.getReferenceFromProduct(product);
+		String reference = this.getProductInfoLookupService().getReferenceFromProduct(product);
 		String name = product.getName();			
 		return ((name!=null && !"".equals(name.trim())) || (reference!=null && !"".equals(reference.trim())));	
 	}

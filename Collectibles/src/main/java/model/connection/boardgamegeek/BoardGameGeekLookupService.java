@@ -4,24 +4,18 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import model.connection.ProductInfoLookupServiceXML;
 import model.connection.TooFastConnectionException;
-import model.connection.amazon.AmazonItemLookupService;
 import model.dataobjects.Author;
 import model.dataobjects.Price;
 import model.dataobjects.Product;
 import model.dataobjects.Rating;
 
-import org.apache.commons.lang.StringUtils;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

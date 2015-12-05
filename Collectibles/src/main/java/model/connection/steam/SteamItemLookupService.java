@@ -229,6 +229,7 @@ public class SteamItemLookupService extends AbstractProductInfoLookupService<Jso
 			priceObject.setConnectorName(this.getIdentifier());
 			priceObject.setLink(this.getExternalUrlLink(doc));
 			priceObject.setPrice(price);
+			priceObject.setCurrency("USD");
 			priceObject.setType("");
 			result.add(priceObject);
 		}

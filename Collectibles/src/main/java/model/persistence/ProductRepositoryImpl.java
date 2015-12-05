@@ -3,12 +3,15 @@ package model.persistence;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import model.dataobjects.HierarchyNode;
 import model.dataobjects.Image;
+import model.dataobjects.Price;
 import model.dataobjects.Product;
 import model.dataobjects.User;
 import model.dataobjects.supporting.ObjectList;
@@ -100,7 +103,26 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		}
 		String hql = "";
 		
-		hql = hql + "select distinct p from Product p LEFT JOIN p.images LEFT JOIN p.owners owners LEFT JOIN p.ownersOtherLanguage ownersOtherLanguage LEFT JOIN p.wishers wishers";
+		hql = hql + "select distinct p from Product p LEFT JOIN p.images ";
+		if ((search.getUsersWhoOwn()!=null && search.getUsersWhoOwn().size()>0) || (search.getUsersWhoDontOwn()!=null && search.getUsersWhoDontOwn().size()>0)){			
+			hql = hql + " LEFT JOIN p.owners owners ";				
+			hql = hql + " LEFT JOIN p.ownersOtherLanguage ownersOtherLanguage ";
+		}
+		if (search.getWishers()!=null && search.getWishers().size()>0){	
+			hql = hql + " LEFT JOIN p.wishers wishers ";		
+		}
+		if (search.getStore()!=null || search.getSeller()!=null){
+			hql = hql + " LEFT JOIN p.prices prices with ";
+			if (search.getStore()!=null){
+				hql = hql + " prices.connectorName = :store ";
+			}
+			if (search.getStore()!=null && search.getSeller()!=null){
+				hql = hql + " AND ";
+			}
+			if (search.getSeller()!=null){
+				hql = hql + " prices.seller = :seller ";
+			}
+		}
 		//hql = hql + "select p from Product p LEFT JOIN FETCH p.images LEFT JOIN FETCH p.owners owners";
 		
 		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
@@ -177,7 +199,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		
 		if (search.getStore()!=null){
 			if (needsAnd){ hql = hql + " AND ";}
-			hql = hql + " ( :store in (SELECT price.connectorName from Price price WHERE price.product = p) )  ";
+			hql = hql + " ( :store in (SELECT price.connectorName from Price price WHERE price.product = p) ) ";
 			needsAnd = true;
 		}
 		if (search.getSeller()!=null){
@@ -185,16 +207,33 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			hql = hql + " ( :seller in (SELECT price.seller from Price price WHERE price.product = p) )  ";
 			needsAnd = true;
 		}
+		
+		if (search.getStore()!=null || search.getSeller()!=null){
+			if (needsAnd){ hql = hql + " AND ";}
+			hql = hql + " prices.price IS NOT NULL  ";
+			needsAnd = true;
+		}
 
+		if (search.getStore()!=null || search.getSeller()!=null){
+			if (needsAnd){ hql = hql + " AND ";}
+			hql = hql + " (prices.price = (SELECT min(prices.price) from prices where prices.product = p)) ";
+			needsAnd = true;
+		}
+		
 		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
 			hql = hql + "GROUP BY p having count(categoryValues)=:sizeCategoryValues "; 			
 		}
 		
+		
+		
+		
 		if (search.getSortBy()!=null){
 			if (search.getSortBy().toLowerCase().equals("name")){
 				hql = hql + " ORDER BY p.name";
-			} else if (search.getSortBy().toLowerCase().equals("price")){
+			} else if (search.getSortBy().toLowerCase().equals("price") && search.getStore()==null && search.getSeller()==null){
 				hql = hql + " ORDER BY p.minPrice";
+			} else if (search.getSortBy().toLowerCase().equals("price")){
+				hql = hql + " ORDER BY prices.price";	
 			} else if (search.getSortBy().toLowerCase().equals("rating")){
 				hql = hql + " ORDER BY p.mainRating";			
 			} else {
@@ -272,7 +311,35 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 				
 		if (listFromDB!=null){
 			
-			
+			if (search.getStore()!=null || search.getSeller()!=null){
+				for (Product product : listFromDB){
+					SortedSet<Price> prices = product.getPrices();
+					boolean found = false;
+					Long currentMinPrice = null;
+					for (Price price : prices){
+						if (
+								(search.getStore()==null || search.getStore().equals(price.getConnectorName()))
+								&&
+								(search.getSeller()==null || search.getSeller().equals(price.getSeller()))
+								&&
+								(currentMinPrice == null || (price.getPrice()!=null && price.getPrice()<currentMinPrice))
+							){
+							product.setMinPrice(price.getPrice());
+							product.setMinPriceCurrency(price.getCurrency());
+							product.setMinPriceLink(price.getLink());
+							product.setMinPriceSeller(price.getSeller());		
+							currentMinPrice = price.getPrice();
+							found = true;
+						}
+					}
+					if (!found){
+						product.setMinPrice(null);
+						product.setMinPriceCurrency(null);
+						product.setMinPriceLink(null);
+						product.setMinPriceSeller(null);
+					}
+				}
+			}
 			
 			if (search.getMaxResults() !=null & search.getPage()!=null && (listFromDB.size() == search.getMaxResults()+1)){
 				listFromDB.remove(listFromDB.size()-1);

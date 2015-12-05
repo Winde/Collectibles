@@ -1,4 +1,4 @@
-package model.connection.amazon;
+package model.connection.amazon.es;
 
 import model.connection.ContinuousScrapper;
 import model.persistence.queues.RedisConnection;
@@ -13,13 +13,13 @@ import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
 @Component
-public class ContinuousScrapperAmazon{
+public class ContinuousScrapperAmazonES{
 
-	private static final Logger logger = LoggerFactory.getLogger(ContinuousScrapperAmazon.class);	
+	private static final Logger logger = LoggerFactory.getLogger(ContinuousScrapperAmazonES.class);	
 	
 	
 	@Autowired
-	private AmazonConnector connector;
+	private AmazonESConnector connector;
 	
 	@Autowired
 	private ContinuousScrapper scrapper;

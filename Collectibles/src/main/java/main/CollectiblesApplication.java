@@ -1,38 +1,23 @@
 package main;
 
-import java.util.concurrent.ScheduledExecutorService;
-
-import javax.persistence.PersistenceContextType;
-import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
-
-import model.connection.ContinuousScrapper;
-import model.connection.amazon.AmazonConnector;
-import model.connection.goodreads.GoodReadsConnector;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.orm.jpa.EntityScan;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.concurrent.ConcurrentMapCache;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
-import org.springframework.cache.guava.GuavaCache;
 import org.springframework.cache.guava.GuavaCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.View;
@@ -42,7 +27,6 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import com.google.common.cache.CacheBuilder;
 
-import configuration.security.jwt.JwtAuthenticationOnSuccess;
 import configuration.security.jwt.TokenAuthenticationService;
 
 

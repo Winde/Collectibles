@@ -49,6 +49,9 @@ public class Price implements Serializable, Comparable<Price>{
 	@Column(name="seller")
 	private String seller;
 	
+	@Column(name="currency")
+	private String currency;
+	
 	public String getConnectorName() {
 		return connectorName;
 	}
@@ -95,6 +98,14 @@ public class Price implements Serializable, Comparable<Price>{
 
 	public void setSeller(String seller) {
 		this.seller = seller;
+	}
+
+	public String getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(String currency) {
+		this.currency = currency;
 	}
 
 	@Override

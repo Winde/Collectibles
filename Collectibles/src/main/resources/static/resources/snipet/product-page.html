@@ -148,13 +148,13 @@
 								<div class="row priceEntry" ng-repeat="priceObject in product.prices" >									
 									<div class="btn-group col-lg-8 col-sm-12 hidden-xs">
 										<a class="col-sm-6 btn btn-success" ng-class="{ disabled : !priceObject.link }" href="{{priceObject.link}}">
-											<span>{{(priceObject.price/100) | currency}}</span> <span ng-if="priceObject.connectorName">{{priceObject.connectorName}} {{priceObject.type}}</span>																												
+											<span>{{(priceObject.price/100) | isoCurrency : priceObject.currency}}</span> <span ng-if="priceObject.connectorName">{{priceObject.connectorName}} {{priceObject.type}}</span>																												
 										</a>
 										<a class="col-sm-6 btn btn-info" ng-if="priceObject.seller" ng-href="#/products/?store={{priceObject.connectorName}}&seller={{priceObject.seller}}">{{priceObject.seller}}</a>
 									</div>
 									<div class="btn-group-vertical visible-xs col-xs-12">
 										<a class="btn btn-success" ng-class="{ disabled : !priceObject.link }" href="{{priceObject.link}}">
-											<span>{{(priceObject.price/100) | currency}}</span> <span ng-if="priceObject.connectorName">{{priceObject.connectorName}} {{priceObject.type}}</span>																												
+											<span>{{(priceObject.price/100) | isoCurrency : priceObject.currency}}</span> <span ng-if="priceObject.connectorName">{{priceObject.connectorName}} {{priceObject.type}}</span>																												
 										</a>
 										<a class="btn btn-info" ng-if="priceObject.seller"  ng-href="#/products/?store={{priceObject.connectorName}}&seller={{priceObject.seller}}">{{priceObject.seller}}</a>
 									</div>									

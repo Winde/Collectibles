@@ -134,7 +134,7 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 	
 	@Override
 	public DrivethrurpgData fetchDocFromProduct(Product product) throws TooFastConnectionException {
-		DrivethrurpgData data = new DrivethrurpgData();
+		DrivethrurpgData data = new DrivethrurpgData();		
 		String link = null;
 		if (product.getExternalLinks()!=null){
 			link = product.getExternalLinks().get(this.getIdentifier());
@@ -237,6 +237,7 @@ public class DrivethrurpgItemLookupService extends AbstractProductInfoLookupServ
 		price.setLink(link);
 		price.setPrice(priceAmount);
 		price.setType(key);
+		price.setCurrency("USD");
 		return price;
 	}
 	

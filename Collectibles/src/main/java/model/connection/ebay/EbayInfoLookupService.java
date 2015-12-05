@@ -254,6 +254,7 @@ public class EbayInfoLookupService extends ProductInfoLookupServiceXML {
 			Price priceObject = new Price();
 			priceObject.setConnectorName(this.getIdentifier());
 			priceObject.setLink(link);
+			priceObject.setCurrency("USD");
 			priceObject.setPrice(price);
 			priceObject.setType("");
 			priceObject.setSeller(sellerString);
