@@ -1,12 +1,12 @@
 <div class="row productListEntry">
 	<div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
-		<a class="btn btn-default btn-block product-name-btn" ng-href="#/product/{{product.id}}"><span>{{product.name}}</span></a>
+		<a class="btn btn-default btn-block product-name-btn" ng-href="product/{{product.id}}"><span>{{product.name}}</span></a>
 	</div>			
 	
 	<div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
 		<div class="imageContainer">
 			<div class="">		
-				<a ng-if="product.selectedImage.id" ng-href="#/product/{{product.id}}">
+				<a ng-if="product.selectedImage.id" ng-href="product/{{product.id}}">
 					<div	afkl-lazy-image="{{domain}}/image/thumb/{{product.selectedImage.id}}"
 							class="afkl-img-ratio-1-1"
 							afkl-lazy-image-options="{'className': 'img-responsive'}"></div>
@@ -20,7 +20,7 @@
 			<span class="btn-group-vertical btn-block">			
 				<a href="{{product.minPriceLink}}" class="btn btn-success priceButton" ng-if="product.minPrice">{{(product.minPrice/100) | isoCurrency: product.minPriceCurrency}}</a>
 				<span class="label label-info" ng-if="!product.minPrice">No price</span>
-				<span class="btn btn-info" ng-if="product.minPriceSeller" ng-click="productListCtrl.updateSeller(product.minPriceSeller) && productListCtrl.updateSearch(true)">{{product.minPriceSeller}}</a>
+				<span class="btn btn-info" ng-if="product.minPriceSeller" ng-click="productListCtrl.updateSeller(product.minPriceSeller,product.minPriceStore) && productListCtrl.updateSearch(true)">{{product.minPriceSeller}}</a>
 			</span>
 		</h3>
 		

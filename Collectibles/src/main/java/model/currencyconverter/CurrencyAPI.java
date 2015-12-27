@@ -22,7 +22,7 @@ public class CurrencyAPI {
 		return url;
 	}
 	
-	@Cacheable(value="currencyRate", cacheManager="currencyRateCacheManager")
+	@Cacheable(value="currencyRate", cacheManager="currencyRateCacheManager", unless="#result == null")
 	public Double getRate(String currencySource,String currencyTarget){
 		logger.info("CALLING CURRENCY API: " + currencySource + " TO " + currencyTarget);
 		String url = this.generateURL(currencySource, currencyTarget);

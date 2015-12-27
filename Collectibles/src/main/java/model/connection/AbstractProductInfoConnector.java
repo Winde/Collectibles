@@ -329,8 +329,7 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 		if (this.guaranteeUnivocalResponse(product)){								
 			Collection<Price> prices = this.getProductInfoLookupService().getPrices(doc);
 			product.removePrice(this.getIdentifier());
-			if (prices!=null){
-				logger.info(this.getIdentifier() + " obtained prices for product "+product+":" + prices);
+			if (prices!=null){				
 				Iterator<Price> iterator = prices.iterator();			
 				Price price = null;			
 				while (iterator.hasNext()){
@@ -345,7 +344,8 @@ public abstract class AbstractProductInfoConnector implements ProductInfoConnect
 					price.setProduct(product);
 					product.addPrice(price);
 					updated = true;
-				}						
+				}				
+				logger.info(this.getIdentifier() + " obtained prices for product "+product+":" + prices);
 			}		
 		} else {
 			product.removePrice(this.getIdentifier());

@@ -2,7 +2,7 @@
 <html ng-app="collections">
 	<head>
 		<title>Collectibles</title>
-		
+		<base href="/app/">
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="mobile-web-app-capable" content="yes" />
 		
@@ -119,9 +119,9 @@
 						<div id="navbar" class="collapse navbar-collapse" uib-collapse="isCollapsed">
 							<ul class="nav navbar-nav">							
 								<li ng-show="!isAuthenticated()" ng-class="{ active: isActive('/login/')}"><a href="" ng-click="openLogin() || (isCollapsed = true)">Login</a></li>
-								<li ng-class="{ active: isActive('/products/')}"><a href="#/products/" ng-click="isCollapsed = true">Products</a></li>																											
-								<li ng-show="isAdmin()" ng-class="{ active: isActive('/products/create/')}"><a href="#/products/create/" ng-click="isCollapsed = true">Add Products</a></li>
-								<li ng-show="isAdmin()" ng-class="{ active: isActive('/hierarchy/create/')}"><a href="#/hierarchy/create/"ng-click="isCollapsed = true">Manage Hierarchies</a></li>
+								<li ng-class="{ active: isActive('/products/')}"><a ng-href="products/" ng-click="isCollapsed = true">Products</a></li>																											
+								<li ng-show="isAdmin()" ng-class="{ active: isActive('/products/create/')}"><a ng-href="products/create/" ng-click="isCollapsed = true">Add Products</a></li>
+								<li ng-show="isAdmin()" ng-class="{ active: isActive('/hierarchy/create/')}"><a ng-href="hierarchy/create/"ng-click="isCollapsed = true">Manage Hierarchies</a></li>
 								<li ng-show="isAuthenticated()" ng-class="{ active: isActive('/logout/')}"><a href="" ng-click="logout() || (isCollapsed = true)" ng-click="isCollapsed = true">Logout</a></li>
 							</ul>
 						</div>

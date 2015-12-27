@@ -39,8 +39,8 @@
 	
 	<span class="btn btn-default" ng-if="isAdmin() && products && products.length && products.length>0" ng-click="productListCtrl.updatePriceSearch()" >Update</span>
 	<div class="row">
-		<h4 class="col-md-1 col-xs-3"><span class="btn btn-primary" ng-class="{active: !isCollapsedFilter}" ng-click="isCollapsedFilter = !isCollapsedFilter">Filter</span></h4>
-		<h4 class="col-md-1 col-xs-3"><span class="btn btn-primary" ng-class="{active: !isCollapsedSort}" ng-click="isCollapsedSort = !isCollapsedSort">Sort</span></h4>
+		<h4 class="col-md-2 col-xs-6"><span class="btn btn-primary btn-block" ng-class="{active: !isCollapsedFilter}" ng-click="isCollapsedFilter = !isCollapsedFilter">Filter</span></h4>
+		<h4 class="col-md-2 col-xs-6"><span class="btn btn-primary btn-block" ng-class="{active: !isCollapsedSort}" ng-click="isCollapsedSort = !isCollapsedSort">Sort</span></h4>
 	</div>
 	
 	<div class="filters cssFade" ng-hide="isCollapsedFilter">

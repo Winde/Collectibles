@@ -229,17 +229,21 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		if (search.getSortBy()!=null){
 			if (search.getSortBy().toLowerCase().equals("name")){
 				hql = hql + " ORDER BY p.name";
-			} else if (search.getSortBy().toLowerCase().equals("price") && search.getStore()==null && search.getSeller()==null){
-				hql = hql + " ORDER BY p.minPriceUsd";
+			} else if (search.getSortBy().toLowerCase().equals("price") && (search.getStore()!=null || search.getSeller()!=null)){
+				hql = hql + " ORDER BY prices.usdPrice";
 			} else if (search.getSortBy().toLowerCase().equals("price")){
-				hql = hql + " ORDER BY prices.usdPrice";	
+				hql = hql + " ORDER BY p.minPriceUsd";	
 			} else if (search.getSortBy().toLowerCase().equals("rating")){
 				hql = hql + " ORDER BY p.mainRating";			
 			} else {
-				hql = hql + " ORDER BY p.id";
+				hql = hql + " ORDER BY p.minPriceUsd";
 			}
 		} else {
-			hql = hql + " ORDER BY p.id";
+			if (search.getStore()!=null || search.getSeller()!=null){
+				hql = hql + " ORDER BY prices.usdPrice";
+			} else {
+				hql = hql + " ORDER BY p.minPriceUsd";
+			}
 		}
 		
 		if (search.getSortOrder()!=null){
@@ -323,6 +327,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 								&&
 								(currentMinPrice == null || (price.getPrice()!=null && price.getPrice()<currentMinPrice))
 							){
+							product.setMinPriceStore(price.getConnectorName());
 							product.setMinPrice(price.getPrice());
 							product.setMinPriceUsd(price.getUsdPrice());
 							product.setMinPriceCurrency(price.getCurrency());
@@ -333,6 +338,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 						}
 					}
 					if (!found){
+						product.setMinPriceStore(null);
 						product.setMinPrice(null);
 						product.setMinPriceUsd(null);
 						product.setMinPriceCurrency(null);

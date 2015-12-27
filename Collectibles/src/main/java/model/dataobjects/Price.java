@@ -162,6 +162,6 @@ public class Price implements Serializable, Comparable<Price>{
 	
 	
 	public String toString(){
-		return "{" + this.getProduct() + "; " + this.getConnectorName() + " - " + this.getType() + "; " + this.getPrice() + " " + this.getCurrency() +" ("+this.getSeller() +") }";
+		return "{" + this.getProduct() + "; " + this.getConnectorName() + " - " + this.getType() + "; " + this.getPrice() + " " + this.getCurrency() +" ("+this.getSeller() +") " + " USD converted price: " + this.getUsdPrice() +" }";
 	}
 }

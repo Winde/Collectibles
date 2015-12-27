@@ -1,23 +1,29 @@
 (function(){
 
-	angular.module('collections').config(function($httpProvider,$routeProvider){
+	angular.module('collections').config(function($httpProvider,$routeProvider,$locationProvider){
+
+		//$locationProvider.html5Mode(true);
+		
+		$locationProvider.html5Mode({
+			enabled: true,			
+		});
 		
 		$httpProvider.interceptors.push('httpInjectProgress')
 		$httpProvider.interceptors.push('httpInjectAuth');
 		$httpProvider.interceptors.push('httpInjectParserMessage');
-		
+
 		var routerConfig = this;
 
 		this.secured = function($location,$q,Auth){
 			var deferred = $q.defer();			
 			if (!Auth.isloggedIn()){							
 				deferred.reject();
-		        $location.url('/products/');
+				$location.url('/products/');
 			} else {
 				deferred.resolve();
 			}
 		}
-				
+
 		$routeProvider
 		//.when('/login/', {
 		//	templateUrl : 'templates/login/login.html',
@@ -46,6 +52,6 @@
 			redirectTo: '/products/'
 		});				
 	});
-	
+
 })();
 

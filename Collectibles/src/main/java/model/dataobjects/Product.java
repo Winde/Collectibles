@@ -128,6 +128,9 @@ public class Product extends SimpleIdDao{
 	@Column(name="min_price_seller")
 	private String minPriceSeller = null;
 
+	@Column(name="min_price_store")
+	private String minPriceStore = null;
+	
 	@Column(name="min_price_currency")
 	private String minPriceCurrency = null;
 
@@ -387,6 +390,7 @@ public class Product extends SimpleIdDao{
 			this.minPriceUsd = newMinPrice.getUsdPrice();
 			this.minPriceLink = newMinPrice.getLink();
 			this.minPriceSeller = newMinPrice.getSeller();
+			this.minPriceStore = newMinPrice.getConnectorName();
 			this.setMinPriceCurrency(newMinPrice.getCurrency());
 			this.setLastPriceUpdate(new Date());			
 		} else {
@@ -395,6 +399,7 @@ public class Product extends SimpleIdDao{
 			this.minPriceSeller = null;
 			this.minPriceCurrency = null;
 			this.minPriceUsd = null;
+			this.minPriceStore = null;
 		}
 	}
 	
@@ -480,6 +485,15 @@ public class Product extends SimpleIdDao{
 		this.minPriceUsd = minPriceUsd;
 	}
 
+	public String getMinPriceStore() {
+		return minPriceStore;
+	}
+
+	public void setMinPriceStore(String minPriceStore) {
+		this.minPriceStore = minPriceStore;
+	}
+
+	
 	
 }
 

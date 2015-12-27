@@ -108,6 +108,9 @@ public class SerializableProduct {
 	private String minPriceSeller = null;
 	
 	@JsonView(ProductSimpleView.class)
+	private String minPriceStore = null;
+	
+	@JsonView(ProductSimpleView.class)
 	private Double mainRating = null;
 	
 	@JsonView(ProductSimpleView.class)
@@ -135,6 +138,8 @@ public class SerializableProduct {
 	@JsonView(ProductComplexView.class)
 	@JsonInclude(Include.ALWAYS) 
 	private SortedMap<String,String> externalLinks = null;
+	
+	
 	
 	public static Collection<SerializableProduct> cloneProduct(Collection<Product> products){
 		return cloneProduct(products,null);
@@ -430,5 +435,14 @@ public class SerializableProduct {
 	public void setMinPriceUsd(Long minPriceUsd) {
 		this.minPriceUsd = minPriceUsd;
 	}
+
+	public String getMinPriceStore() {
+		return minPriceStore;
+	}
+
+	public void setMinPriceStore(String minPriceStore) {
+		this.minPriceStore = minPriceStore;
+	}
+		
 		
 }

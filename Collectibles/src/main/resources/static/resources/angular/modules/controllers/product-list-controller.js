@@ -71,7 +71,7 @@
 				$scope.page = 0;
 			}			
 						
-			$location.search(searchObject);					
+			$location.search(searchObject);
 		}
 		
 		this.obtainSearchParameters = function(){
@@ -154,15 +154,17 @@
 			});
 		}
 		
-		this.updateSeller = function(seller){						
+		this.updateSeller = function(seller,storeIdentifier){						
 			if (seller==undefined){
 				$scope.seller = null;	
+				$scope.store = {};
 				return true;
 			} else{
 				if ($scope.seller == seller) {
 					return false;
 				} else{
 					$scope.seller = seller
+					$scope.store = { identifier: storeIdentifier };
 					return true;
 				}
 			}			
