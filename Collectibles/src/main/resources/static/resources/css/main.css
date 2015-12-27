@@ -1,3 +1,29 @@
+.fa-amazon-es:before {
+	content: "\f270";
+}
+
+.ebay-icon {
+	background: url(../imgs/ebay_small.png) no-repeat no-repeat;            
+    background-position: center;
+}
+
+.drivethrurpg-icon {	
+	background: url(../imgs/drivethrurpg_20x20.jpg) no-repeat no-repeat;            
+    background-position: center;
+}
+
+.steam-icon {
+	background: url(../imgs/steam_20x20.png) no-repeat no-repeat;            
+    background-position: center;
+}
+
+
+
+.ellipsis {
+	overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .editButton {
 	margin-bottom: 15px;
 }

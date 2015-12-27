@@ -115,16 +115,22 @@
 					</div>
 				</div>
 				
-				<div class="form-group optionsSearch col-xs-12" ng-if="connectors && connectors.length>0">
+				<div class="form-group optionsSearch col-lg-8 col-xs-12" ng-if="connectors && connectors.length>0">
 					<label class="disabled visible-xs">Prices</label>			
-					<div class="btn-group">
+					<div class="btn-group btn-group-justified">
 						<label class="btn btn-default disabled hidden-xs">Prices</label>		
-						<label class="btn btn-default" uib-btn-radio="null" ng-model="store.identifier" ng-change="productListCtrl.updateSearch(true)">
-							Best Price
+						<label class="btn btn-default ellipsis" uib-btn-radio="null" ng-model="store.identifier" ng-change="productListCtrl.updateSearch(true)">
+							<span class="hidden-xs">Best Price</span>
+							<span class="visible-xs">Any</span>
+							
 						</label>
-						<label ng-repeat="connector in connectors | filter:{supportsPrices: true}" class="btn btn-default" uib-btn-radio="connector.identifier" ng-model="store.identifier" ng-change="productListCtrl.updateSearch(true)">
+						<label 	ng-repeat="connector in connectors | filter:{supportsPrices: true}" class="btn btn-default ellipsis" 
+								uib-btn-radio="connector.identifier" 
+								ng-model="store.identifier" 
+								ng-change="productListCtrl.updateSearch(true)">
 							<span class="hidden-xs">{{connector.identifier}}</span>
-							<span class="visible-xs">{{connector.identifier | limitTo:10}}...</span>
+							<span class="visible-xs" ng-class="{ '{{productListCtrl.icons[connector.identifier]}}' : true}">&nbsp;</span>
+							
 						</label>
 								
 					</div>

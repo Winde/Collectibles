@@ -5,6 +5,14 @@
 	                                        function($scope,$filter,$location,Image,Product,Hierarchy,User,Message){
 		var controller = this;
 				
+		controller.icons = {
+				'Amazon ES': 'fa fa-amazon-es',
+				'Amazon US': 'fa fa-amazon',
+				'Ebay': 'ebay-icon',
+				'DrivethruRPG': 'drivethrurpg-icon',
+				'Steam': 'steam-icon'			
+		};
+		
 		$scope.isCollapsedSort= true;
 		$scope.isCollapsedFilter= true;
 		$scope.editMode = false;
