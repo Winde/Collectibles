@@ -1,8 +1,8 @@
 (function(){
 	
 	angular.module('product')
-	.controller('ProductListController',['$scope','$filter','$location','Image','Product','Hierarchy','User','Message',
-	                                        function($scope,$filter,$location,Image,Product,Hierarchy,User,Message){
+	.controller('ProductListController',['$scope','$filter','$location','Properties','Image','Product','Hierarchy','User','Message',
+	                                        function($scope,$filter,$location,Properties,Image,Product,Hierarchy,User,Message){
 		var controller = this;
 				
 		controller.icons = {
@@ -18,7 +18,7 @@
 		$scope.editMode = false;
 		$scope.store = {}; 
 			
-		this.defaultPaginationSize = 50;
+		this.defaultPaginationSize = Properties.productsPerPage;
 		
 		if ($scope.$parent && $scope.$parent.root) {
 			$scope.root = $scope.$parent.root;
@@ -184,49 +184,42 @@
 			var searchObject = controller.obtainSearchParameters();
 		
 						
-			if (searchObject.hierarchy 
-					|| (searchObject.searchTerm && searchObject.searchTerm!="" && searchObject.searchTerm.length>2)
-					|| (searchObject.seller && searchObject.seller!="")
-					
-			){
-				$scope.processingSearch = true;
-				if (searchObject.hierarchy!=null){
-					var hierarchyId = parseInt(searchObject.hierarchy);
-					if (hierarchyId!=null && !isNaN(hierarchyId)){
-						$scope.hierarchies.length = 0;						
-						$scope.hierarchies =[];
-						var all = { id: $scope.root.id, name: "All", isRoot: true};
-						$scope.hierarchies.push(all);
-						Hierarchy.calculateTreeFromSelection($scope.root,$scope.hierarchies,hierarchyId,3);
-					}						
-				}
-				Product.search(searchObject)
-				.success(function(data){ 
-					if (data && data.objects){
-						$scope.products = data.objects;
-						if ($scope.products.length >0){
-							$scope.isCollapsedFilter= false;
-						}
-					}
-					if (data && data.maxResults){
-						$scope.maxResults = data.maxResults;
-					}
-					if (data && data.hasNext!=null){
-						$scope.hasNext = data.hasNext;
-					}	
-					if ($scope.positionInitialGrid){
-						$scope.positionInitialGrid();
-					}
-				})
-				.catch(function(data){
-					Message.alert("There was an error");
-					$scope.products = [];				
-				}).finally(function(data){
-					$scope.processingSearch = false;
-				});
-			} else {
-				$scope.products = [];
+			
+			$scope.processingSearch = true;
+			if (searchObject.hierarchy!=null){
+				var hierarchyId = parseInt(searchObject.hierarchy);
+				if (hierarchyId!=null && !isNaN(hierarchyId)){
+					$scope.hierarchies.length = 0;						
+					$scope.hierarchies =[];
+					var all = { id: $scope.root.id, name: "All", isRoot: true};
+					$scope.hierarchies.push(all);
+					Hierarchy.calculateTreeFromSelection($scope.root,$scope.hierarchies,hierarchyId,3);
+				}						
 			}
+			Product.search(searchObject)
+			.success(function(data){ 
+				if (data && data.objects){
+					$scope.products = data.objects;
+					if ($scope.products.length >0){
+						$scope.isCollapsedFilter= false;
+					}
+				}
+				if (data && data.maxResults){
+					$scope.maxResults = data.maxResults;
+				}
+				if (data && data.hasNext!=null){
+					$scope.hasNext = data.hasNext;
+				}	
+				if ($scope.positionInitialGrid){
+					$scope.positionInitialGrid();
+				}
+			})
+			.catch(function(data){
+				Message.alert("There was an error");
+				$scope.products = [];				
+			}).finally(function(data){
+				$scope.processingSearch = false;
+			});			
 		}
 		/*
 		if (!$scope.users && $scope.isAuthenticated()) {
@@ -269,9 +262,11 @@
              }
          );
 		*/
-		$scope.$on('$locationChangeSuccess', function() {
-			controller.setSearchParameters();
-			controller.search();
+		$scope.$on('$locationChangeSuccess', function(newLocation) {
+			if ($location.path() == '/products/'){
+				controller.setSearchParameters();
+				controller.search();
+			}
 		});
 		
 		$scope.$on('login', function() { controller.search();});

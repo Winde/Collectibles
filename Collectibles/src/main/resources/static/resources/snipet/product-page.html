@@ -7,7 +7,7 @@
 	</div>
 
 	<ol class="breadcrumb product-crumb hidden-sm hidden-xs" ng-if="product.hierarchyPath">
-	  <li ng-repeat="node in product.hierarchyPath"><a ng-href="{{'products/?hierarchy='+node.id}}">{{node.name}}</a> </li>
+	  <li ng-repeat="node in product.hierarchyPath"><a ng-href="{{'/products/?hierarchy='+node.id}}">{{node.name}}</a> </li>
 	  <li class="active">{{product.name}}</li>	  	  
 	</ol>
 
@@ -150,13 +150,13 @@
 										<a class="col-sm-6 btn btn-success" ng-class="{ disabled : !priceObject.link }" href="{{priceObject.link}}">
 											<span>{{(priceObject.price/100) | isoCurrency : priceObject.currency}}</span> <span ng-if="priceObject.connectorName">{{priceObject.connectorName}} {{priceObject.type}}</span>																												
 										</a>
-										<a class="col-sm-6 btn btn-info" ng-if="priceObject.seller" ng-href="products/?store={{priceObject.connectorName}}&seller={{priceObject.seller}}">{{priceObject.seller}}</a>
+										<a class="col-sm-6 btn btn-info" ng-if="priceObject.seller" ng-href="/products/?store={{priceObject.connectorName}}&seller={{priceObject.seller}}">{{priceObject.seller}}</a>
 									</div>
 									<div class="btn-group-vertical visible-xs col-xs-12">
 										<a class="btn btn-success" ng-class="{ disabled : !priceObject.link }" href="{{priceObject.link}}">
 											<span>{{(priceObject.price/100) | isoCurrency : priceObject.currency}}</span> <span ng-if="priceObject.connectorName">{{priceObject.connectorName}} {{priceObject.type}}</span>																												
 										</a>
-										<a class="btn btn-info" ng-if="priceObject.seller"  ng-href="products/?store={{priceObject.connectorName}}&seller={{priceObject.seller}}">{{priceObject.seller}}</a>
+										<a class="btn btn-info" ng-if="priceObject.seller"  ng-href="/products/?store={{priceObject.connectorName}}&seller={{priceObject.seller}}">{{priceObject.seller}}</a>
 									</div>									
 								</div>
 							</div>

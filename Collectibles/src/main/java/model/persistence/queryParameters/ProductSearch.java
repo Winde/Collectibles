@@ -3,7 +3,6 @@ package model.persistence.queryParameters;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import model.dataobjects.CategoryValue;
@@ -164,9 +163,13 @@ public class ProductSearch implements SearchObject {
 	@Override
 	public Collection<String> errors() {
 		Collection<String> errors = new ArrayList<>();
+		/*
+		
 		if (hierarchy==null && searchTerm==null && seller==null){
 			errors.add("hierarchy");
 		}
+		
+		*/
 
 		return errors;
 	}

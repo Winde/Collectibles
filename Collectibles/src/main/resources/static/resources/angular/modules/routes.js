@@ -1,12 +1,22 @@
 (function(){
 
-	angular.module('collections').config(function($httpProvider,$routeProvider,$locationProvider){
+	angular.module('collections').config(function(Properties,$httpProvider,$routeProvider,$locationProvider){
 
 		//$locationProvider.html5Mode(true);
 		
-		$locationProvider.html5Mode({
-			enabled: true,			
-		});
+		console.log(Properties.useHtml5Mode);
+		
+		if (Properties.useHtml5Mode){
+			$locationProvider.html5Mode({
+				enabled: true,			
+			});
+			console.log('HTML5 enabled');
+		} else  {
+			$locationProvider.html5Mode({
+				enabled: false,			
+			});
+			console.log('HTML5 disabled');
+		}
 		
 		$httpProvider.interceptors.push('httpInjectProgress')
 		$httpProvider.interceptors.push('httpInjectAuth');

@@ -128,12 +128,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			hql = hql + " INNER JOIN p.categoryValues categoryValues ";
 		}
 		
-		hql = hql + " where ";
+		
 		
 		boolean needsAnd = false;
 		
-		if (search.getSearchTerm()!=null){			
-			if (needsAnd){ hql = hql + " AND ";}
+		if (search.getSearchTerm()!=null){		
+			hql = processConjuntionAndInitialWhere(hql, needsAnd);			
 			hql = hql + ""
 					+ "( "
 					+ "		lower(p.description) LIKE lower(CONCAT('%',:search,'%')) OR "
@@ -142,18 +142,18 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 			needsAnd = true;
 		}
 		if (search.getHierarchy()!=null){		
-			if (needsAnd){ hql = hql + " AND ";}
+			hql = processConjuntionAndInitialWhere(hql, needsAnd);
 			hql = hql + "(p.hierarchyPlacement.lineage LIKE CONCAT(:lineage,'%')) ";
 			needsAnd = true;
 		}
 		if (search.getCategoryValues()!=null && search.getCategoryValues().size()>0){
-			if (needsAnd){ hql = hql + " AND ";}
+			hql = processConjuntionAndInitialWhere(hql, needsAnd);
 			hql = hql + "( categoryValues IN (:categoryValues) ) ";
 			needsAnd = true;			
 		}
 		
 		if (search.getWithImages()!=null){
-			if (needsAnd){ hql = hql + " AND ";}			
+			hql = processConjuntionAndInitialWhere(hql, needsAnd);			
 			if (search.getWithImages()){
 				hql = hql + "(p.images IS NOT EMPTY ) ";
 			} else {
@@ -164,7 +164,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		
 		if (search.getWishers()!=null && search.getWishers().size()>0){			
 			for (int i=0;i<search.getWishers().size();i++){
-				if (needsAnd){ hql = hql + " AND ";}
+				hql = processConjuntionAndInitialWhere(hql, needsAnd);
 				hql = hql + "((:wishers"+i+") IN elements(p.wishers)) ";
 				needsAnd = true;
 			}						
@@ -172,7 +172,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		
 		if (search.getUsersWhoOwn()!=null && search.getUsersWhoOwn().size()>0){			
 			for (int i=0;i<search.getUsersWhoOwn().size();i++){
-				if (needsAnd){ hql = hql + " AND ";}
+				hql = processConjuntionAndInitialWhere(hql, needsAnd);
 				hql = hql + "((:owners"+i+") IN elements(p.owners) OR (:owners"+i+") IN elements(p.ownersOtherLanguage)) ";
 				needsAnd = true;
 			}						
@@ -180,14 +180,14 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		
 		if (search.getUsersWhoDontOwn()!=null && search.getUsersWhoDontOwn().size()>0){
 			for (int i=0;i<search.getUsersWhoDontOwn().size();i++){
-				if (needsAnd){ hql = hql + " AND ";}
+				hql = processConjuntionAndInitialWhere(hql, needsAnd);
 				hql = hql + "((p.owners IS EMPTY OR (:usersWhoDontOwn"+i+") NOT IN elements(p.owners)) AND (p.ownersOtherLanguage IS EMPTY OR (:usersWhoDontOwn"+i+") NOT IN elements(p.ownersOtherLanguage)))";
 				needsAnd = true;
 			}			
 		}
 		
 		if (search.getWithPrice()!=null){
-			if (needsAnd){ hql = hql + " AND ";}			
+			hql = processConjuntionAndInitialWhere(hql, needsAnd);						
 			if (search.getWithPrice()){
 				hql = hql + "(p.minPrice IS NOT NULL ) ";
 			} else {
@@ -197,24 +197,24 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		}
 		
 		if (search.getStore()!=null){
-			if (needsAnd){ hql = hql + " AND ";}
+			hql = processConjuntionAndInitialWhere(hql, needsAnd);
 			hql = hql + " ( :store in (SELECT price.connectorName from Price price WHERE price.product = p) ) ";
 			needsAnd = true;
 		}
 		if (search.getSeller()!=null){
-			if (needsAnd){ hql = hql + " AND ";}
+			hql = processConjuntionAndInitialWhere(hql, needsAnd);
 			hql = hql + " ( :seller in (SELECT price.seller from Price price WHERE price.product = p) )  ";
 			needsAnd = true;
 		}
 		
 		if (search.getStore()!=null || search.getSeller()!=null){
-			if (needsAnd){ hql = hql + " AND ";}
+			hql = processConjuntionAndInitialWhere(hql, needsAnd);
 			hql = hql + " prices.price IS NOT NULL  ";
 			needsAnd = true;
 		}
 
 		if (search.getStore()!=null || search.getSeller()!=null){
-			if (needsAnd){ hql = hql + " AND ";}
+			hql = processConjuntionAndInitialWhere(hql, needsAnd);
 			hql = hql + " (prices.price = (SELECT min(prices.price) from prices where prices.product = p AND prices.connectorName = :store)) ";
 			needsAnd = true;
 		}
@@ -424,8 +424,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 		return product;
 	}
 
-
-	
+	private String processConjuntionAndInitialWhere(String hql, boolean needsAnd) {
+		String result = hql;
+		if (!needsAnd){ result = result + " where ";}
+		if (needsAnd){ result = result + " and ";}
+		return result;
+	}
 	
 	
 

@@ -41,8 +41,12 @@
 		<script type="text/javascript" src="angular/angular-animate.min.js"></script>
 		<script type="text/javascript" src="angular/angular-cookies.min.js"></script>
 		
+		
+		
 		<script type="text/javascript" src="angular/modules/app.js"></script>		
 		<script type="text/javascript" src="angular/modules/routes.js"></script>
+		
+		<script type="text/javascript" src="angular/modules/constants/Properties.js"></script>
 		
 		<script type="text/javascript" src="angular/modules/injectors/http-inject-auth.js"></script>
 		<script type="text/javascript" src="angular/modules/injectors/http-inject-progress-bar.js"></script>
@@ -57,8 +61,7 @@
 		
 		
 		<script type="text/javascript" src="angular/modules/services/Auth.js"></script>
-		<script type="text/javascript" src="angular/modules/services/Base64.js"></script>
-		<script type="text/javascript" src="angular/modules/services/Domain.js"></script>
+		<script type="text/javascript" src="angular/modules/services/Base64.js"></script>		
 		<script type="text/javascript" src="angular/modules/services/Product.js"></script>
 		<script type="text/javascript" src="angular/modules/services/Hierarchy.js"></script>
 		<script type="text/javascript" src="angular/modules/services/Image.js"></script>
@@ -67,6 +70,7 @@
 				
 				
 		<script type="text/javascript" src="angular/modules/directives/generic-ajax-directive.js"></script>
+		<script type="text/javascript" src="angular/modules/directives/generic-cordovalink-directive.js"></script>
 		<script type="text/javascript" src="angular/modules/directives/generic-image-fluidbox.js"></script>
 		<script type="text/javascript" src="angular/modules/directives/generic-options-class-directive.js"></script>
 		<script type="text/javascript" src="angular/modules/directives/generic-selectpicker-directive.js"></script>			
@@ -114,14 +118,15 @@
 									class="icon-bar"></span> <span class="icon-bar"></span> <span
 									class="icon-bar"></span>
 							</button>
-							<a class="navbar-brand" href="#/products/">Collections</a>
+							<a class="navbar-brand" href="/products/">Collections</a>
 						</div>
 						<div id="navbar" class="collapse navbar-collapse" uib-collapse="isCollapsed">
 							<ul class="nav navbar-nav">							
 								<li ng-show="!isAuthenticated()" ng-class="{ active: isActive('/login/')}"><a href="" ng-click="openLogin() || (isCollapsed = true)">Login</a></li>
-								<li ng-class="{ active: isActive('/products/')}"><a ng-href="products/" ng-click="isCollapsed = true">Products</a></li>																											
-								<li ng-show="isAdmin()" ng-class="{ active: isActive('/products/create/')}"><a ng-href="products/create/" ng-click="isCollapsed = true">Add Products</a></li>
-								<li ng-show="isAdmin()" ng-class="{ active: isActive('/hierarchy/create/')}"><a ng-href="hierarchy/create/"ng-click="isCollapsed = true">Manage Hierarchies</a></li>
+								<li ng-class="{ active: isActive('/products/')}"><a ng-href="/products/" ng-click="isCollapsed = true">Products</a></li>										
+								<li ng-show="isAuthenticated()"><a ng-href="/products/?owned=false&wished=true&page=0&maxResults=50&sortBy=price&sortOrder=asc" ng-click="isCollapsed = true">Wishlist</a></li>																	
+								<li ng-show="isAdmin()" ng-class="{ active: isActive('/products/create/')}"><a ng-href="/products/create/" ng-click="isCollapsed = true">Add Products</a></li>
+								<li ng-show="isAdmin()" ng-class="{ active: isActive('/hierarchy/create/')}"><a ng-href="/hierarchy/create/"ng-click="isCollapsed = true">Manage Hierarchies</a></li>
 								<li ng-show="isAuthenticated()" ng-class="{ active: isActive('/logout/')}"><a href="" ng-click="logout() || (isCollapsed = true)" ng-click="isCollapsed = true">Logout</a></li>
 							</ul>
 						</div>

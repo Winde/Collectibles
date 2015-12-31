@@ -1,7 +1,7 @@
 (function(){	
 	
 	angular.module('product')
-	.directive('productListEntry', function(Domain){
+	.directive('productListEntry', function(Properties){
 		return {
 			restrict: 'E',	
 			templateUrl: 'snipet/product-list-entry.html',
@@ -12,7 +12,7 @@
 				scope.remove = function(){
 					productSearchCtrl.remove(scope.product);
 				}
-				scope.domain = Domain.base();
+				scope.domain = Properties.baseDomain;
 			}
 				
 		};		

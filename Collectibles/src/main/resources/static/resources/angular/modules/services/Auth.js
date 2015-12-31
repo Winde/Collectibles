@@ -1,7 +1,7 @@
 (function(){
 
 	angular.module('login')	
-	.factory('Auth', function HierarchyFactory(Domain,Message,$injector,$location, $rootScope){	
+	.factory('Auth', function HierarchyFactory(Properties,Message,$injector,$location, $rootScope){	
 		var factory = this;
 		
 		this.headerWithSessionRequest = "X-AUTH-TOKEN";
@@ -88,7 +88,7 @@
 						headers = {};
 						headers[factory.headerWithSessionRequest] = storedSession;
 						$http({
-							url: Domain.base()+'/checksession', 
+							url: Properties.baseDomain+'/checksession', 
 							method: 'POST', 
 							nointercept: true,
 							headers: headers				
@@ -108,7 +108,7 @@
 			login: function(credentials,callbackSuccess,callbackError){						
 				$injector.invoke(function($http) {															
 					$http({
-						url: Domain.base()+'/login', 
+						url: Properties.baseDomain+'/login', 
 						method: 'POST', 
 						nointercept: true, 
 						data: $.param(credentials),

@@ -1,7 +1,7 @@
 (function(){
 	
 	angular.module('user')
-	.factory('User', function ProductFactory(Domain,$http){
+	.factory('User', function ProductFactory(Properties,$http){
 		var factory = this;
 		
 				
@@ -9,7 +9,7 @@
 			all: function() {				
 				return $http({ 
 					method: 'GET', 
-					url: Domain.base()+'/users/list/', 
+					url: Properties.baseDomain+'/users/list/', 
 					progressbar: true 
 				});
 			}		

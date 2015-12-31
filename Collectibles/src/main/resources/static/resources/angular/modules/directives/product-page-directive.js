@@ -1,7 +1,7 @@
 (function(){	
 	
 	angular.module('product')
-	.directive('productPage', function(Domain){
+	.directive('productPage', function(Properties){
 		return {			
 			restrict: 'E',
 			templateUrl: 'snipet/product-page.html',	
@@ -14,7 +14,7 @@
 				isAdmin: "&"
 			},
 			link: function(scope,element,attrs){
-				scope.domain = Domain.base();				
+				scope.domain = Properties.baseDomain;				
 			},
 			controllerAs: 'productCtrl',
 			controller: 'ProductDetailsController'

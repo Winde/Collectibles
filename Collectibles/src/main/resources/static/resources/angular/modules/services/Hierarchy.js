@@ -1,7 +1,7 @@
 (function(){
 	
 	angular.module('hierarchy')
-	.factory('Hierarchy', function HierarchyFactory(Domain,$http){
+	.factory('Hierarchy', function HierarchyFactory(Properties,$http){
 		
 		var maxHierarchyLevels = 3;
 		
@@ -68,7 +68,7 @@
 		
 		return {
 			root: function(){				
-				return $http.get(Domain.base()+'/hierarchy/root/');				
+				return $http.get(Properties.baseDomain+'/hierarchy/root/');				
 			},
 			calculateTree: function(root,destination,maxDepth){
 				if (root.children!=null && root.children!=undefined && root.children.length>0){							
@@ -103,7 +103,7 @@
 			},
 			create: function(hierarchy, parent){
 				return $http({
-					url: Domain.base()+'/hierarchy/create/'+parent.id+'/', 
+					url: Properties.baseDomain+'/hierarchy/create/'+parent.id+'/', 
 					method: 'POST', 
 					data: hierarchy,
 					progressbar: true
@@ -111,7 +111,7 @@
 			},
 			remove: function(hierarchy){				
 				return $http({
-					url: Domain.base()+'/hierarchy/remove/'+hierarchy.id+'/', 
+					url: Properties.baseDomain+'/hierarchy/remove/'+hierarchy.id+'/', 
 					method: 'DELETE',
 					progressbar: true
 				});
